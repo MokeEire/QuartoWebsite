@@ -1,0 +1,23 @@
+project:
+  type: website
+
+website:
+  title: "Mark Barrett"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+      - href: blog.md
+        text: Blog
+
+format:
+  html:
+    theme: flatly
+    css: styles.css
+    toc: true
+    code-tools: true
+    reference-location: margin
+
+editor: visual
+

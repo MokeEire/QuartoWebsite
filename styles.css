@@ -1,0 +1,7 @@
+/* css styles */
+div.cell-output-stdout > pre {
+  background-color: rgba(236,240,241,.65);
+  border-left: 8px solid var(--bs-green);
+  border-radius: .25rem;
+  padding: .4em .2em;
+}
