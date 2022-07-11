@@ -1,0 +1,17 @@
+---
+title: "About me"
+---
+
+I am a researcher, data analyst, behavioural science nerd, and visualization designer.
+
+My interests include **decision-making**, **governance institutions**, and **information systems**, and particularly areas where these topics coincide.
+
+This website is intended to showcase the kind of analysis I like to do, and how I like to do it.
+
+Some questions that are of particular interest to me:
+
+-   Are the structures and processes of policy-making institutions conducive to effective, informed, and equitable judgements?
+
+-   What factors in our society and policies perpetuate poverty?
+
+-   How can public and private institutions foster an information system which enables society to develop a shared consensus of facts on issues central to public well-being?
