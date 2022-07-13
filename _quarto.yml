@@ -17,6 +17,7 @@ format:
     css: styles.css
     toc: true
     code-tools: true
+    code-fold: true
     reference-location: margin
 
 editor: visual
