@@ -1,0 +1,317 @@
+---
+title: "Parsing XML with R, using congressional legislative data"
+author: "Mark"
+---
+
+```{r}
+#| label: setup
+#| message: false
+library(extrafont)
+library(tictoc)
+library(furrr)
+library(here)
+library(reactable)
+
+source("https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R")
+bill_xml_link = "https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"
+bill_xml_file = read_xml(bill_xml_link)
+```
+
+```{r}
+#| label: df-print-fct
+#| include: false
+
+knit_print.data.frame = function(x, ...){
+  knitr::knit_print(
+    reactable(x,
+              compact = T, 
+              resizable = T,
+              ),
+    ...
+    )
+}
+```
+
+The US government maintains a [repository](https://www.govinfo.gov/bulkdata/BILLSTATUS) of congressional bill data which offers us a view of how bills pass through congress and how congress members act in the process. Bills are stored in [XML](https://en.wikipedia.org/wiki/XML) which is really handy for storing information but less helpful for analysis (or at least seems so to me).
+
+# The Goal
+
+::: {.callout-tip appearance="simple"}
+## In this post you will learn to:
+
+-   Load and parse XML files in R using the [`{xml2}`](https://xml2.r-lib.org/) package
+
+-   Explore the structure of XML documents
+:::
+
+In this post, I will show you how to read in a raw XML file and parse it into a dataframe containing nested dataframes where necessary.
+
+::: panel-tabset
+## Raw XML
+
+```{r}
+#| echo: false
+xml_child(bill_xml_file, "bill")
+```
+
+## to a formatted dataframe
+
+Containing nested dataframes for elements which are at different levels of observation:
+
+```{r}
+#| echo: false
+#| message: false
+#| column: page
+example_bill_df = extract_bill_status(bill_xml_link, log_types = "console")
+
+example_bill_df %>% 
+  select(
+    -bill_id, -constitutionalAuthorityStatementText, -where(is_list)
+  ) %>% 
+  reactable::reactable(
+    theme = moke_rt(),
+    compact = T,
+    resizable = T,
+    columns = list(
+      "billNumber" = colDef(width = 100),
+      "billType" = colDef(width = 100),
+      "congress" = colDef(width = 100),
+      "version" = colDef(width = 100),
+      "createDate" = colDef(width = 100, format = colFormat(date = T)),
+      "updateDate" = colDef(width = 100, format = colFormat(date = T)),
+      "introducedDate" = colDef(format = colFormat(date = T)),
+      "latestAction_actionDate" = colDef(format = colFormat(date = T))
+    )
+  )
+```
+
+::: panel-tabset
+## Committees
+
+Committees contains two list columns with dataframes - `committee_activities` and `subcommittee_activities`.
+
+```{r}
+#| echo: false
+#| column: page
+reactable::reactable(
+  rename_with(unnest(example_bill_df["committees"], cols = c(committees)), 
+              ~str_to_title(str_replace_all(., "_", " "))),
+  theme = moke_rt(),
+    compact = T,
+    resizable = T,
+    wrap = F
+  )
+```
+
+## Votes
+
+Votes contains one list column with a dataframe - `vote_roll`.
+
+```{r}
+#| echo: false
+#| column: page
+reactable(
+  rename_with(unnest(example_bill_df["votes"], cols = c(votes)), 
+              ~str_to_title(str_replace_all(., "_", " "))),
+  theme = moke_rt(),
+    compact = T,
+    resizable = T,
+    wrap = F
+  )
+```
+
+## Actions
+
+```{r}
+#| echo: false
+#| column: page
+reactable(
+  rename_with(unnest(example_bill_df["actions"], cols = c(actions)), 
+              ~str_to_title(str_remove_all(., "action_?"))),
+  theme = moke_rt(),
+    compact = T,
+    resizable = T,
+    wrap = F,
+  pagination = F,
+  height = "320px"
+  )
+```
+
+## Sponsors
+
+```{r}
+#| echo: false
+#| column: page
+reactable(
+  rename_with(unnest(example_bill_df["sponsors"], cols = c(sponsors)), 
+              ~str_to_title(str_replace_all(., "sponsor_", ""))),
+  theme = moke_rt(),
+    compact = T,
+    resizable = T,
+    wrap = F
+  )
+```
+
+## Cosponsors
+
+```{r}
+#| echo: false
+#| column: page
+reactable(
+  rename_with(unnest(example_bill_df["cosponsors"], cols = c(cosponsors)), 
+              ~str_to_title(str_remove_all(., "cosponsor_"))),
+  theme = moke_rt(),
+    compact = T,
+    resizable = T,
+  pagination = F,
+  height = "320px"
+  )
+```
+:::
+:::
+
+# What is XML?
+
+From [Wikipedia](https://en.wikipedia.org/wiki/XML):
+
+> Extensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing arbitrary data. It defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
+>
+> The design goals of XML emphasize simplicity, generality, and usability across the Internet. It is a textual data format with strong support via Unicode for different human languages. Although the design of XML focuses on documents, the language is widely used for the representation of arbitrary data structures such as those used in web services.
+
+XML's flexibility allows it to represent lots of different kinds of data structures. As you will see next, understanding the data structure you are working with is typically one of the most important tasks in using XML data.
+
+# The Process
+
+## Understanding the structure
+
+As mentioned at the outset, we will be using [govinfo's Bill Status data](https://www.govinfo.gov/bulkdata/BILLSTATUS)[^1] and parsing the data into a dataframe format which can be more easily manipulated. To explore the structure of the legislative data, I selected a bill which contained information on committees, actions, votes, and cosponsors.
+
+[^1]: Some helpful resources for navigating this data:\
+    <https://github.com/usgpo/bulk-data>\
+    <https://www.govinfo.gov/help/bills>
+
+```{r}
+#| label: read-xml
+#| code-fold: show
+(bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"))
+```
+
+`read_xml()` returns an `xml_document`[^2] object which shows us the top level nodes when called in the console. Now let's take a look at the full structure of the file.
+
+[^2]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+
+```{r}
+#| class-output: code-block-h
+#| code-fold: show
+xml_structure(bill_xml_file)
+
+```
+
+This output shows how nested elements are stored e.g. `<committees>` contains elements for committees associated with the bill, and within each committee there may be a `<subcommittees>` element to record subcommittee activity too. It is this nested structure which makes XML a useful storage type for legislative information.
+
+Using R's list columns, we can have all this information in a single object and use `unnest()` to change the level of detail.
+
+To get a good understanding of what is in the data, it is usually a good idea to read through [the documentation](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md#21elements) first. To explore the contents of XML files, these functions are incredibly helpful:
+
+-   [`xml_structure()`](https://xml2.r-lib.org/reference/xml_structure.html)
+
+-   [`xml_contents()`](https://xml2.r-lib.org/reference/xml_children.html)
+
+-   [`xml_children()`](https://xml2.r-lib.org/reference/xml_children.html) / `xml_child()` - return a nodeset of child nodes or a specific node
+
+Within the `billStatus` document, we want to select the `<bill>` child node which is the *actual* parent node of our data. We can use `xml_child()` to select this node:
+
+```{r}
+#| label: select-bill
+#| code-fold: show
+(bill_node = xml_child(bill_xml_file, "bill"))
+```
+
+::: callout-note
+You can check the length of your node using `xml_length()`
+:::
+
+```{r}
+#| label: xml-length
+#| code-fold: show
+xml_length(bill_node)
+```
+
+Now we can see the topline elements of the data. We have identifying attributes like the bill number, type, and the congress it was introduced in. We also have information on how legislators interacted with the bill like the bill's sponsors and cosponsors, which committees were involved in its passage, votes taken on the bill, and a variety of other attributes listed above.
+
+## From XML to dataframe
+
+Now that we have the XML data loaded, we want to parse it into a dataframe (or tibble) so we can use it in an analysis. This requires a bit of strategy and consideration of how you want to structure your data. I am structuring the data at the bill-level i.e. one row per bill.
+
+### Singular vs. Non-singular nodes
+
+For nodes like `<billNumber>` and `<introducedDate>`, we only have one element per bill but other elements like `<committees>` and `<actions>` there might be dozens of elements per bill.
+
+We can check the length of each node to determine if they only have one element
+
+```{r}
+#| label: explore-fcts
+(bill_node_lengths = xml_length(xml_children(bill_node)))
+```
+
+Using this, we can look at nodes which have zero length and which do not.
+
+::: panel-tabset
+### Singular Nodes
+
+```{r}
+#| label: singular-nodes
+#| class-output: code-block-h
+#| code-fold: show
+(singular_nodes = xml_children(bill_node)[bill_node_lengths == 0])
+```
+
+### Non-singular Nodes
+
+```{r}
+#| label: nonsingular-nodes
+#| code-fold: show
+#| class-output: code-block-h
+(nonsingular_nodes = xml_children(bill_node)[bill_node_lengths > 0])
+```
+:::
+
+Now with a nifty combination of `as_list()`, `xml_name()`, and `flatten_dfc()` we can convert the singular nodes into a single row of data.
+
+```{r}
+#| label: singular-nodes-df
+#| column: page
+(singular_nodes_df = as_list(singular_nodes) %>% 
+  setNames(xml_name(singular_nodes)) %>% 
+  flatten_dfc()) %>% 
+  reactable(theme = moke_rt(),
+            columns = list(
+              "constitutionalAuthorityStatementText" = colDef(show=F),
+              "createDate" = colDef(format = colFormat(date = T), width = 100),
+              "updateDate" = colDef(format = colFormat(date = T), width = 100),
+              "introducedDate" = colDef(format = colFormat(date = T)),
+              "congress" = colDef(width = 100),
+              "version" = colDef(width = 100),
+              "billNumber" = colDef(width = 100),
+              "billType" = colDef(width = 100)
+            ))
+```
+
+Note that `flatten_dfc()` drops list elements which are empty (possibly through `compact()`?). Unfortunately, `as_list()` doesn't retain the element's name so we need to set the names ourselves.
+
+```{r}
+#| label: singular-nodes-str
+#| class-output: code-block-h
+as_list(singular_nodes) %>% 
+  str()
+
+```
+
+------------------------------------------------------------------------
+
+# Session Info
+
+```{r}
+#| label: session-info
+sessioninfo::session_info("loaded")
+```
