@@ -7,9 +7,6 @@ author: "Mark"
 #| label: setup
 #| message: false
 library(extrafont)
-library(tictoc)
-library(furrr)
-library(here)
 library(reactable)
 
 source("https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R")
