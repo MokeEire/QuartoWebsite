@@ -355,6 +355,12 @@ as_list(singular_nodes) %>%
 
 ------------------------------------------------------------------------
 
+# Other helpful articles
+
+Here are some of the helpful articles I came across in the course of writing this:
+
+[From XML to Excel for Data Analysis](https://towardsdatascience.com/from-xml-to-excel-for-data-analysis-ac0c0c765b7d "Introduction to Processing XML In Python")
+
 # Session Info
 
 ```{r}
