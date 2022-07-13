@@ -29,9 +29,9 @@ knit_print.data.frame = function(x, ...){
 }
 ```
 
-The US government maintains a [repository](https://www.govinfo.gov/bulkdata/BILLSTATUS) of congressional bill data which offers us a view of how bills pass through congress and how congress members act in the process. Bills are stored in [XML](https://en.wikipedia.org/wiki/XML) which is really handy for storing information but less helpful for analysis (or at least seems so to me).
+If you work with data regularly, you have probably used a plethora of data input formats, from Excel spreadsheets and text files to relational databases and potentially XML. (e)Xtensible Markup Language is a storage type designed for flexibly storing and transmitting data[^1]. This flexibility often leads to a bit of a hassle when trying to parse XML data. If you're still reading, the good news is that this article should provide an understanding of XML and a set of steps for processing an XML file with R into a more analysis-friendly format.
 
-# The Goal
+[^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
 ::: {.callout-tip appearance="simple"}
 ## In this post you will learn to:
@@ -40,6 +40,65 @@ The US government maintains a [repository](https://www.govinfo.gov/bulkdata/BILL
 
 -   Explore the structure of XML documents
 :::
+
+The first step is always to check the data documentation[^2]. In this post I'll be using the US government's [congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS). To follow along, you can download the [individual XML file](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"), while you can find the bulk data [here](https://www.govinfo.gov/bulkdata/BILLSTATUS).
+
+[^2]: Sorry to all whose documentation is:\
+    "We don't have anything like that, but you can ask \[Impossibly busy data engineer\], they know everything you need."
+
+The XML file contains information about HR-391: Global Health Security Act of 2021 like its sponsors and cosponsors, votes on the bill, and the committees that considered it. Here's a sample of the XML:
+
+```{r}
+#| layout-nrow: 1
+#| layout-ncol: 2
+#| class-output: code-block-h
+#| column: page-inset-shaded
+#| echo: false
+(example_node = xml_find_first(bill_xml_file, "//bill/recordedVotes")) %>% 
+  xml_structure()
+
+xml_child(example_node)
+```
+
+Above is an example of how votes recorded on the bill are stored. The `<recordedVotes>` container can have multiple `<recordedVote>` elements which describe a vote taken on the bill[^3].
+
+[^3]: We can (and later I do) go deeper here and extract the roll's XML file to get individual representatives' votes.
+
+# Read XML with R
+
+We'll need to load the {xml2} package to read in our XML file. I also load the {tidyverse} package because it's generally exceedingly useful.
+
+```{r}
+#| code-fold: show
+library(tidyverse)
+library(xml2)
+
+bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
+```
+
+`read_xml()` returns an `xml_document`[^4] object. With this, we can look at the bill's top level nodes.
+
+[^4]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+
+```{r}
+#| code-fold: show
+# Look at the contents
+xml_contents(bill_xml_file)
+```
+
+In this case it's actually more useful to look at the `<bill>` element which is a child node of our XML document[^5], which is what `xml_child()` is for.
+
+[^5]: I will confess I'm not quite sure why this is the case, nor do I particularly understand what `<dublinCore>` is (though prevailing theories suggest some kind of document schema or a new metal genre originating from my home of Dublin).
+
+```{r}
+#| code-fold: show
+#| label: xml-bill-child
+#| code-overflow: wrap
+# Return child nodes named bill
+xml_child(bill_xml_file, "bill")
+```
+
+which offers us a view of how bills pass through congress and how congress members act in the process. Bills are stored in [XML](https://en.wikipedia.org/wiki/XML) which is really handy for storing information but less helpful for analysis (or at least seems so to me).
 
 In this post, I will show you how to read in a raw XML file and parse it into a dataframe containing nested dataframes where necessary.
 
@@ -167,23 +226,13 @@ reactable(
 :::
 :::
 
-# What is XML?
-
-From [Wikipedia](https://en.wikipedia.org/wiki/XML):
-
-> Extensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing arbitrary data. It defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
->
-> The design goals of XML emphasize simplicity, generality, and usability across the Internet. It is a textual data format with strong support via Unicode for different human languages. Although the design of XML focuses on documents, the language is widely used for the representation of arbitrary data structures such as those used in web services.
-
-XML's flexibility allows it to represent lots of different kinds of data structures. As you will see next, understanding the data structure you are working with is typically one of the most important tasks in using XML data.
-
 # The Process
 
 ## Understanding the structure
 
-As mentioned at the outset, we will be using [govinfo's Bill Status data](https://www.govinfo.gov/bulkdata/BILLSTATUS)[^1] and parsing the data into a dataframe format which can be more easily manipulated. To explore the structure of the legislative data, I selected a bill which contained information on committees, actions, votes, and cosponsors.
+As mentioned at the outset, we will be using [govinfo's Bill Status data](https://www.govinfo.gov/bulkdata/BILLSTATUS)[^6] and parsing the data into a dataframe format which can be more easily manipulated. To explore the structure of the legislative data, I selected a bill which contained information on committees, actions, votes, and cosponsors.
 
-[^1]: Some helpful resources for navigating this data:\
+[^6]: Some helpful resources for navigating this data:\
     <https://github.com/usgpo/bulk-data>\
     <https://www.govinfo.gov/help/bills>
 
@@ -193,9 +242,9 @@ As mentioned at the outset, we will be using [govinfo's Bill Status data](https:
 (bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"))
 ```
 
-`read_xml()` returns an `xml_document`[^2] object which shows us the top level nodes when called in the console. Now let's take a look at the full structure of the file.
+`read_xml()` returns an `xml_document`[^7] object which shows us the top level nodes when called in the console. Now let's take a look at the full structure of the file.
 
-[^2]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+[^7]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| class-output: code-block-h
