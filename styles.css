@@ -5,3 +5,11 @@ div.cell-output-stdout > pre {
   border-radius: .25rem;
   padding: .4em .2em;
 }
+
+.code-block-h {
+  height: 320px;
+}
+
+.reactable {
+  margin: 32px 8px;
+}
