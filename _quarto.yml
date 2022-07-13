@@ -18,7 +18,7 @@ format:
     toc: true
     code-tools: true
     code-fold: true
-    reference-location: margin
+    reference-location: document
 
 editor: visual
 
