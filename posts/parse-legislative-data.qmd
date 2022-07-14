@@ -41,36 +41,33 @@ If you work with data regularly, you have probably used a plethora of data input
 -   Explore the structure of XML documents
 :::
 
-The first step is always to check the data documentation[^2]. In this post I'll be using the US government's [congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS). To follow along, you can download the [individual XML file](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"), while you can find the bulk data [here](https://www.govinfo.gov/bulkdata/BILLSTATUS).
+In this post I'll be using the US government's congressional bill data. The first step of data analysis is always to check the documentation[^2] and thankfully [govinfo](https://www.govinfo.gov/) has provided some [documentation to guide us](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md).
 
 [^2]: Sorry to all whose documentation is:\
     "We don't have anything like that, but you can ask \[Impossibly busy data engineer\], they know everything you need."
 
-The XML file contains information about HR-391: Global Health Security Act of 2021 like its sponsors and cosponsors, votes on the bill, and the committees that considered it. Here's a sample of the XML:
+To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"), while you can find the bulk data [here](https://www.govinfo.gov/bulkdata/BILLSTATUS). The sample file (chosen because it contains a variety of important elements) contains information about HR-391: Global Health Security Act of 2021 including its sponsors and cosponsors, votes on the bill, and the committees that considered it. Here's a sample of the XML:
 
 ```{r}
-#| layout-nrow: 1
-#| layout-ncol: 2
-#| class-output: code-block-h
-#| column: page-inset-shaded
+#| code-overflow: scroll
 #| echo: false
 (example_node = xml_find_first(bill_xml_file, "//bill/recordedVotes")) %>% 
-  xml_structure()
+  xmlParse()
 
-xml_child(example_node)
 ```
 
 Above is an example of how votes recorded on the bill are stored. The `<recordedVotes>` container can have multiple `<recordedVote>` elements which describe a vote taken on the bill[^3].
 
 [^3]: We can (and later I do) go deeper here and extract the roll's XML file to get individual representatives' votes.
 
-# Read XML with R
+# Read XML data with R
 
-We'll need to load the {xml2} package to read in our XML file. I also load the {tidyverse} package because it's generally exceedingly useful.
+We'll load the {XML} and {xml2} packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I also load the {tidyverse} package because it's generally exceedingly useful.
 
 ```{r}
 #| code-fold: show
 library(tidyverse)
+library(XML)
 library(xml2)
 
 bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
