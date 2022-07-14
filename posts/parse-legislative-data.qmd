@@ -430,16 +430,16 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 
 ### Votes
 
-Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. They are also an interesting element to parse because we need to use the `<url>` element to parse an individual vote roll XML file.
+Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. Individual votes are stored in the `<recordedVotes>` container. We can access child elements in XML using a forward slash (this uses a language called XPATH).
 
 ```{r}
-bill_recorded_votes = xml_find_all(bill_xml, "recordedVotes")
-
-(bill_recorded_vote_nodes = xml_find_all(bill_recorded_votes, "recordedVote")) %>% 
+(bill_recorded_vote_nodes = xml_find_all(bill_xml, "recordedVotes/recordedVote")) %>% 
   xml_contents()
 ```
 
-Because the data structure is all top-level nodes, we can simply convert it to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^8] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+
+[^8]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
 # Coerce nodes to list
@@ -449,26 +449,17 @@ recorded_votes_list = as_list(bill_recorded_vote_nodes)
   glimpse()
 ```
 
-Now we want to get the vote roll XML file, so we go back @sec1 and use `read_xml()`
+Now we want to get the vote roll XML file, so we go back to `read_xml()` .
 
 ```{r}
 (vote_roll_xml = read_xml(recorded_votes_df$url))
 ```
 
-There are two main nodes - `<rollcall-vote>` and `<vote-data>`. What does the structure for these nodes look like?
+There are two main nodes - `<vote-metadata>` and `<vote-data>`. How many elements does each node have and what do the structures for these look like?
 
 ```{r}
-vote_roll_children = xml_children(vote_roll_xml)
-xml_length(vote_roll_children)
-```
-
-```{r}
-vote_roll_children
-```
-
-```{r}
-#| layout-nrow: 1
-map(vote_roll_children, xml_contents)
+(vote_roll_children = xml_children(vote_roll_xml)) %>% 
+  map(xml_contents)
 ```
 
 One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. Let's try to parse the legislator-level data first.
