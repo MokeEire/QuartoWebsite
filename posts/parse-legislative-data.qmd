@@ -33,40 +33,43 @@ knit_print.data.frame = function(x, ...){
 }
 ```
 
-If you work with data regularly, you have probably used a plethora of data input formats, from Excel spreadsheets and text files to relational databases and potentially XML. (e)Xtensible Markup Language is a storage type designed for flexibly storing and transmitting data[^1]. This flexibility often leads to a bit of a hassle when trying to parse XML data. If you're still reading, the good news is that this article should provide an understanding of XML and a set of steps for processing an XML file with R into a more analysis-friendly format.
+If you work with data regularly, you have probably used data formats like Excel spreadsheets, text files, relational databases and if you're reading this potentially XML too. XML, or (e)Xtensible Markup Language, is a storage format designed for flexibly transmitting data[^1] which often leads to a bit of a hassle when trying to parse it for use in analytics. If you're still reading, the good news is that this article should provide an understanding of XML and a set of steps for processing an XML file with R into a more analysis-friendly format.
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
 ::: {.callout-tip appearance="simple"}
-## In this post you will learn to:
+## You're gonna learn to:
 
--   Load and parse XML files in R using the [`{xml2}`](https://xml2.r-lib.org/) package
+-   Load and parse XML files in R using the `{XML}` and `{xml2}` packages
 
 -   Explore the structure of XML documents
+
+-   List, map, and flatten your data into a tabular format
 :::
 
-In this post I'll be using the US government's congressional bill data. The first step of data analysis is always to check the documentation[^2] and thankfully [govinfo](https://www.govinfo.gov/) has provided some [documentation to guide us](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md).
+I'll be using the US government's congressional bill data as an example. As always the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for how the data is stored.
 
-[^2]: Sorry to all whose documentation is:\
-    "We don't have anything like that, but you can ask \[Impossibly busy data engineer\], they know everything you need."
+To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"). The sample bill (chosen only because it contains examples of important elements) is [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs) and the XML file contains information about its sponsors and cosponsors, votes on the bill, and the committees that considered it.
 
-To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"), while you can find the bulk data [here](https://www.govinfo.gov/bulkdata/BILLSTATUS). The sample file (chosen because it contains a variety of important elements) contains information about HR-391: Global Health Security Act of 2021 including its sponsors and cosponsors, votes on the bill, and the committees that considered it. Here's a sample of the XML:
+Here's a sample of the XML:
 
 ```{r}
 #| code-overflow: scroll
 #| echo: false
-(example_node = xml_find_first(bill_xml_file, "//bill/recordedVotes")) %>% 
-  xmlParse()
+# (example_node = xml_find_first(bill_xml_file, "//bill")) %>% 
+#   xmlParse()
 
+xml_child(bill_xml_file) %>% 
+  xml_contents()
 ```
 
-Above is an example of how votes recorded on the bill are stored. The `<recordedVotes>` container can have multiple `<recordedVote>` elements which describe a vote taken on the bill[^3].
+Above is an example of how votes recorded on the bill are stored. The `<recordedVotes>` container can have multiple `<recordedVote>` elements which describe a vote taken on the bill[^2].
 
-[^3]: We can (and later I do) go deeper here and extract the roll's XML file to get individual representatives' votes.
+[^2]: We can (and later I do) go deeper here and extract the roll's XML file to get individual representatives' votes.
 
 # Read XML data with R
 
-We'll load the {XML} and {xml2} packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I also load the {tidyverse} package because it's generally exceedingly useful.
+We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I also load the `{tidyverse}` package because it's generally exceedingly useful.
 
 ```{r}
 #| code-fold: show
@@ -77,9 +80,9 @@ library(xml2)
 bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 ```
 
-`read_xml()` returns an `xml_document`[^4] object. With this, we can look at the bill's top level nodes.
+`read_xml()` returns an `xml_document`[^3] object. With this, we can look at the bill's top level nodes.
 
-[^4]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+[^3]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| code-fold: show
@@ -87,9 +90,9 @@ bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BIL
 xml_contents(bill_xml_file)
 ```
 
-In this case it's actually more useful to look at the `<bill>` element which is a child node of our XML document[^5], which is what `xml_child()` is for.
+In this case it's actually more useful to look at the `<bill>` element which is a child node of our XML document[^4], which is what `xml_child()` is for.
 
-[^5]: I will confess I'm not quite sure why this is the case, nor do I particularly understand what `<dublinCore>` is (though prevailing theories suggest some kind of document schema or a new metal genre originating from my home of Dublin).
+[^4]: I will confess I'm not quite sure why this is the case, nor do I particularly understand what `<dublinCore>` is (though prevailing theories suggest some kind of document schema or a new metal genre originating from my home of Dublin).
 
 ```{r}
 #| code-fold: show
@@ -114,7 +117,9 @@ bill_xml_parse = xmlParse(bill_xml_file)
   glimpse()
 ```
 
-But you might notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values concatenated. This approach may work for simpler XML structures, but in this case we need to do a little bit more work which brings us to one of the cardinal rules of data analysis:
+But notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values concatenated. This approach works for simpler XML structures, but in this case we need to do a little bit more work to get the data into a tidy dataframe.
+
+That brings us to one of the cardinal rules of data analysis:
 
 ::: {.callout-tip appearance="simple"}
 ## Look at your data
@@ -124,7 +129,9 @@ Look at the structure and contents of your data and understand how it is organiz
 
 # Define the output
 
-Another important step is to think about the form we want the data so we can determine how to transform it. I want the congressional data to have one row per bill, with the nested characteristics stored in list columns. This will produce a comprehensive dataset which can easily be subset and transformed to various levels of observation as needed. The end result looks like this:
+As well as looking at your data, it's also usually helpful to look to your intended output. This determines how to transform the data.
+
+**Example:** I want the congressional data to have one row per bill, with the nested characteristics stored in list columns. This will produce a comprehensive dataset which can easily be subset and transformed to various levels of observation as needed. The end result should look like this:
 
 ```{r}
 #| echo: false
@@ -286,13 +293,13 @@ Now we have the bill title, when it was introduced, what type of bill it is, and
 
 ## Parse the not-so-simple elements
 
-This is where the majority of the legwork is so if you can comfortably ignore[^6] some portion of the data, now's a good time. There's no point spending an hour trying to write a function for one particularly difficult bit of information only to realize you don't need it anyway.
+This is where the majority of the legwork is so if you can comfortably ignore[^5] some portion of the data, now's a good time. There's no point spending an hour trying to write a function for one particularly difficult bit of information only to realize you don't need it anyway.
 
-[^6]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
+[^5]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
 
-For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^7].
+For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^6].
 
-[^7]: Ctrl/Cmd+F: `extract_bill_status`
+[^6]: Ctrl/Cmd+F: `extract_bill_status`
 
 ### Actions
 
@@ -437,9 +444,9 @@ Votes are particularly interesting because it provides a more discrete measure o
   xml_contents()
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^8] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^7] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
 
-[^8]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
+[^7]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
 # Coerce nodes to list
