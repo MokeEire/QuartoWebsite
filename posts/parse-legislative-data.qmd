@@ -2,12 +2,14 @@
 title: "Parsing XML with R, using congressional legislative data"
 author: "Mark"
 code-link: true
+code-fold: show
 ---
 
 ```{r}
 #| label: setup
 #| message: false
 #| warning: false
+#| echo: false
 library(extrafont)
 library(reactable)
 
@@ -101,7 +103,7 @@ Parsing this file to a dataframe will require a little thought because we have a
 
 ```{r}
 #| label: xml-to-df
-#| code-fold: show
+#| class-output: code-block-h
 # First you need to use the xmlParse function
 bill_xml_parse = xmlParse(bill_xml_file)
 
@@ -275,7 +277,7 @@ reactable(bill_df,
 ```
 
 ::: callout-caution
-## \`flatten_dfc()\` drops empty elements
+## What about empty elements?
 
 Note that `flatten_dfc()` drops list elements which are empty (possibly through `compact()`?). This means our output varies based on each file's contents. This is not an issue itself, but it is something to be wary of if you plan on combining multiple XML files.
 :::
@@ -288,9 +290,13 @@ This is where the majority of the legwork is so if you can comfortably ignore[^6
 
 [^6]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
 
-For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R) (Ctrl/Cmd+F: `extract_bill_status`)
+For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^7].
+
+[^7]: Ctrl/Cmd+F: `extract_bill_status`
 
 ### Actions
+
+What's in the actions container?
 
 ```{r}
 #| label: actions-xml
@@ -348,6 +354,7 @@ Now if you're processing a large amount of these data, you may want to be explic
 
 ```{r}
 #| label: actions-type-conv
+#| code-fold: true
 (actions_df = type_convert(actions_df,
                           col_types = cols(
                             action_date = col_date(), 
