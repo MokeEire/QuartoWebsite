@@ -1,11 +1,13 @@
 ---
 title: "Parsing XML with R, using congressional legislative data"
 author: "Mark"
+code-link: true
 ---
 
 ```{r}
 #| label: setup
 #| message: false
+#| warning: false
 library(extrafont)
 library(reactable)
 
