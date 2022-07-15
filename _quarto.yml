@@ -3,6 +3,8 @@ project:
 
 website:
   title: "Mark Barrett"
+  site-url: https://mokeeire.github.io/QuartoWebsite
+  repo-url: https://github.com/MokeEire/QuartoWebsite
   navbar:
     left:
       - href: index.qmd
@@ -11,15 +13,17 @@ website:
         text: About
       - href: blog.md
         text: Blog
+    right:
+      - icon: twitter
+        aria-label: twitter
+        href: https://twitter.com/Mmm_JuicyFruit
+      - icon: github
+        aria-label: github
+        href: https://github.com/MokeEire
 
 format:
   html:
     theme: flatly
     css: styles.css
-    toc: true
-    code-tools: true
-    code-fold: true
-    reference-location: document
 
-editor: visual
 
