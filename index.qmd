@@ -1,58 +1,35 @@
 ---
+title: "Hello"
+image: me-circle.png
+listing: 
+  feed: true
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  fields: [date, title, image, reading-time]
+  image-height: "160px"
 page-layout: full
 editor: source
+format:
+  html:
+    toc: false
+    code-tools: false
+    code-fold: false
 ---
 
 ::: grid
-::: {.g-col-12 .g-col-md-4 .g-start-md-2}
-![](me-circle.png){height="280px" width="280px"}
+::: {.g-col-12 .g-col-md-3 align-self="center"}
+![](me-circle.png){width="100%"}
 :::
 
-::: {#about-me-text .g-col-12 .g-col-md-6}
+::: {#about-me-text .g-col-12 .g-col-md-7}
 # Welcome, I'm Mark Barrett.
 
 I am an analyst with a passion for behavioural science, R, and public policy. This is my personal website where I will showcase what I have learned and how I approach the research process.
 
 You can find me on [GitHub](https://github.com/MokeEire) and [Twitter](https://twitter.com/Mmm_JuicyFruit).
 :::
-
-::: {.g-col-12 .g-col-md-5 .g-start-md-2}
-# Data Visualization
-
--   This will be filled...
--   ...when everything i sdfs ready.f adf asd sdf sdf
--   Bla bla bla bla sdf s sd fs sdf sdfasdfsf
 :::
 
-::: {.g-col-12 .g-col-md-5}
-# Stats/ML
-
--   This will be filled...
--   ...when everything is ready.
--   Bla bla bla bla
-:::
-
-::: {.g-col-12 .g-col-md-5 .g-start-md-2}
-# Dashboards
-
--   This will be filled...
--   ...when everything is ready.
--   Bla bla bla bla
-:::
-
-::: {.g-col-12 .g-col-md-5}
-# YouTube
-
--   This will be filled...
--   ...when everything is ready.
--   Bla bla bla bla
-:::
-
-::: {.g-col-12 .g-col-md-5 .g-start-md-2}
-# Dashboards
-
--   This will be filled...
--   ...when everything is ready.
--   Bla bla bla bla
-:::
-:::
+## Posts
