@@ -4,5 +4,11 @@
     "items": [
       "/posts/parse-legislative-data.html"
     ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/posts/parse-legislative-data.html"
+    ]
   }
 ]
