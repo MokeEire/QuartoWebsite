@@ -46,7 +46,7 @@ If you work with data regularly, you have probably used data formats like Excel 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
 ::: {.callout-tip appearance="simple"}
-## You're gonna learn to:
+## What you'll learn:
 
 -   Load and parse XML files in R using the `{XML}` and `{xml2}` packages
 
@@ -670,6 +670,7 @@ parse_vote_roll = function(vote, logger, bill_type, bill_num){
 Here are some of the helpful articles I came across in the course of writing this:
 
 -   [From XML to Excel for Data Analysis](https://towardsdatascience.com/from-xml-to-excel-for-data-analysis-ac0c0c765b7d "Introduction to Processing XML In Python")
+-   [Reading XML files in R](https://medium.com/geekculture/reading-xml-files-in-r-3122c3a2a8d9)
 
 # Session Info
 
