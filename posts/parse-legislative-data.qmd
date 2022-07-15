@@ -1,8 +1,16 @@
 ---
-title: "Parsing XML with R, using congressional legislative data"
-author: "Mark"
-code-link: true
-code-fold: show
+title: "Parsing XML with R"
+subtitle: "Untangling congressional legislative data"
+date: "2022-07-14"
+categories: 
+  - data
+  - governance
+  - R
+format: 
+  html: 
+    code-link: true
+    code-fold: show
+    code-tools: true
 ---
 
 ```{r}
