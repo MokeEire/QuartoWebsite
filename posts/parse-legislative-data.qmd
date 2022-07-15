@@ -62,6 +62,7 @@ To follow along, you can download the sample XML file [here](https://www.govinfo
 Here's a sample of the XML:
 
 ```{r}
+#| label: xml-sample
 #| code-overflow: scroll
 #| echo: false
 # (example_node = xml_find_first(bill_xml_file, "//bill")) %>% 
@@ -80,6 +81,7 @@ Above is an example of how votes recorded on the bill are stored. The `<recorded
 We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I also load the `{tidyverse}` package because it's generally exceedingly useful.
 
 ```{r}
+#| label: read-xml
 #| code-fold: show
 library(tidyverse)
 library(XML)
@@ -93,6 +95,7 @@ bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BIL
 [^3]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
+#| label: xml-contents
 #| code-fold: show
 # Look at the contents
 xml_contents(bill_xml_file)
@@ -142,6 +145,7 @@ As well as looking at your data, it's also usually helpful to look to your inten
 **Example:** I want the congressional data to have one row per bill, with the nested characteristics stored in list columns. This will produce a comprehensive dataset which can easily be subset and transformed to various levels of observation as needed. The end result should look like this:
 
 ```{r}
+#| label: example-bill
 #| echo: false
 #| message: false
 #| column: screen-inset-shaded
@@ -178,12 +182,13 @@ example_bill_df %>% # glimpse() # here to check the data
   )
 ```
 
-With the following list columns:
+With the following list columns (among others):
 
 ::: panel-tabset
 ## Committees
 
 ```{r}
+#| label: glimpse-committees
 #| echo: false
 glimpse(example_bill_df[["committees"]])
 
@@ -192,6 +197,7 @@ glimpse(example_bill_df[["committees"]])
 ## Votes
 
 ```{r}
+#| label: glimpse-votes
 #| echo: false
 glimpse(example_bill_df[["votes"]])
 
@@ -200,6 +206,7 @@ glimpse(example_bill_df[["votes"]])
 ## Actions
 
 ```{r}
+#| label: glimpse-actio
 #| echo: false
 glimpse(example_bill_df[["actions"]])
 ```
@@ -207,6 +214,7 @@ glimpse(example_bill_df[["actions"]])
 ## Sponsors
 
 ```{r}
+#| label: glimpse-sponsors
 #| echo: false
 glimpse(example_bill_df[["sponsors"]])
 ```
@@ -214,6 +222,7 @@ glimpse(example_bill_df[["sponsors"]])
 ## Cosponsors
 
 ```{r}
+#| label: glimpse-cosponsors
 #| echo: false
 glimpse(example_bill_df[["cosponsors"]])
 ```
@@ -221,6 +230,7 @@ glimpse(example_bill_df[["cosponsors"]])
 ## Summaries
 
 ```{r}
+#| label: glimpse-summaries
 #| echo: false
 glimpse(example_bill_df[["bill_summaries"]])
 ```
@@ -228,6 +238,7 @@ glimpse(example_bill_df[["bill_summaries"]])
 ## Versions
 
 ```{r}
+#| label: glimpse-versions
 #| echo: false
 glimpse(example_bill_df[["bill_text_versions"]])
 ```
@@ -448,6 +459,7 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. Individual votes are stored in the `<recordedVotes>` container. We can access child elements in XML using a forward slash (this uses a language called XPATH).
 
 ```{r}
+#| label: vote-nodes-contents
 (bill_recorded_vote_nodes = xml_find_all(bill_xml, "recordedVotes/recordedVote")) %>% 
   xml_contents()
 ```
@@ -457,6 +469,7 @@ You may have spotted why votes are interesting elements to parse because inside 
 [^7]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
+#| label: vote-nodes-df
 # Coerce nodes to list
 recorded_votes_list = as_list(bill_recorded_vote_nodes)
 
@@ -467,12 +480,14 @@ recorded_votes_list = as_list(bill_recorded_vote_nodes)
 Now we want to get the vote roll XML file, so we go back to `read_xml()` .
 
 ```{r}
+#| label: vote-roll-xml
 (vote_roll_xml = read_xml(recorded_votes_df$url))
 ```
 
 There are two main nodes - `<vote-metadata>` and `<vote-data>`. How many elements does each node have and what do the structures for these look like?
 
 ```{r}
+#| label: vote-roll-children
 (vote_roll_children = xml_children(vote_roll_xml)) %>% 
   map(xml_contents)
 ```
@@ -480,18 +495,21 @@ There are two main nodes - `<vote-metadata>` and `<vote-data>`. How many element
 One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. Let's try to parse the legislator-level data first.
 
 ```{r}
+#| label: vote-roll-data
 (vote_data = xml_find_all(vote_roll_xml, "vote-data"))
 ```
 
 Here is the XML for a single legislator's vote:
 
 ```{r}
+#| label: vote-roll-data-single
 xml_child(vote_data)
 ```
 
 With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we can flatten the XML into one row per legislator
 
 ```{r}
+#| label: vote-roll-data-flat
 (vote_roll_flattened = vote_data %>% 
   as_list() %>% 
   flatten_dfr() %>% 
@@ -501,6 +519,7 @@ With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we c
 But we lose all the attributes! And `name-id` looked particularly useful. We'll need to extract the attributes before we flatten the data. Let's take another look at the legislators structure.
 
 ```{r}
+#| label: vote-roll-leg-list
 vote_legislators = vote_data %>% 
   xml_find_all("recorded-vote")
 
@@ -511,6 +530,7 @@ vote_legislators = vote_data %>%
 The legislator element has all the attributes, while the vote element only has a value. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.
 
 ```{r}
+#| label: vote-roll-leg-df
 (legislator_vote_df = legislators_list %>% 
     # Modify one level deeper using map_at to target legislator elements
     map(map_at, "legislator", attributes) %>% 
@@ -520,6 +540,7 @@ The legislator element has all the attributes, while the vote element only has a
 Now we have a table of legislator voting data! But what about the `<vote-metadata>`?
 
 ```{r}
+#| label: vote-roll-metadata-xml
 (vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")) %>% 
   xml_contents()
 ```
@@ -527,6 +548,7 @@ Now we have a table of legislator voting data! But what about the `<vote-metadat
 Everything other than the `<vote-totals>` element is singular so we can get that out of the way the same way as before:
 
 ```{r}
+#| label: vote-roll-metadata-singular
 vote_singular_nodes = xml_singular_nodes(vote_metadata)
 
 (vote_df = as_list(vote_singular_nodes) %>% 
@@ -540,6 +562,7 @@ vote_singular_nodes = xml_singular_nodes(vote_metadata)
 The `<vote-totals>` are a bit of a unique little element, with 3 different types of nodes.
 
 ```{r}
+#| label: vote-roll-metadata-totals-contents
 (vote_totals = xml_find_all(vote_metadata, "vote-totals")) %>% 
   xml_contents()
 ```
@@ -547,6 +570,7 @@ The `<vote-totals>` are a bit of a unique little element, with 3 different types
 This is another opportunity for us to be choosy with our data. The first node is table headers, which we don't need because the elements are tagged anyway. From these, we really only need the `<totals-by-party>` nodes as long as the totals of which agree with `<totals-by-vote>` , which is worth checking.
 
 ```{r}
+#| label: vote-roll-metadata-xml
 #| layout-nrow: 1
 (vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party"))
 
