@@ -226,25 +226,9 @@ glimpse(example_bill_df[["sponsors"]])
 #| echo: false
 glimpse(example_bill_df[["cosponsors"]])
 ```
-
-## Summaries
-
-```{r}
-#| label: glimpse-summaries
-#| echo: false
-glimpse(example_bill_df[["bill_summaries"]])
-```
-
-## Versions
-
-```{r}
-#| label: glimpse-versions
-#| echo: false
-glimpse(example_bill_df[["bill_text_versions"]])
-```
 :::
 
-With this output in mind and an understanding of the current data structure, we can break the process down into two broad categories - the simple, and the not-so-simple.
+With this output in mind and an understanding of the current data structure, we can break the parsing process down into two categories - the simple, and the not-so-simple.
 
 # Parsing
 
@@ -570,7 +554,7 @@ The `<vote-totals>` are a bit of a unique little element, with 3 different types
 This is another opportunity for us to be choosy with our data. The first node is table headers, which we don't need because the elements are tagged anyway. From these, we really only need the `<totals-by-party>` nodes as long as the totals of which agree with `<totals-by-vote>` , which is worth checking.
 
 ```{r}
-#| label: vote-roll-metadata-xml
+#| label: vote-roll-metadata-totals-both
 #| layout-nrow: 1
 (vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party"))
 
@@ -581,6 +565,7 @@ This is another opportunity for us to be choosy with our data. The first node is
 Once we have our nodeset (which at last are all singular), we use same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.
 
 ```{r}
+#| label: vote-roll-metadata-totals-party
 #| message: false
 #| warning: false
 (party_vote_totals_df = vote_totals_by_party %>% 
@@ -604,6 +589,7 @@ summarise(party_vote_totals,
 Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together.
 
 ```{r}
+#| label: vote-roll-build
 (vote_roll_df = vote_df %>% 
   mutate(legislator_votes = list(legislator_vote_df),
          party_votes = list(party_vote_totals_df)) %>% 
@@ -614,6 +600,7 @@ Now that we have all of our vote data wrangled from the thorny grasp of XML, we 
 And we continue to stack this Russian doll of data from the legislator-level to the vote-level...
 
 ```{r}
+#| label: vote-build
 (recorded_votes_df = recorded_votes_df %>% 
   mutate(vote_roll = list(vote_roll_df))) %>% 
   glimpse()
@@ -622,6 +609,7 @@ And we continue to stack this Russian doll of data from the legislator-level to 
 ...all the way until we've gotten back to the bill-level.
 
 ```{r}
+#| label: add-bills
 bill_df$votes = list(recorded_votes_df)
 
 glimpse(bill_df)
