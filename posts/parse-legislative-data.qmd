@@ -8,6 +8,7 @@ categories:
   - R
 format: 
   html: 
+    toc: true
     code-link: true
     code-fold: show
     code-tools: true
