@@ -1,5 +1,5 @@
 ---
-title: "Hello"
+title: "Welcome, my name is Mark Barrett."
 image: me-circle.png
 listing: 
   contents: posts
@@ -23,9 +23,8 @@ format:
 :::
 
 ::: {#about-me-text .g-col-12 .g-col-md-7}
-# Welcome, I'm Mark Barrett.
 
-I am an analyst with a passion for behavioural science, R, and public policy. This is my personal website where I will showcase what I have learned and how I approach the research process.
+I am an analyst with a passion for behavioural science, R, and public policy. This is my personal website for building a data analytics and visualization portfolio, and writing about policy and my research process.
 :::
 :::
 
