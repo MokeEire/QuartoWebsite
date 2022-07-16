@@ -2,9 +2,23 @@
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About me",
+    "title": "Mark Barrett",
     "section": "",
-    "text": "My interests include decision-making, governance institutions, and information systems, and particularly areas where these topics coincide.\nThis website is intended to showcase the kind of analysis I like to do, and how I like to do it.\nSome questions that are of particular interest to me:\n\nAre the structures and processes of policy-making institutions conducive to effective, informed, and equitable judgements?\nWhat factors in our society and policies perpetuate poverty?\nHow can public and private institutions foster an information system which enables society to develop a shared consensus of facts on issues central to public well-being?"
+    "text": "I am an analyst with a passion for behavioural science, R, and public policy. This website is for building a data analytics and visualization portfolio, and writing about policy and my research process. My interests include decision-making, governance institutions, and information systems, and particularly areas where these topics coincide."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Mark Barrett",
+    "section": "Education",
+    "text": "Education\nLoyola Marymount University | Los Angeles, CA\nB.S in Economics & Psychology | Aug. 2012 - May 2016"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Mark Barrett",
+    "section": "Experience",
+    "text": "Experience\nRAND Corporation | Research Assistant | Apr. 2016 - Feb. 2020\nCBRE | Sr. Research Data Analyst | Mar. 2020 - May 2022\nKarl Storz | Sr. Business Analyst | June 2022 - present"
   },
   {
     "objectID": "blog.html",
@@ -18,14 +32,7 @@
     "href": "index.html",
     "title": "Hi, I’m Mark.",
     "section": "",
-    "text": "Welcome to my personal website! I am an analyst with a passion for behavioural science, R, and public policy. This website is for building a data analytics and visualization portfolio, and writing about policy and my research process."
-  },
-  {
-    "objectID": "index.html#posts",
-    "href": "index.html#posts",
-    "title": "Hi, I’m Mark.",
-    "section": "Posts",
-    "text": "Posts"
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n\n\n\n\n  \n\n\n\n\n\nUntangling congressional legislative data\n\n\n\n\n\n\nJul 14, 2022\n\n\n20 min\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/parse-legislative-data.html",

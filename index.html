@@ -65,7 +65,7 @@ ul.task-list{list-style: none;}
     }
 
     const options = {
-      valueNames: ['listing-date','listing-title','listing-image','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      valueNames: ['listing-date','listing-title','listing-image','listing-reading-time',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] }],
       
       searchColumns: ["listing-date","listing-title","listing-author","listing-subtitle","listing-image","listing-description","listing-categories"],
     };
@@ -132,48 +132,56 @@ ul.task-list{list-style: none;}
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-left">
+      <h1 class="title">Hi, I’m Mark.</h1>
+            <p class="subtitle lead">Welcome to my personal website</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R">R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="data">data <span class="quarto-category-count">(1)</span></div><div class="category" data-category="governance">governance <span class="quarto-category-count">(1)</span></div></div></div>
+        
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-unnumbered"><div class="category" data-category="R">R</div><div class="category" data-category="data">data</div><div class="category" data-category="governance">governance</div></div></div>
 <!-- main -->
-<main class="content column-page-left" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Hi, I’m Mark.</h1>
-</div>
+<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
 
 
-<div class="quarto-title-meta">
-
-    
-    
-  </div>
-  
-
-</header>
-
-<div class="grid">
-<div class="g-col-12 g-col-md-3" data-align-self="center">
-<p><img src="me-circle.png" class="img-fluid" style="width:100.0%"></p>
-</div>
-<div id="about-me-text" class="g-col-12 g-col-md-7">
-<p>Welcome to my personal website! I am an analyst with a passion for behavioural science, R, and public policy. This website is for building a data analytics and visualization portfolio, and writing about policy and my research process.</p>
-</div>
-</div>
-<section id="posts" class="level2">
-<h2 class="anchored" data-anchor-id="posts">Posts</h2>
 
 
 
-</section>
+
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
+<div class="listing-actions-group">
+   <div class="input-group input-group-sm quarto-listing-sort">
+     <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+     <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
+       <option value="" disabled="" selected="" hidden="">Order By</option>
+       <option value="index" data-direction="asc">Default</option>
+         <option value="listing-date-sort" data-direction="asc">
+          Date - Oldest
+        </option>
+         <option value="listing-date-sort" data-direction="desc">
+          Date - Newest
+        </option>
+     </select>
+  </div>
+</div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="data,governance,R" data-listing-date-sort="1657782000000" data-listing-file-modified-sort="1657920101020" data-listing-reading-time-sort="20.705">
+<div class="quarto-post image-right" data-index="0" data-categories="data,governance,R" data-listing-date-sort="1657782000000" data-listing-file-modified-sort="1657932553568" data-listing-reading-time-sort="20.705">
 <div class="thumbnail">
 <p><a href="./posts/parse-legislative-data.html"> <img src="https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif" class="thumnail-image" style="height: 160px;"> </a></p>
 </div>
