@@ -12,6 +12,8 @@ format:
     code-link: true
     code-fold: show
     code-tools: true
+    comments:
+      hypothesis: true
 ---
 
 ```{r}
