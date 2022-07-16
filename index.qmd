@@ -1,31 +1,15 @@
 ---
-title: "Welcome, my name is Mark Barrett."
-image: me-circle.png
+title: "Hi, I'm Mark."
+subtitle: "Welcome to my personal website"
 listing: 
   contents: posts
   sort: "date desc"
   type: default
-  categories: true
+  categories: unnumbered
   fields: [date, title, image, reading-time]
+  sort-ui: [date]
   image-height: "160px"
 page-layout: full
-editor: source
-format:
-  html:
-    toc: false
-    code-tools: false
-    code-fold: false
+title-block-banner: true
+image: me-circle.png
 ---
-
-::: grid
-::: {.g-col-12 .g-col-md-3 align-self="center"}
-![](me-circle.png){width="100%"}
-:::
-
-::: {#about-me-text .g-col-12 .g-col-md-7}
-
-I am an analyst with a passion for behavioural science, R, and public policy. This is my personal website for building a data analytics and visualization portfolio, and writing about policy and my research process.
-:::
-:::
-
-## Posts
