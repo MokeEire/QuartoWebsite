@@ -243,7 +243,7 @@ xml_singular_nodes = function(xml_node){
 
 ```
 
-Now with a nifty combination of `as_list()`, `xml_name()`, and `flatten_dfc()` we can convert the singular nodes into a single row of data.
+Now with a nifty combination of `as_list()`, `xml_name()`, and `flatten_dfc()` we can go from XML -\> list -\> dataframe. The process convert the singular nodes into a list, names them, and flattens each element of the list into a single column of data.
 
 ```{r}
 #| label: singular-nodes-df
@@ -254,7 +254,7 @@ bill_df = as_list(singular_nodes) %>%
   flatten_dfc()
 ```
 
-Which gives us a single row of data:
+Which combines to give us a single row of data:
 
 ```{r}
 #| label: singular-nodes-rt
