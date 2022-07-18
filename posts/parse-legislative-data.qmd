@@ -44,7 +44,7 @@ knit_print.data.frame = function(x, ...){
 }
 ```
 
-If you work with data regularly, you have probably used data formats like Excel spreadsheets, text files, relational databases and if you're reading this potentially XML too. XML, or (e)Xtensible Markup Language, is a storage format designed for flexibly transmitting data[^1] which often leads to a bit of a hassle when trying to parse it for use in analytics. If you're still reading, the good news is that this article should provide an understanding of XML and a set of steps for processing an XML file with R into a more analysis-friendly format.
+Data comes in many forms. You have probably used data formats like Excel spreadsheets, text files, relational databases and if you're reading this you may have run into some (e)Xtensible Markup Language, or XML files. XML is a storage format designed for flexibly transmitting data[^1] but this flexibility often leads to a bit of a hassle when trying to parse it for use in analytics. This article takes a look at this tricky, but valuable data type, how to use it, and a set of steps for processing XML with R so it can be prepared for .
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
