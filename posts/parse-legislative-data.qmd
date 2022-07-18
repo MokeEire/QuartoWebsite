@@ -275,13 +275,7 @@ reactable(bill_df,
             ))
 ```
 
-::: callout-caution
-## What about empty elements?
-
-Note that `flatten_dfc()` drops list elements which are empty (possibly through `compact()`?). This means our output varies based on each file's contents. This is not an issue itself, but it is something to be wary of if you plan on combining multiple XML files.
-:::
-
-Now we have the bill title, when it was introduced, what type of bill it is, and which congress introduced it. I also want to include the data for actions, sponsors, committees, and votes, but these need to processed individually.
+This includes the bill title, when it was introduced, what type of bill it is, and which congress introduced it. To combine the data for actions, sponsors, committees, and votes, we need to process them individually.
 
 ## Parse the not-so-simple elements
 
@@ -324,30 +318,36 @@ In the individual action container, we can see we have the type, text, and date 
 ```{r}
 #| label: actions-functions
 #| code-fold: show
-# Function to flatten a list to dataframe columns and 
+# Helper function: flatten_dfc_rename
+# flatten a list to dataframe and 
 # rename the columns with a given prefix
 flatten_dfc_rename = function(list_to_flatten, 
                           name_prefix = "prefix"){
   rename_with(flatten_dfc(list_to_flatten), ~str_c(name_prefix, "_", .))
 }
 
+# Function: parse_action
 # Parse actions from list to dataframe
 parse_action = function(action){
   action %>% 
-    # Flatten sourceSystem elements and rename them
+    # Flatten+rename  sourceSystem elements
     modify_at("sourceSystem", ~flatten_dfc_rename(.x, "source")) %>% 
+    # Flatten+rename committees
     modify_at("committees", function(committee){
       map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
     }) %>% 
+    # Flatten object to dataframe
     flatten_dfc() %>% 
+    # Add prefix to singular columns
     rename_with(.fn = ~str_c("action_", .), .cols = -starts_with("action")) %>% 
     janitor::clean_names()
 }
 
+# Parse the first action
 parse_action(actions_list[[1]])
 ```
 
-Using `{purrr}`'s `map_*()` functions, we can apply this function over all of the items:
+Using the `{purrr}` library's `map_*()` functions, we can apply this function over all of the items:
 
 ```{r}
 #| label: actions-dfr
