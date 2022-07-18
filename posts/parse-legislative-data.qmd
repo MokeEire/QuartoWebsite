@@ -93,9 +93,9 @@ library(xml2)
 bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 ```
 
-`read_xml()` returns an `xml_document`[^3] object. With this, we can look at the bill's top level nodes.
+Read in the file with `read_xml()` , which returns an `xml_document`[^2] object. Now check what's inside.
 
-[^3]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+[^2]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| label: xml-contents
@@ -104,9 +104,9 @@ bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BIL
 xml_contents(bill_xml_file)
 ```
 
-In this case it's actually more useful to look at the `<bill>` element which is a child node of our XML document[^4], which is what `xml_child()` is for.
+The `<dublinCore>` element is a document metadata identifier[^3] and while very useful in its own right, it isn't relevant for our purposes. In this case it's actually more useful to look at the `<bill>` child node using `xml_child()`.
 
-[^4]: I will confess I'm not quite sure why this is the case, nor do I particularly understand what `<dublinCore>` is (though prevailing theories suggest some kind of document schema or a new metal genre originating from my home of Dublin).
+[^3]: And sadly not an Irish metal music genre.
 
 ```{r}
 #| code-fold: show
@@ -299,13 +299,13 @@ Now we have the bill title, when it was introduced, what type of bill it is, and
 
 ## Parse the not-so-simple elements
 
-This is where the majority of the legwork is so if you can comfortably ignore[^5] some portion of the data, now's a good time. There's no point spending an hour trying to write a function for one particularly difficult bit of information only to realize you don't need it anyway.
+This is where the majority of the legwork is so if you can comfortably ignore[^4] some portion of the data, now's a good time. There's no point spending an hour trying to write a function for one particularly difficult bit of information only to realize you don't need it anyway.
 
-[^5]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
+[^4]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
 
-For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^6].
+For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^5].
 
-[^6]: Ctrl/Cmd+F: `extract_bill_status`
+[^5]: Ctrl/Cmd+F: `extract_bill_status`
 
 ### Actions
 
@@ -451,9 +451,9 @@ Votes are particularly interesting because it provides a more discrete measure o
   xml_contents()
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^7] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^6] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
 
-[^7]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
+[^6]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
 #| label: vote-nodes-df
