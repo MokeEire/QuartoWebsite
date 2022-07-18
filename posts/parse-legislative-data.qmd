@@ -223,7 +223,7 @@ With this output in mind and an understanding of the current data structure, we 
 
 ## Parse the simple elements
 
-The simple parts of the data to process are those which are already at the level of observation you want. In our case - at the bill level. These are typically the top-level nodes which only have one piece of data. To select only these nodes we can write a function like the one below:
+The simple parts of the data to process are those which are already at the level of observation you want. In our case - at the bill level. These are typically the top-level nodes which only have one piece of data. To select only these nodes we can write a function like the one below. It selects the child nodes, uses `xml_length()` to select the nodes which have no further child nodes (i.e. singular), and keeps the nodes which are singular and not empty.
 
 ```{r}
 #| label: singular-nodes
