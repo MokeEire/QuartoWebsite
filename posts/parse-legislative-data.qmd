@@ -73,11 +73,11 @@ It is a format designed to work with any "arbitrary" structure. For example, an 
   xmlParse()
 ```
 
-Where this action `<item>` node is one of many actions taken on a bill (its *parent* node), and may also contain multiple committee `<item>` nodes (its *children*). To have a table at this level of detail could end up being hundreds of rows per bill, which makes this flexible structure more helpful.
+Where this action `<item>` node is one of many actions taken on a `<bill>` node (its *parent* node), while an `<item>` may also contain multiple committee `<item>` nodes (its *children*). To have a table at this level of detail could end up being hundreds of rows per bill, making this flexible structure in XML more helpful.
 
 # Read XML data with R
 
-We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I usually also load the `{tidyverse}` package because it is packed with useful functions.
+We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I generally prefer the latter but I suggest looking through the packages' documentation to find the right function for your task. I usually also load the `{tidyverse}` package because it is packed with useful functions.
 
 ```{r}
 #| label: read-xml
@@ -89,14 +89,14 @@ library(xml2)
 bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 ```
 
-Read in the file with `read_xml()` , which returns an `xml_document`[^2] object. Now check what's inside.
+Read in the file with `read_xml()` , which returns an `xml_document`[^2] object.
 
 [^2]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| label: xml-contents
 #| code-fold: show
-# Look at the contents
+# Look at the xml_document's contents
 xml_contents(bill_xml_file)
 ```
 
@@ -112,7 +112,7 @@ The `<dublinCore>` element is a document metadata identifier[^3] and while very 
 (bill_xml = xml_child(bill_xml_file, "bill"))
 ```
 
-Parsing this file to a dataframe will require a little thought because we have a number of nodes which have multiple data points within them. However it's always a good idea to try the simplest approach first, which is the aptly named `xmlToDataFrame()`.
+To convert this data from XML to a dataframe we need to deal with the nodes which have nested data. This requires a little thought about what data is relevant to your question and what [level of observation](https://en.wikipedia.org/wiki/Unit_of_observation) you want to use. It is also usually a good idea to try the most direct approach first, which is the aptly named `xmlToDataFrame()`.
 
 ```{r}
 #| label: xml-to-df
@@ -127,7 +127,7 @@ bill_xml_parse = xmlParse(bill_xml_file)
   glimpse()
 ```
 
-But notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values concatenated. In our case we need to do a little bit more work to get the data into a tidy dataframe, but this approach can work for simpler XML structures. The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
+But notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values combined into a single column. In cases that have nested data, you may need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame, but this approach can work for simpler XML structures. The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
 
 ::: {.callout-tip appearance="simple"}
 ## Look at your data
