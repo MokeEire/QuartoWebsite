@@ -285,11 +285,11 @@ Now we have the bill title, when it was introduced, what type of bill it is, and
 
 ## Parse the not-so-simple elements
 
-This is where the majority of the legwork is so if you can comfortably ignore[^4] some portion of the data, now's a good time. There's no point spending an hour trying to write a function for one particularly difficult bit of information only to realize you don't need it anyway.
+This is where the majority of the legwork is so if you can comfortably filter out some data[^4], now's a good time. There's no point spending an hour trying to process one particularly difficult bit of information only to realize it isn't useful to you anyway.
 
 [^4]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
 
-For brevity I will just go through actions and votes, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^5].
+For brevity I'll go through how to process the actions and votes elements, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^5].
 
 [^5]: Ctrl/Cmd+F: `extract_bill_status`
 
@@ -302,7 +302,14 @@ What's in the actions container?
 (actions_xml = xml_find_all(bill_xml, "actions/item"))
 ```
 
-So this bill has 14 actions recorded on it. We can use `as_list()` to convert the XML to a list.
+And what does a single action element look like?
+
+```{r}
+#| label: action-xml-item
+xml_contents(actions_xml[1])
+```
+
+So this bill has 14 actions recorded on it. We can use `as_list()` to convert the `{xml_nodeset}` to a list.
 
 ```{r}
 #| label: actions-list
