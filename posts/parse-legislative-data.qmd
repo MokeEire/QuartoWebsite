@@ -44,7 +44,7 @@ knit_print.data.frame = function(x, ...){
 }
 ```
 
-Data comes in many forms. You have probably used data formats like Excel spreadsheets, text files, relational databases and if you're reading this you may have run into files stored in (e)Xtensible Markup Language, or XML. XML is a storage format designed for flexibly transmitting data[^1] but this flexibility often leads to a bit of a hassle when trying to parse it for use in analytics. This article takes a look at this tricky, but valuable data type, how to use it, and a set of steps for processing XML with R.
+Data comes in many forms. You've probably used data formats like Excel spreadsheets, text files, databases and if you're reading this maybe even (e)Xtensible Markup Language, or XML. XML is a storage format designed for flexibly transmitting data[^1] but this flexibility often leads to a bit of a hassle when trying to parse it for use in analytics. This article takes a look at this tricky, but valuable data type, how to use it, and a set of steps for processing XML with R.
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
@@ -58,9 +58,9 @@ Data comes in many forms. You have probably used data formats like Excel spreads
 -   List, map, and flatten your data into a tabular format
 :::
 
-The impetus for this post was the US government's congressional data. The US General Post Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I wanted to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not).
+The impetus for this post was the US government's congressional data. The US General Post Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I'm curious to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not). More to come on this in the future.
 
-As always the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for how to interpret the data and where its limitations are.
+As always, the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) on how to interpret the data and where its limitations are.
 
 To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"). The sample bill (chosen because its contents are instructional for data cleaning) is [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)*.*
 
@@ -159,6 +159,7 @@ example_bill_df %>% # glimpse() # here to check the data
     wrap = F,
     columns = list(
       "latest_action_action_date" = colDef(name = "action_date", 
+                                           width = 115,
                                            format = colFormat(date = T)),
      "latest_action_text" = colDef(name = "action_text"),
        "constitutional_authority_statement_text" = colDef(show=F),
@@ -166,6 +167,7 @@ example_bill_df %>% # glimpse() # here to check the data
       "update_date" = colDef(format = colFormat(date = T), width = 100),
       "introduced_date" = colDef(format = colFormat(date = T), width = 135),
       "congress" = colDef(width = 80),
+     "origin_chamber" = colDef(show=F),
       "version" = colDef(show = F, width = 80),
       "bill_number" = colDef(width = 100),
       "bill_type" = colDef(width = 80),
@@ -217,11 +219,11 @@ glimpse(example_bill_df[["sponsors"]])
 ```
 :::
 
-With this output in mind and an understanding of the current data structure, we can break the parsing process down into two categories - the simple, and the not-so-simple.
-
 # Parsing
 
-## Parse the simple elements
+With this output in mind and an understanding of the current data structure, we can break the parsing process down into two categories - the simple, and the not-so-simple.
+
+## The simple elements
 
 The simple parts of the data to process are those which are already at the level of observation you want. In our case - at the bill level. These are typically the top-level nodes which only have one piece of data. To select only these nodes we can write a function like the one below. It selects the child nodes, uses `xml_length()` to select the nodes which have no further child nodes (i.e. singular), and keeps the nodes which are singular and not empty.
 
@@ -278,7 +280,7 @@ reactable(bill_df,
 
 This includes the bill title, when it was introduced, what type of bill it is, and which congress introduced it. To combine the data for actions, sponsors, committees, and votes, we need to process them individually.
 
-## Parse the not-so-simple elements
+## The not-so-simple elements
 
 This is where the majority of the legwork is so if you can comfortably filter out some data[^4], now's a good time. There's no point spending an hour trying to process one particularly difficult bit of information only to realize it isn't useful to you anyway.
 
@@ -311,6 +313,7 @@ So this bill has 14 actions recorded on it. We can use `as_list()` to convert th
 #| code-fold: show
 actions_list = as_list(actions_xml)
 
+# Look at the first action
 glimpse(actions_list[[1]])
 ```
 
