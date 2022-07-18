@@ -215,14 +215,6 @@ glimpse(example_bill_df[["actions"]])
 #| echo: false
 glimpse(example_bill_df[["sponsors"]])
 ```
-
-## Cosponsors
-
-```{r}
-#| label: glimpse-cosponsors
-#| echo: false
-glimpse(example_bill_df[["cosponsors"]])
-```
 :::
 
 With this output in mind and an understanding of the current data structure, we can break the parsing process down into two categories - the simple, and the not-so-simple.
