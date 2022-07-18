@@ -58,30 +58,26 @@ Data comes in many forms. You have probably used data formats like Excel spreads
 -   List, map, and flatten your data into a tabular format
 :::
 
-I'll be using the US government's congressional bill data as an example. As always the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for how the data is stored.
+The impetus for this post was the US government's congressional data. The US General Post Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I wanted to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not).
 
-To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"). The sample bill (chosen only because it contains examples of important elements) is [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs) and the XML file contains information about its sponsors and cosponsors, votes on the bill, and the committees that considered it.
+As always the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for how to interpret the data and where its limitations are.
 
-Here's a sample of the XML:
+To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"). The sample bill (chosen because its contents are instructional for data cleaning) is [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)*.*
+
+# What is XML?
+
+It is a format designed to work with any "arbitrary" structure. For example, an action taken on a bill in our data looks like this:
 
 ```{r}
-#| label: xml-sample
-#| code-overflow: scroll
-#| echo: false
-# (example_node = xml_find_first(bill_xml_file, "//bill")) %>% 
-#   xmlParse()
-
-xml_child(bill_xml_file) %>% 
-  xml_contents()
+(example_node = xml_find_first(bill_xml_file, "bill/actions/item")) %>% 
+  xmlParse()
 ```
 
-Above is an example of how votes recorded on the bill are stored. The `<recordedVotes>` container can have multiple `<recordedVote>` elements which describe a vote taken on the bill[^2].
-
-[^2]: We can (and later I do) go deeper here and extract the roll's XML file to get individual representatives' votes.
+Where this action `<item>` node is one of many actions taken on a bill (its *parent* node), and may also contain multiple committee `<item>` nodes (its *children*). To have a table at this level of detail could end up being hundreds of rows per bill, which makes this flexible structure more helpful.
 
 # Read XML data with R
 
-We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I also load the `{tidyverse}` package because it's generally exceedingly useful.
+We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I strongly suggest looking through the packages' help files to find the right function for your task. I usually also load the `{tidyverse}` package because it is packed with useful functions.
 
 ```{r}
 #| label: read-xml
@@ -131,14 +127,12 @@ bill_xml_parse = xmlParse(bill_xml_file)
   glimpse()
 ```
 
-But notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values concatenated. This approach works for simpler XML structures, but in this case we need to do a little bit more work to get the data into a tidy dataframe.
-
-That brings us to one of the cardinal rules of data analysis:
+But notice that a number of fields like `actions`, `committees`, and `sponsors` have had their values concatenated. In our case we need to do a little bit more work to get the data into a tidy dataframe, but this approach can work for simpler XML structures. The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
 
 ::: {.callout-tip appearance="simple"}
 ## Look at your data
 
-Look at the structure and contents of your data and understand how it is organized. This is essential for coming up with a solution to consistently process the data.
+In fact, you could even say *stare* at it. Understanding the structure and contents of your data is essential for designing a solution to consistently process the data.
 :::
 
 # Define the output
