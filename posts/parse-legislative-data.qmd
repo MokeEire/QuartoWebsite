@@ -362,7 +362,7 @@ What's in the actions container?
 
 ```{r}
 #| label: actions-xml
-(actions_xml = xml_find_all(bill_xml, "actions/item"))
+(actions_xml = xml_find_all(bill_node, "actions/item"))
 ```
 
 And what does a single action element look like?
@@ -393,12 +393,40 @@ In the individual action container, we can see we have the type, text, and date 
 # rename the columns with a given prefix
 flatten_dfc_rename = function(list_to_flatten, 
                           name_prefix = "prefix"){
-  rename_with(flatten_dfc(list_to_flatten), ~str_c(name_prefix, "_", .))
+  rename_with(
+    .data = flatten_dfc(list_to_flatten), 
+    .fn = ~str_c(name_prefix, "_", .),
+    # Exclude columns which already start with the prefix
+    .cols = -starts_with(name_prefix)
+    )
 }
 
 # Function: parse_action
 # Parse actions from list to dataframe
 parse_action = function(action){
+  action %>% 
+    # Flatten+rename  sourceSystem elements
+    map_at("sourceSystem", ~flatten_dfc_rename(.x, "source")) %>% 
+    # Flatten+rename committees
+    map_at("committees", function(committee){
+      map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
+    }) %>% 
+    # Flatten object to dataframe
+    flatten_dfc_rename(., "action") %>% 
+    janitor::clean_names()
+}
+
+# Parse the first action
+parse_action(actions_list[[1]]) %>% 
+  glimpse()
+```
+
+```{r}
+#| label: benchmark-parse-action
+#| eval: false
+#| include: false
+# Test modify_at vs map_at
+parse_action2 = function(action){
   action %>% 
     # Flatten+rename  sourceSystem elements
     modify_at("sourceSystem", ~flatten_dfc_rename(.x, "source")) %>% 
@@ -407,17 +435,21 @@ parse_action = function(action){
       map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
     }) %>% 
     # Flatten object to dataframe
-    flatten_dfc() %>% 
-    # Add prefix to singular columns
-    rename_with(.fn = ~str_c("action_", .), .cols = -starts_with("action")) %>% 
+    flatten_dfc_rename(., "action") %>% 
     janitor::clean_names()
 }
 
 # Parse the first action
-parse_action(actions_list[[1]])
+parse_action2(actions_list[[1]])
+
+# What about speed?
+microbenchmark::microbenchmark(
+  parse_action = parse_action(actions_list[[1]]),
+  parse_action2 = parse_action2(actions_list[[1]]), times = 1000
+)
 ```
 
-Using the `{purrr}` library's `map_*()` functions, we can apply this function over all of the items:
+Using the `{purrr}` library's `map_dfr()`, we can apply this function to each action and combine the results as rows in a dataframe.
 
 ```{r}
 #| label: actions-dfr
