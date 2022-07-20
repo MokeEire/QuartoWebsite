@@ -77,16 +77,17 @@ Where this action `<item>` node is one of many actions taken on a `<bill>` node 
 
 # Read XML data with R
 
-We'll load the `{XML}` and `{xml2}` packages to read in our XML file. Between these two libraries there are numerous ways to load in and process XML data. I generally prefer the latter but I suggest looking through the packages' documentation to find the right function for your task. I usually also load the `{tidyverse}` package because it is packed with useful functions.
+Here are the tools we'll be using. Between `{XML}` and `{xml2}` there are numerous ways to load in and process XML data. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task. `{purrr}` helps us parse and flatten the data into tabular form once we've converted it to a list.
 
 ```{r}
 #| label: read-xml
 #| code-fold: show
-library(tidyverse)
 library(XML)
 library(xml2)
+library(purrr)
 
-bill_xml_file = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
+
+bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 ```
 
 Read in the file with `read_xml()` , which returns an `xml_document`[^2] object.
@@ -97,7 +98,7 @@ Read in the file with `read_xml()` , which returns an `xml_document`[^2] object.
 #| label: xml-contents
 #| code-fold: show
 # Look at the xml_document's contents
-xml_contents(bill_xml_file)
+xml_contents(bill_xml)
 ```
 
 The `<dublinCore>` element is a document metadata identifier[^3] and while very useful in its own right, it isn't relevant for our purposes. In this case it's actually more useful to look at the `<bill>` child node using `xml_child()`.
