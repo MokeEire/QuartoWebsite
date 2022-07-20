@@ -58,7 +58,7 @@ Data comes in many forms. You've probably used data formats like Excel spreadshe
 -   List, map, and flatten your data into a tabular format
 :::
 
-The impetus for this post was the US government's congressional data. The US General Post Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I'm curious to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not). More to come on this in the future.
+The impetus for this post was the US government's congressional data. The US Government Publishing Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I'm curious to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not). More to come on this in the future.
 
 As always, the first step of data analysis is to check if any documentation exists and thankfully [govinfo](https://www.govinfo.gov/) has provided some [guidance](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) on how to interpret the data and where its limitations are.
 
