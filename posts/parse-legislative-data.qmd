@@ -238,9 +238,17 @@ glimpse(example_bill_df[["sponsors"]])
 
 With this output in mind and an understanding of the current data structure, we can break the parsing process down into two categories - the simple, and the not-so-simple.
 
+In general, the process is two steps:
+
+1.  Convert XML to a list with `as_list()`
+2.  Flatten the list to a data frame using a combination of functions from `{purrr}`
+    a.  `flatten_dfc()`/`flatten_dfr()` to flatten a list into a data frame by column or row respectively
+
+    b.  `map_dfc()`/`map_dfr()` to apply a function to each element of a list and combine the results as columns or rows in a data frame respectively
+
 ## The simple elements
 
-The simple parts of the data to process are those which are already at the level of observation you want. In our case - at the bill level. These are typically the top-level nodes which only have one piece of data. To select only these nodes we can write a function like the one below. It selects the child nodes, uses `xml_length()` to select the nodes which have no further child nodes (i.e. singular), and keeps the nodes which are singular and not empty.
+The simple parts of the data to process are those which are already at the level of observation you want. In our case - at the bill level. These are typically the top-level nodes which only have one piece of data. To select only these nodes we want to select the bill's child nodes which have no further children and are not empty. We can write a function in R like the one below, or use [XPath](https://www.w3schools.com/xml/xml_parser.asp) (or XML Path Language) to identify the nodes we want directly. In the process of writing this, I discovered that using XPath made this \~5x faster but I include the R function because XPath can be tricky and it may be useful to some.
 
 ```{r}
 #| label: singular-nodes
@@ -256,22 +264,65 @@ xml_singular_nodes = function(xml_node){
   keep(zero_length_child_nodes, ~(xml_text(.) != ""))
 }
 
-(singular_nodes = xml_singular_nodes(bill_xml))
+# Using XPath:
+singular_nodes1 = xml_find_all(bill_xml, 
+                                "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]")
+
+# Using R function:
+singular_nodes2 = xml_singular_nodes(bill_node)
+
+# Check they are the same
+# all.equal(singular_nodes1, singular_nodes2)
+
+# Use the first one 
+singular_nodes = singular_nodes1
 
 ```
-
-Now with a nifty combination of `as_list()`, `xml_name()`, and `flatten_dfc()` we can go from XML -\> list -\> dataframe. The process convert the singular nodes into a list, names them, and flattens each element of the list into a single column of data.
 
 ```{r}
-#| label: singular-nodes-df
-#| code-fold: show
-bill_df = as_list(singular_nodes) %>% 
-  # as_list() doesn't retain element names so we set names ourselves
-  setNames(xml_name(singular_nodes)) %>% 
-  flatten_dfc()
+#| label: bench-node-selection
+#| eval: false
+#| echo: false
+
+# benchmark the two different ways of selecting nodes
+microbenchmark::microbenchmark(
+  xml_singular_nodes = xml_singular_nodes(bill_node),
+  xml_find_all = xml_find_all(bill_xml, "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]")
+)
 ```
 
-Which combines to give us a single row of data:
+### XML -\> List
+
+The first step is to convert the XML to a list using `as_list()`.
+
+```{r}
+#| label: singular-nodes-list
+#| code-fold: show
+(singular_list = as_list(singular_nodes)) %>% 
+  glimpse()
+```
+
+Note that we didn't retain the element names so we need to assign them ourselves.
+
+```{r}
+#| label: singular-nodes-list-named
+#| code-fold: show
+(singular_list_named = setNames(singular_list, xml_name(singular_nodes))) %>% 
+  glimpse()
+```
+
+### List -\> Dataframe
+
+Lastly, we want to flatten this list into a dataframe using purrr's `flatten_dfc()` which flattens each list element into a **d**ata**f**rame **c**olumn.
+
+```{r}
+#| label: singular-nodes-list-flattened
+#| code-fold: show
+(bill_df = flatten_dfc(singular_list_named)) %>% 
+  glimpse()
+```
+
+Or in table form:
 
 ```{r}
 #| label: singular-nodes-rt
