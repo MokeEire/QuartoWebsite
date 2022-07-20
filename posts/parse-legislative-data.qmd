@@ -542,7 +542,7 @@ Votes are particularly interesting because it provides a more discrete measure o
 
 ```{r}
 #| label: vote-nodes-contents
-(bill_recorded_vote_nodes = xml_find_all(bill_xml, "recordedVotes/recordedVote")) %>% 
+(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote")) %>% 
   xml_contents()
 ```
 
@@ -666,8 +666,7 @@ Once we have our nodeset (which at last are all singular), we use same listing, 
 #| label: vote-roll-metadata-totals-party
 #| message: false
 #| warning: false
-(party_vote_totals_df = vote_totals_by_party %>% 
-  as_list() %>% 
+(party_vote_totals_df = as_list(vote_totals_by_party) %>% 
   map_dfr(flatten_dfc) %>% 
     type_convert())
 ```
