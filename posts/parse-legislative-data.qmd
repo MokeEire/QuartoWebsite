@@ -313,7 +313,7 @@ Note that we didn't retain the element names so we need to assign them ourselves
 
 ### List -\> Dataframe
 
-Lastly, we want to flatten this list into a dataframe using purrr's `flatten_dfc()` which flattens each list element into a **d**ata**f**rame **c**olumn.
+Lastly, using purrr's `flatten_dfc()` we can flatten each list element into a **d**ata**f**rame **c**olumn.
 
 ```{r}
 #| label: singular-nodes-list-flattened
@@ -344,46 +344,44 @@ reactable(bill_df,
             ))
 ```
 
-This includes the bill title, when it was introduced, what type of bill it is, and which congress introduced it. To combine the data for actions, sponsors, committees, and votes, we need to process them individually.
+Our dataframe includes the bill title, when it was introduced, what type of bill it is, and which congress introduced it.
 
 ## The not-so-simple elements
 
-This is where the majority of the legwork is so if you can comfortably filter out some data[^4], now's a good time. There's no point spending an hour trying to process one particularly difficult bit of information only to realize it isn't useful to you anyway.
+To combine nested data like that of actions and votes, we will use the same steps as before, tailored to each element's data structure. For more complex cases, I would implore you to write functions[^4]. They can make your code more reliable, easier to debug, and they make you think critically about how you are handling data.
 
-[^4]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
+[^4]: [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/) is a good place to start learning about writing functions.
 
-For brevity I'll go through how to process the actions and votes elements, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^5].
+This is where the majority of the legwork is so if you can comfortably filter out some data[^5], now's a good time. There's no point spending an hour trying to process one particularly difficult bit of information only to realize it isn't useful to you anyway.
 
-[^5]: Ctrl/Cmd+F: `extract_bill_status`
+[^5]: But do yourself a favour and write it down somewhere - comment it in the code, tell your colleagues or collaborators, put it on a particularly strong post it, whatever works.
 
 ### Actions
 
-What's in the actions container?
+The actions node has an `<item>` child node for each congressional action taken for a bill, such as being introduced, sent to a committee, debated on the floor, etc.
+
+Below is an example of a single action element.
 
 ```{r}
 #| label: actions-xml
 (actions_xml = xml_find_all(bill_node, "actions/item"))
-```
 
-And what does a single action element look like?
-
-```{r}
-#| label: action-xml-item
+# Look at first action
 xml_contents(actions_xml[1])
 ```
 
-So this bill has 14 actions recorded on it. We can use `as_list()` to convert the `{xml_nodeset}` to a list.
+Just as before, we use `as_list()` to convert the `{xml_nodeset}` to a list.
 
 ```{r}
 #| label: actions-list
 #| code-fold: show
 actions_list = as_list(actions_xml)
 
-# Look at the first action
+# Look at first action
 glimpse(actions_list[[1]])
 ```
 
-In the individual action container, we can see we have the type, text, and date of the action, a list of committees related to the action, and some elements which are singular and some which are not. To deal with this, we can write a function (or set of functions) like the ones below to process an action:
+In the individual action container, we can see we have the type, text, and date of the action, a list of committees related to the action, and some elements which are singular and some which are not. To deal with this, we can write a function (or set of functions) like the ones below to process an action.
 
 ```{r}
 #| label: actions-functions
@@ -405,7 +403,7 @@ flatten_dfc_rename = function(list_to_flatten,
 # Parse actions from list to dataframe
 parse_action = function(action){
   action %>% 
-    # Flatten+rename  sourceSystem elements
+    # Flatten+rename sourceSystem elements
     map_at("sourceSystem", ~flatten_dfc_rename(.x, "source")) %>% 
     # Flatten+rename committees
     map_at("committees", function(committee){
@@ -413,6 +411,7 @@ parse_action = function(action){
     }) %>% 
     # Flatten object to dataframe
     flatten_dfc_rename(., "action") %>% 
+    # Lastly, clean the names
     janitor::clean_names()
 }
 
@@ -449,7 +448,7 @@ microbenchmark::microbenchmark(
 )
 ```
 
-Using the `{purrr}` library's `map_dfr()`, we can apply this function to each action and combine the results as rows in a dataframe.
+Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata**f**rame **r**ows.
 
 ```{r}
 #| label: actions-dfr
@@ -458,7 +457,7 @@ Using the `{purrr}` library's `map_dfr()`, we can apply this function to each ac
   glimpse()
 ```
 
-Now if you're processing a large amount of these data, you may want to be explicit about the data types expected in each column. This is vital when we want to `unnest()` the actions data and combine many bills' actions into an actions-level dataset. You can do this using `type_convert()` , notice the change in column types from the output above.
+Now if you're processing a large amount of data, you may want to be explicit about the data types expected in each column. This is vital when we want to `unnest()` the actions data into an actions-level dataset. You can do this using `type_convert()` , notice the change in column types from the output above.
 
 ```{r}
 #| label: actions-type-conv
