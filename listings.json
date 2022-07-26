@@ -2,13 +2,13 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/posts/parse-legislative-data.html"
+      "/posts/parse-xml.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
-      "/posts/parse-legislative-data.html"
+      "/posts/parse-xml.html"
     ]
   }
 ]
