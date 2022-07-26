@@ -488,30 +488,6 @@ bill_df$actions = list(actions_df)
 glimpse(bill_df)
 ```
 
-The remaining sections will be following the same process for different elements, but it can be boiled down to these steps:
-
-1.  **Explore the structure**
-
-> Go through any available documentation, and when you read in the XML file you can use functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` .
-
-2.  **Define the output**
-
-> Consider what you want the output to look like and think about how it needs to be transformed to match this target.
-
-3.  **Process a single element** (write a function if it gets too complicated)
-
-> Get one element into the form you want. Writing functions can help you think through the data transformations being applied and make your code easier to read.
-
-4.  **Apply to all elements**
-
-> Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a dataframe of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.
-
-::: {.callout-caution appearance="simple"}
-## Find the exceptions
-
-Lastly, you will likely run into situations where a node which only seemed to contain a single piece of data has a different structure with multiple sub-elements for other files. This will happen, you'll go back to the drawing board, design more flexibility in your functions, and understand how process either format.
-:::
-
 ```{r}
 #| eval: false
 #| include: false
@@ -702,7 +678,7 @@ And we continue to stack this Russian doll of data from the legislator-level to 
   glimpse()
 ```
 
-...all the way until we've gotten back to the bill-level.
+...all the way until we've gotten back to the bill-level. Now we have the bill-level characteristics with action and vote information nested in list columns.
 
 ```{r}
 #| label: add-bills
@@ -710,6 +686,40 @@ bill_df$votes = list(recorded_votes_df)
 
 glimpse(bill_df)
 ```
+
+Meaning if we want to analyze the actions data, we simply have to `unnest()` it.
+
+```{r}
+#| label: unnest-actions
+unnest(bill_df, actions) %>% 
+  glimpse()
+```
+
+I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^7].
+
+[^7]: Ctrl/Cmd+F: `extract_bill_status`
+
+# TL;DR: Main Points
+
+Processing XML documents can be simple depending on their structure, so try the simplest method if you can. If your data is making use of XML's flexibility you might but it can be boiled down to these steps:
+
+1.  **Explore the structure**
+
+> Go through any available documentation, and when you read in the XML file you can use functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` .
+
+2.  **Define the output**
+
+> Consider what you want the output to look like and think about how it needs to be transformed to match this target.
+
+3.  **Process a single element** (write a function if it gets too complicated)
+
+> Get one element into the form you want. Writing functions can help you think through the data transformations being applied and make your code easier to read.
+
+4.  **Apply to all elements**
+
+> Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a dataframe of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.
+
+Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.
 
 ```{r}
 #| eval: false
