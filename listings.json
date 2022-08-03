@@ -2,13 +2,13 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/posts/parse-xml.html"
+      "/posts/parse-xml/parse-xml.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
-      "/posts/parse-xml.html"
+      "/posts/parse-xml/parse-xml.html"
     ]
   }
 ]

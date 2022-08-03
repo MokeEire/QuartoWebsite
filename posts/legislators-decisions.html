@@ -154,11 +154,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc"><h2 id="toc-title">On this page</h2>
-   
-  <ul>
-<li><a href="#session-info" id="toc-session-info" class="nav-link active" data-scroll-target="#session-info">Session Info</a></li>
-  </ul></nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
@@ -188,115 +184,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </header><div class="cell">
 
 </div>
-<p>Governance institutions around the world appear to be struggling to take on modern challenges as they grow from <em>changes</em> to <em>crises</em>. In the US in particular, legislators have squarely failed to address several ongoing crises. The credibility of the governing institutions is deteriorating as the response to a global pandemic has been delayed and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence. Why is the US Congress struggling to pass effective legislation? Can we even evaluate the institutions and individuals who determine the laws we live by?</p>
-<p>The impetus for this post was the US government’s congressional data. The US Government Publishing Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g.&nbsp;votes and debates. I’m curious to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not). More to come on this in the future.</p>
-<p>As always, the first step of data analysis is to check if any documentation exists and thankfully <a href="https://www.govinfo.gov/">govinfo</a> has provided some <a href="https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md">guidance</a> on how to interpret the data and where its limitations are.</p>
-<p>To follow along, you can download the sample XML file <a href="https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml" title="HR-391: Global Health Security Act of 2021">here</a>. The sample bill (chosen because its contents are instructional for data cleaning) is <a href="https://www.govinfo.gov/app/details/BILLS-117hr391rfs"><em>HR-391: Global Health Security Act of 2021</em></a><em>.</em></p>
-<section id="session-info" class="level1"><h1>Session Info</h1>
-<p>Version information about R, OS, and loaded packages.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>─ Session info ───────────────────────────────────────────────────────────────
- setting  value
- version  R version 4.2.1 (2022-06-23 ucrt)
- os       Windows 10 x64 (build 19043)
- system   x86_64, mingw32
- ui       RTerm
- language (EN)
- collate  English_United States.utf8
- ctype    English_United States.utf8
- tz       America/Los_Angeles
- date     2022-07-26
- pandoc   2.18 @ C:/Program Files/RStudio/bin/quarto/bin/tools/ (via rmarkdown)
-
-─ Packages ───────────────────────────────────────────────────────────────────
- package     * version   date (UTC) lib source
- assertthat    0.2.1     2019-03-21 [1] CRAN (R 4.2.0)
- backports     1.4.1     2021-12-13 [1] CRAN (R 4.2.0)
- bit           4.0.4     2020-08-04 [1] CRAN (R 4.2.0)
- bit64         4.0.5     2020-08-30 [1] CRAN (R 4.2.0)
- bitops        1.0-7     2021-04-24 [1] CRAN (R 4.2.0)
- broom         1.0.0     2022-07-01 [1] CRAN (R 4.2.1)
- cellranger    1.1.0     2016-07-27 [1] CRAN (R 4.2.0)
- cli           3.3.0     2022-04-25 [1] CRAN (R 4.2.0)
- colorspace    2.0-3     2022-02-21 [1] CRAN (R 4.2.0)
- crayon        1.5.1     2022-03-26 [1] CRAN (R 4.2.0)
- curl          4.3.2     2021-06-23 [1] CRAN (R 4.2.0)
- DBI           1.1.3     2022-06-18 [1] CRAN (R 4.2.0)
- dbplyr        2.2.1     2022-06-27 [1] CRAN (R 4.2.1)
- digest        0.6.29    2021-12-01 [1] CRAN (R 4.2.0)
- dplyr       * 1.0.9     2022-04-28 [1] CRAN (R 4.2.0)
- ellipsis      0.3.2     2021-04-29 [1] CRAN (R 4.2.0)
- evaluate      0.15      2022-02-18 [1] CRAN (R 4.2.0)
- extrafont   * 0.18      2022-04-12 [1] CRAN (R 4.2.0)
- extrafontdb   1.0       2012-06-11 [1] CRAN (R 4.2.0)
- fansi         1.0.3     2022-03-24 [1] CRAN (R 4.2.0)
- fastmap       1.1.0     2021-01-25 [1] CRAN (R 4.2.0)
- forcats     * 0.5.1     2021-01-27 [1] CRAN (R 4.2.0)
- fs            1.5.2     2021-12-08 [1] CRAN (R 4.2.0)
- generics      0.1.2     2022-01-31 [1] CRAN (R 4.2.0)
- ggplot2     * 3.3.6     2022-05-03 [1] CRAN (R 4.2.0)
- glue          1.6.2     2022-02-24 [1] CRAN (R 4.2.0)
- gtable        0.3.0     2019-03-25 [1] CRAN (R 4.2.0)
- haven         2.5.0     2022-04-15 [1] CRAN (R 4.2.0)
- hms           1.1.1     2021-09-26 [1] CRAN (R 4.2.0)
- htmltools     0.5.2     2021-08-25 [1] CRAN (R 4.2.0)
- htmlwidgets   1.5.4     2021-09-08 [1] CRAN (R 4.2.0)
- httr          1.4.3     2022-05-04 [1] CRAN (R 4.2.0)
- jsonlite    * 1.8.0     2022-02-22 [1] CRAN (R 4.2.0)
- knitr         1.39      2022-04-26 [1] CRAN (R 4.2.0)
- lifecycle     1.0.1     2021-09-24 [1] CRAN (R 4.2.0)
- log4r       * 0.4.2     2021-11-04 [1] CRAN (R 4.2.0)
- lubridate   * 1.8.0     2021-10-07 [1] CRAN (R 4.2.0)
- magrittr    * 2.0.3     2022-03-30 [1] CRAN (R 4.2.0)
- modelr        0.1.8     2020-05-19 [1] CRAN (R 4.2.0)
- mokeR       * 0.1.0     2022-07-16 [1] local
- munsell       0.5.0     2018-06-12 [1] CRAN (R 4.2.0)
- pillar        1.7.0     2022-02-01 [1] CRAN (R 4.2.0)
- pkgconfig     2.0.3     2019-09-22 [1] CRAN (R 4.2.0)
- purrr       * 0.3.4     2020-04-17 [1] CRAN (R 4.2.0)
- R6            2.5.1     2021-08-19 [1] CRAN (R 4.2.0)
- RCurl       * 1.98-1.7  2022-06-09 [1] CRAN (R 4.2.0)
- reactable   * 0.3.0     2022-05-26 [1] CRAN (R 4.2.0)
- readr       * 2.1.2     2022-01-30 [1] CRAN (R 4.2.0)
- readxl        1.4.0     2022-03-28 [1] CRAN (R 4.2.0)
- reprex        2.0.1     2021-08-05 [1] CRAN (R 4.2.0)
- rjson       * 0.2.21    2022-01-09 [1] CRAN (R 4.2.0)
- rlang         1.0.4     2022-07-12 [1] CRAN (R 4.2.1)
- rmarkdown     2.14      2022-04-25 [1] CRAN (R 4.2.0)
- rstudioapi    0.13      2020-11-12 [1] CRAN (R 4.2.0)
- Rttf2pt1      1.3.8     2020-01-10 [1] CRAN (R 4.2.1)
- rvest         1.0.2     2021-10-16 [1] CRAN (R 4.2.0)
- scales        1.2.0     2022-04-13 [1] CRAN (R 4.2.0)
- sessioninfo   1.2.2     2021-12-06 [1] CRAN (R 4.2.0)
- stringi       1.7.6     2021-11-29 [1] CRAN (R 4.2.0)
- stringr     * 1.4.0     2019-02-10 [1] CRAN (R 4.2.0)
- tibble      * 3.1.7     2022-05-03 [1] CRAN (R 4.2.0)
- tidyjson    * 0.3.1     2020-05-31 [1] CRAN (R 4.2.0)
- tidyr       * 1.2.0     2022-02-01 [1] CRAN (R 4.2.0)
- tidyselect    1.1.2     2022-02-21 [1] CRAN (R 4.2.0)
- tidyverse   * 1.3.1     2021-04-15 [1] CRAN (R 4.2.0)
- tzdb          0.3.0     2022-03-28 [1] CRAN (R 4.2.0)
- utf8          1.2.2     2021-07-24 [1] CRAN (R 4.2.0)
- vctrs         0.4.1     2022-04-13 [1] CRAN (R 4.2.0)
- vroom         1.5.7     2021-11-30 [1] CRAN (R 4.2.0)
- withr         2.5.0     2022-03-03 [1] CRAN (R 4.2.0)
- xfun          0.31      2022-05-10 [1] CRAN (R 4.2.0)
- XML         * 3.99-0.10 2022-06-09 [1] CRAN (R 4.2.0)
- xml2        * 1.3.3     2021-11-30 [1] CRAN (R 4.2.0)
- yaml          2.3.5     2022-02-21 [1] CRAN (R 4.2.0)
-
- [1] C:/Users/Mark/AppData/Local/R/win-library/4.2
- [2] C:/Program Files/R/R-4.2.1/library
-
-──────────────────────────────────────────────────────────────────────────────</code></pre>
-</div>
-</div>
+<p>Governance institutions around the world appear to be struggling to take on modern challenges as they grow from <em>changes</em> to <em>crises</em>. In the US in particular, legislators have squarely failed to address several ongoing crises. The credibility of the governing institutions is deteriorating as the response to a global pandemic has been delayed and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence. Why is the US Congress struggling to pass effective legislation? Can we even evaluate the institutions and individuals who decide the laws we live by?</p>
+<p>There is a framework for minimizing decision-making error in individuals and groups known as <em>decision hygiene</em>. In the book <em>Noise</em>, the authors deconstruct the concept of error into two sources - bias and noise - to demonstrate how the solution depends on both. Bias is a consistent influence on the outcome - think the effect of partisanship on a person’s stance on gun policy. Noise describes the inherent variability of the context. For instance, if all we knew was a person’s political affiliation we might predict that a democrat favours gun <em>control</em> and a republican favours gun <em>rights</em><a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. But we also know there are democrats and republicans for whom this would be a bad prediction. The many factors we don’t know about that affect a person’s views are what creates the noise.</p>
+<p>How would the principles of decision hygiene apply to the decision-making of our legislators? The goal of this article is to answer this question.</p>
 
 
 <!-- -->
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+<ol>
+<li id="fn1" role="doc-endnote"><p>Notice the use of framing in the political landscape? I would bet this is related to polarization, but it would be interesting to examine whether it is a cause, a result, or both.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol></section></div></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const icon = "";
   const anchorJS = new window.AnchorJS();
@@ -426,70 +324,60 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Why we need to think about our legislator's decisions"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> ""</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2022-07-14"</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> true</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">  - policy</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">  - governance</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">  - decision-making</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">  html: </span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">    code-link: true</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: show</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">    comments:</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">      hypothesis: true</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(extrafont)</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reactable)</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R"</span>)</span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>bill_xml_link <span class="ot">=</span> <span class="st">"https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>bill_xml_file <span class="ot">=</span> <span class="fu">read_xml</span>(bill_xml_link)</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: df-print-fct</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>knit_print.data.frame <span class="ot">=</span> <span class="cf">function</span>(x, ...){</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">knit_print</span>(</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">reactable</span>(x,</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>              <span class="at">compact =</span> T, </span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>              <span class="at">resizable =</span> T,</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>              ),</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    ...</span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>Governance institutions around the world appear to be struggling to take on modern challenges as they grow from *changes* to *crises*. In the US in particular, legislators have squarely failed to address several ongoing crises. The credibility of the governing institutions is deteriorating as the response to a global pandemic has been delayed and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence. Why is the US Congress struggling to pass effective legislation? Can we even evaluate the institutions and individuals who determine the laws we live by?</span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>The impetus for this post was the US government's congressional data. The US Government Publishing Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g. votes and debates. I'm curious to see what kind of insights we can glean about the legislative structures and context of decision-making that determines the laws that are passed (or not). More to come on this in the future.</span>
-<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>As always, the first step of data analysis is to check if any documentation exists and thankfully <span class="co">[</span><span class="ot">govinfo</span><span class="co">](https://www.govinfo.gov/)</span> has provided some <span class="co">[</span><span class="ot">guidance</span><span class="co">](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md)</span> on how to interpret the data and where its limitations are.</span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>To follow along, you can download the sample XML file <span class="co">[</span><span class="ot">here</span><span class="co">](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021")</span>. The sample bill (chosen because its contents are instructional for data cleaning) is <span class="co">[</span><span class="ot">*HR-391: Global Health Security Act of 2021*</span><span class="co">](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)</span>*.*</span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session Info</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>Version information about R, OS, and loaded packages.</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: session-info</span></span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>sessioninfo<span class="sc">::</span><span class="fu">session_info</span>(<span class="st">"loaded"</span>)</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Why we need to think about our legislator's decisions"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> ""</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> "2022-07-14"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="an">draft:</span><span class="co"> true</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="an">categories:</span><span class="co"> </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">  - policy</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">  - governance</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">  - decision-making</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> </span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">  html: </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co">    code-link: true</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">    code-fold: show</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">    comments:</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">      hypothesis: true</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(extrafont)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reactable)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R"</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>bill_xml_link <span class="ot">=</span> <span class="st">"https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>bill_xml_file <span class="ot">=</span> <span class="fu">read_xml</span>(bill_xml_link)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: df-print-fct</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>knit_print.data.frame <span class="ot">=</span> <span class="cf">function</span>(x, ...){</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">knit_print</span>(</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">reactable</span>(x,</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>              <span class="at">compact =</span> T, </span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>              <span class="at">resizable =</span> T,</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>              ),</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>Governance institutions around the world appear to be struggling to take on modern challenges as they grow from *changes* to *crises*. In the US in particular, legislators have squarely failed to address several ongoing crises. The credibility of the governing institutions is deteriorating as the response to a global pandemic has been delayed and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence. Why is the US Congress struggling to pass effective legislation? Can we even evaluate the institutions and individuals who decide the laws we live by?</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>There is a framework for minimizing decision-making error in individuals and groups known as *decision hygiene*. In the book *Noise*, the authors deconstruct the concept of error into two sources - bias and noise - to demonstrate how the solution depends on both. Bias is a consistent influence on the outcome - think the effect of partisanship on a person's stance on gun policy. Noise describes the inherent variability of the context. For instance, if all we knew was a person's political affiliation we might predict that a democrat favours gun *control* and a republican favours gun *rights*<span class="ot">[^1]</span>. But we also know there are democrats and republicans for whom this would be a bad prediction. The many factors we don't know about that affect a person's views are what creates the noise.</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ot">[^1]: </span>Notice the use of framing in the political landscape? I would bet this is related to polarization, but it would be interesting to examine whether it is a cause, a result, or both.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>How would the principles of decision hygiene apply to the decision-making of our legislators? The goal of this article is to answer this question.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
