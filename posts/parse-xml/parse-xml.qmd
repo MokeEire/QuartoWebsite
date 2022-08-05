@@ -495,7 +495,7 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 
 ### Nested XML
 
-Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. Individual votes are stored in the `<recordedVotes>` container. We can access child elements in XML using a forward slash (this uses a language called XPATH).
+Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. Individual votes are stored in the `<recordedVotes>` container.
 
 ```{r}
 #| label: vote-nodes-contents
@@ -503,9 +503,9 @@ Votes are particularly interesting because it provides a more discrete measure o
   xml_contents()
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^10] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^9] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
 
-[^10]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
+[^9]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
 #| label: vote-nodes-df
@@ -524,10 +524,12 @@ vote_roll_xml = read_xml(recorded_votes_df$url)
 
 vote_data = xml_find_all(vote_roll_xml, "vote-data")
 
-xml_child(vote_data)
+vote_legislators = vote_data %>% 
+  xml_find_all("recorded-vote")
 
-# (vote_roll_children = xml_children(vote_roll_xml)) %>% 
-#   map(xml_contents)
+(legislators_list = as_list(vote_legislators))[1] %>% 
+  glimpse()
+
 ```
 
 With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we can flatten the XML into one row per legislator but we lose all the attributes.
@@ -540,18 +542,7 @@ With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we c
     unnest(everything()))
 ```
 
-Instead we'll need to extract the attributes before we flatten the data. Let's take another look at the legislators structure.
-
-```{r}
-#| label: vote-roll-leg-list
-vote_legislators = vote_data %>% 
-  xml_find_all("recorded-vote")
-
-(legislators_list = as_list(vote_legislators))[1] %>% 
-  glimpse()
-```
-
-The legislator element has all the attributes, while the vote element only has a value. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.
+Instead we'll need to extract the attributes before we flatten the data. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.
 
 ```{r}
 #| label: vote-roll-leg-df
@@ -586,20 +577,15 @@ The `<vote-totals>` are a bit of a unique little element, with 3 different types
 
 (vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party"))
 
+(party_vote_totals_df = as_list(vote_totals_by_party) %>% 
+  map_dfr(flatten_dfc) %>% 
+    type_convert())
+
 (totals_by_vote = xml_find_all(vote_totals, "totals-by-vote")) %>% 
   xml_contents()
 ```
 
 Once we have our nodeset (which at last are all singular), we use same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.
-
-```{r}
-#| label: vote-roll-metadata-totals-party
-#| message: false
-#| warning: false
-(party_vote_totals_df = as_list(vote_totals_by_party) %>% 
-  map_dfr(flatten_dfc) %>% 
-    type_convert())
-```
 
 ```{r}
 #| eval: false
@@ -625,21 +611,21 @@ vote_roll_df = vote_df %>%
 (recorded_votes_df = recorded_votes_df %>% 
   mutate(vote_roll = list(vote_roll_df))) %>% 
   glimpse()
+
+bill_df$votes = list(recorded_votes_df)
 ```
 
 ...all the way until we've gotten back to the bill-level. Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.
 
 ```{r}
 #| label: unnest-actions
-bill_df$votes = list(recorded_votes_df)
-
 unnest(bill_df, actions) %>% 
   glimpse()
 ```
 
-I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^11].
+I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^10].
 
-[^11]: Ctrl/Cmd+F: `extract_bill_status`
+[^10]: Ctrl/Cmd+F: `extract_bill_status`
 
 # TL;DR: Main Points
 
