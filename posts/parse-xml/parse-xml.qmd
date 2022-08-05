@@ -344,21 +344,15 @@ reactable(bill_df,
 
 ## Nested elements
 
-It's nice when things are simple, but often times they're not. In congressional data, three such cases are: elements with multiple children, elements with multiple children with their own sub-elements, and elements with nested XML data.
+At this point I should be clear about one of my assumptions: that performance with list-columns scales reasonably in various dimensions. I have yet to hit a computational wall[^9], but I am sure at some point it would be much smarter to store this information in a relational database. In either case you may come across elements with multiple children, multiple children with their own sub-elements, and elements with nested XML data. I'll be As you dive deeper into your data you'll likely have to decide which information you're extracting and how.
 
-we might want to know what happened to the bill over time -- when it was introduced, voted on, and/or passed. Each of these could be represented as a column representing the date of the action like `introducedDate`, but this becomes unruly as the different action types and characteristics increase. Below is an example of an individual action element.
-
-```{r}
-#| label: actions-xml
-actions_xml = xml_find_all(bill_node, "actions/item")
-
-# Look at first action
-xml_contents(actions_xml[1])
-```
+[^9]: Parsing \~12,000 congressional bills takes 20 minutes for my computer.
 
 To include actions and votes, we can take advantage of the `nest()`/`unnest()` functionality of `{tidyr}`. We use the same steps as before to convert the XML to a list and then nest them in a list column.
 
 ### Multiple children
+
+This section's still under construction, if you're reading this and you're not someone I sent this to I am impressed you've managed to reach this corner of the internet.
 
 ### Multiple children with sub-elements
 
@@ -373,7 +367,7 @@ actions_list = as_list(actions_xml)
 glimpse(actions_list[[1]])
 ```
 
-In the individual action container, we can see we have the type, text, and date of the action, a list of committees related to the action, and some elements which are singular and some which are not. To deal with this, we can write a function (or set of functions) like the ones below to process an action.
+In the individual action container, we have the date, a list of committees related to the action, some administrative information, the text and type of action. To deal with this, we can write a function (or set of functions) like the ones below to process an action.
 
 ```{r}
 #| label: actions-functions
@@ -503,9 +497,9 @@ Votes are particularly interesting because it provides a more discrete measure o
   xml_contents()
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^9] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^10] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
 
-[^9]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
+[^10]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
 
 ```{r}
 #| label: vote-nodes-df
@@ -575,11 +569,11 @@ The `<vote-totals>` are a bit of a unique little element, with 3 different types
 (vote_totals = xml_find_all(vote_metadata, "vote-totals")) %>% 
   xml_contents()
 
-(vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party"))
+vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")
 
-(party_vote_totals_df = as_list(vote_totals_by_party) %>% 
+party_vote_totals_df = as_list(vote_totals_by_party) %>% 
   map_dfr(flatten_dfc) %>% 
-    type_convert())
+    type_convert()
 
 (totals_by_vote = xml_find_all(vote_totals, "totals-by-vote")) %>% 
   xml_contents()
@@ -623,9 +617,9 @@ unnest(bill_df, actions) %>%
   glimpse()
 ```
 
-I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^10].
+I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^11].
 
-[^10]: Ctrl/Cmd+F: `extract_bill_status`
+[^11]: Ctrl/Cmd+F: `extract_bill_status`
 
 # TL;DR: Main Points
 
