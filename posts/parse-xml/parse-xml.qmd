@@ -247,13 +247,17 @@ glimpse(example_bill_df[["sponsors"]])
 
 With this output in mind and an understanding of the data structure, we can break down the process into extracting singular elements, and nested elements. In both cases, we convert XML to a list and use `{purrr]` to flatten and transform the list into the desired output format.
 
+For more complex cases like this, I would implore you to write functions[^7]. Functions can make your code more reliable, easier to debug, and they make you think critically about how you are handling data.
+
+[^7]: [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/) is a good place to start learning about writing functions.
+
 ## Singular elements
 
-These are elements which have only a single value. In the bookstore example, each of the book's children were singular. In congressional data, some of the singular elements for a bill include `billNumber` and `billType`. These elements will form the basis for our intended output of one row per bill.
+In the bookstore example, each of the book's children were singular, which means they are well suited to be flattened into a dataframe. In the congressional data, we'll need to single out the singular elements like `billNumber` and `billType` before converting to a dataframe. To do this, I find nodes which meet two criteria: 1) the node does not have any child elements, and 2) the node is not an empty string.
 
-We can write a function in R, or use [XPath](https://www.w3schools.com/xml/xml_parser.asp) (or XML Path Language) to identify the nodes we want directly[^7]. I think of XPath like searching a file directory with the path to the set of nodes you want. Expressions `[` within the square brackets `]` are like search conditions. To get singular elements at the bill level, I select nodes which have no children using the XPath function `count`[^8]. Using `xml_find_all()` gives us an `{xml_nodeset}` which can be coerced to a list using `as_list()`.
+`xml_find_all()` extracts nodes based on an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) string and returns an `{xml_nodeset}` which can be coerced to a list using `as_list()`. As the function's help file says, "XPath is like regular expressions for trees". When writing an XPath expression, you are selecting the nodes which match the given pattern. In this case `//bill/*` selects all the child nodes in a bill node, while the text `[` within the square brackets `]` indexes these nodes to select those which have no children using the XPath function `count` and nodes which are not empty strings[^8].
 
-[^7]: In the process of writing this, I discovered that using XPath made this \~5x faster but I include the R function because XPath can be tricky and it may be useful to some.
+[^8]: In the process of writing this, I discovered that using XPath made this \~5x faster but I include the R function because XPath can be tricky and it may be useful to some.
 
     ```{r}
     #| label: singular-nodes
@@ -293,8 +297,6 @@ We can write a function in R, or use [XPath](https://www.w3schools.com/xml/xml_p
     )
     ```
 
-[^8]: Note I also exclude elements which are empty strings because I wanted to ensure the data types were consistent.
-
 ```{r}
 #| label: singular-nodes-list
 #| code-fold: show
@@ -308,21 +310,14 @@ singular_nodes = xml_find_all(
   glimpse()
 ```
 
-Note that we didn't retain the element names so we need to assign them ourselves.
+Note that we didn't retain the element names so we need to assign them ourselves. When your data is in a named list, you can flatten each element in the list into a **d**ata**f**rame **c**olumn using purrr's `flatten_dfc()` .
 
 ```{r}
 #| label: singular-nodes-list-named
 #| code-fold: show
-(singular_list_named = setNames(singular_list, 
-                                xml_name(singular_nodes))) %>% 
-  glimpse()
-```
+singular_list_named = setNames(singular_list, 
+                                xml_name(singular_nodes))
 
-When your data is in a named list, you can flatten each element in the list into a **d**ata**f**rame **c**olumn using purrr's `flatten_dfc()` .
-
-```{r}
-#| label: singular-nodes-list-flattened
-#| code-fold: show
 (bill_df = flatten_dfc(singular_list_named)) %>% 
   glimpse()
 ```
@@ -355,15 +350,13 @@ we might want to know what happened to the bill over time -- when it was introdu
 
 ```{r}
 #| label: actions-xml
-(actions_xml = xml_find_all(bill_node, "actions/item"))
+actions_xml = xml_find_all(bill_node, "actions/item")
 
 # Look at first action
 xml_contents(actions_xml[1])
 ```
 
-To include actions and votes, we use the same steps as before and nest them in a list column such that each row will have a nested dataframe. This strategy takes advantage of the `nest()`/`unnest()` functionality of `{tidyr}`. For more complex cases like this, I would implore you to write functions[^9]. Functions can make your code more reliable, easier to debug, and they make you think critically about how you are handling data.
-
-[^9]: [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/) is a good place to start learning about writing functions.
+To include actions and votes, we can take advantage of the `nest()`/`unnest()` functionality of `{tidyr}`. We use the same steps as before to convert the XML to a list and then nest them in a list column.
 
 ### Multiple children
 
@@ -385,7 +378,7 @@ In the individual action container, we can see we have the type, text, and date 
 ```{r}
 #| label: actions-functions
 #| code-fold: true
-#| code-summary: "Functions"
+#| code-summary: "View Functions"
 # Helper function: flatten_dfc_rename
 # flatten a list to dataframe and 
 # rename the columns with a given prefix
@@ -415,9 +408,6 @@ parse_action = function(action){
     janitor::clean_names()
 }
 
-# Parse the first action
-parse_action(actions_list[[1]]) %>% 
-  glimpse()
 ```
 
 ```{r}
@@ -448,14 +438,22 @@ microbenchmark::microbenchmark(
 )
 ```
 
-Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata**f**rame **r**ows. It is useful to be explicit about the data types when you plan to combine rows into a dataframe or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.
+Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata**f**rame **r**ows.
+
+```{r}
+# Parse the first action
+parse_action(actions_list[[1]]) %>% 
+  glimpse()
+```
+
+It is useful to be explicit about the data types when you plan to combine rows into a dataframe or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.
 
 ```{r}
 #| label: actions-dfr
 #| code-fold: show
 actions_df = map_dfr(actions_list, parse_action)
 
-(actions_df = type_convert(actions_df,
+actions_df = type_convert(actions_df,
                           col_types = cols(
                             action_date = col_date(), 
                             action_time = col_time(),
@@ -467,7 +465,7 @@ actions_df = map_dfr(actions_list, parse_action)
                             action_type = col_character(), 
                             action_code = col_character()
                             )
-                          ))
+                          )
 
 bill_df$actions = list(actions_df)
 ```
