@@ -329,22 +329,20 @@ As the help file for `xml_find_all()` says, "XPath is like regular expressions f
       keep(zero_length_child_nodes, ~(xml_text(.) != ""))
     }
 
-    # Using XPath:
-    singular_nodes1 = xml_find_all(bill_xml, 
-                                    "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]")
-
-    # Using R function:
-    singular_nodes2 = xml_singular_nodes(bill_node)
-
-    # Check they are the same
-    # all.equal(singular_nodes1, singular_nodes2)
-
     ```
 
     ```{r}
     #| label: bench-node-selection
-    #| eval: false
-    #| echo: false
+
+    # Using XPath:
+    # singular_nodes1 = xml_find_all(bill_xml, 
+    #                                 "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]")
+
+    # Using R function:
+    # singular_nodes2 = xml_singular_nodes(bill_node)
+
+    # Check they are the same
+    # all.equal(singular_nodes1, singular_nodes2)
 
     # benchmark the two different ways of selecting nodes
     microbenchmark::microbenchmark(
