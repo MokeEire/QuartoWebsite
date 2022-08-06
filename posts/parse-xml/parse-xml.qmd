@@ -364,7 +364,7 @@ singular_nodes = xml_find_all(
   glimpse()
 ```
 
-Note that we didn't retain the element names so we need to assign them ourselves. When your data is in a named list, you can flatten each element in the list into a **d**ata**f**rame **c**olumn using purrr's `flatten_dfc()` .
+Note that we didn't retain the element names so we need to assign them ourselves. When your data is in a named list, you can flatten each element in the list into a **d**ata **f**rame **c**olumn using purrr's `flatten_dfc()` .
 
 ```{r}
 #| label: singular-nodes-list-named
@@ -380,6 +380,7 @@ singular_list_named = setNames(singular_list,
 #| label: singular-nodes-rt
 #| column: page
 #| echo: false
+#| eval: false
 reactable(bill_df,
           theme = moke_rt(),
             columns = list(
@@ -398,9 +399,9 @@ reactable(bill_df,
 
 ## Nested elements
 
-At this point I should be clear about one of my assumptions: that performance with list-columns scales reasonably in various dimensions. I have yet to hit a computational wall[^9], but I am sure at some point it would be much smarter to store this information in a relational database. In either case you may come across elements with multiple children, multiple children with their own sub-elements, and elements with nested XML data. I'll be As you dive deeper into your data you'll likely have to decide which information you're extracting and how.
+At this point I should be clear about one of my assumptions: that performance with list-columns scales reasonably in various dimensions. I have yet to hit a computational wall[^11], but I am sure at some point it would be much smarter to store this information in a relational database. In either case you may come across elements with multiple children, multiple children with their own sub-elements, and elements with nested XML data. I'll be As you dive deeper into your data you'll likely have to decide which information you're extracting and how.
 
-[^9]: Parsing \~12,000 congressional bills takes 20 minutes for my computer.
+[^11]: Parsing \~12,000 congressional bills takes 20 minutes for my computer.
 
 To include actions and votes, we can take advantage of the `nest()`/`unnest()` functionality of `{tidyr}`. We use the same steps as before to convert the XML to a list and then nest them in a list column.
 
@@ -415,6 +416,9 @@ The actions node has an `<item>` child node for each congressional action taken 
 ```{r}
 #| label: actions-list
 #| code-fold: show
+
+actions_xml = xml_find_all(bill_node, "actions/item")
+
 actions_list = as_list(actions_xml)
 
 # Look at first action
@@ -428,7 +432,7 @@ In the individual action container, we have the date, a list of committees relat
 #| code-fold: true
 #| code-summary: "View Functions"
 # Helper function: flatten_dfc_rename
-# flatten a list to dataframe and 
+# flatten a list to data frame and 
 # rename the columns with a given prefix
 flatten_dfc_rename = function(list_to_flatten, 
                           name_prefix = "prefix"){
@@ -441,7 +445,7 @@ flatten_dfc_rename = function(list_to_flatten,
 }
 
 # Function: parse_action
-# Parse actions from list to dataframe
+# Parse actions from list to data frame
 parse_action = function(action){
   action %>% 
     # Flatten+rename sourceSystem elements
@@ -450,7 +454,7 @@ parse_action = function(action){
     map_at("committees", function(committee){
       map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
     }) %>% 
-    # Flatten object to dataframe
+    # Flatten object to data frame
     flatten_dfc_rename(., "action") %>% 
     # Lastly, clean the names
     janitor::clean_names()
@@ -471,7 +475,7 @@ parse_action2 = function(action){
     modify_at("committees", function(committee){
       map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
     }) %>% 
-    # Flatten object to dataframe
+    # Flatten object to data frame
     flatten_dfc_rename(., "action") %>% 
     janitor::clean_names()
 }
@@ -486,20 +490,19 @@ microbenchmark::microbenchmark(
 )
 ```
 
-Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata**f**rame **r**ows.
+Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata **f**rame **r**ows. Here's the output of this process:
 
 ```{r}
 # Parse the first action
-parse_action(actions_list[[1]]) %>% 
+(actions_df = map_dfr(actions_list, parse_action)) %>% 
   glimpse()
 ```
 
-It is useful to be explicit about the data types when you plan to combine rows into a dataframe or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.
+It is useful to be explicit about the data types when you plan to combine rows into a data frame or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.
 
 ```{r}
 #| label: actions-dfr
 #| code-fold: show
-actions_df = map_dfr(actions_list, parse_action)
 
 actions_df = type_convert(actions_df,
                           col_types = cols(
@@ -543,17 +546,16 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 
 ### Nested XML
 
-Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour. Individual votes are stored in the `<recordedVotes>` container.
+Sometimes you can even have links to other XML files in a node, as we can see in the `<recordedVotes>` element. Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour.
 
 ```{r}
 #| label: vote-nodes-contents
-(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote")) %>% 
-  xml_contents()
+(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote"))
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^10] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
+You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^12] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
 
-[^10]: ![They heard you like XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif)
+[^12]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}
 
 ```{r}
 #| label: vote-nodes-df
@@ -671,9 +673,9 @@ unnest(bill_df, actions) %>%
   glimpse()
 ```
 
-I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^11].
+I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^13].
 
-[^11]: Ctrl/Cmd+F: `extract_bill_status`
+[^13]: Ctrl/Cmd+F: `extract_bill_status`
 
 # TL;DR: Main Points
 
@@ -693,7 +695,7 @@ Processing XML documents can be simple depending on their structure, so try the 
 
 4.  **Apply to all elements**
 
-> Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a dataframe of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.
+> Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.
 
 Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.
 
