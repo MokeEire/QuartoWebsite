@@ -85,23 +85,26 @@ The `<bookstore>` parent, or *root* element contains child elements called `<boo
 
 Note the book elements also have `category` attributes. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML. This post will touch on data stored using both methods. To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
 
-# Read XML data with R
+# Navigating XML with R
 
-To illustrate potential complexities of XML structures, I'll be using congressional bill data provided by the [United States Government Publishing Office (GPO)](https://www.gpo.gov/). To follow along, you can download the sample XML file [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021"). I chose [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)because it contains good examples of some of the challenges of parsing XML data*.* As always, the first step of data analysis is to look at the documentation. Luckily, GovInfo provides a [user guide](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for the Bill Status data.
+To illustrate potential complexities of XML structures, I'll be using congressional bill data provided by the [United States Government Publishing Office (GPO)](https://www.gpo.gov/). To follow along, you can download the sample XML bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021")[^3]. As always, the first step of data analysis is to look at the documentation. Luckily, GovInfo provides a [user guide](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for the Bill Status data.
 
-In terms of R packages, four will be important for this article. `{XML}` and `{xml2}`[^3] provide functions for reading in XML data while `{purrr}` and `{tidyr}` helps us parse and flatten the data into tabular form. To start, read in the file with `read_xml()` , which returns an `xml_document`[^4] object.
+[^3]: I chose the bill [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)only because it contains good examples of the challenges of parsing XML data, so consider this a standard *retweets ≠ endorsements* situation*.*
 
-[^3]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
+In terms of R packages, four are most important for this article. `{XML}` and `{xml2}`[^4] provide functions for reading in XML data while `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) helps us parse and flatten the data into tabular form. To start, read in the file with `read_xml()` , which returns an `xml_document`[^5] object.
 
-[^4]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+[^4]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
+
+[^5]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| label: read-xml
 #| code-fold: show
 #| code-summary: "Load and view XML file"
+
+library(tidyverse)
 library(XML)
 library(xml2)
-library(purrr)
 
 
 bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
@@ -110,48 +113,24 @@ bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTAT
 xml_contents(bill_xml)
 ```
 
-We can see the document has two top-level nodes - one `<bill>` node and one called `<dublinCore>`[^5] In this case we can look just at the `<bill>` node using `xml_child()`.
+We can see the document has two top-level nodes - one `<bill>` node and one called `<dublinCore>`[^6] In this case we can look just at the `<bill>` node using `xml_child()`.
 
-[^5]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
+[^6]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
 
 ```{r}
 #| code-fold: show
 #| label: xml-bill-child
 #| code-overflow: wrap
 # Return child nodes named bill
+
 (bill_node = xml_child(bill_xml, "bill"))
 ```
 
-So if we want to have a dataframe with one row per bill, we have a few different kinds of elements to deal with. Firstly there are the elements which have **only one value** (i.e. *singular*) like `billNumber`, `createDate`, and `billType`. There are also elements which have information *nested* in them like `recordedVotes`, `committees`, and `actions`.
+So if we want to have a data frame with one row per bill, we have a few different kinds of elements to deal with. Firstly there are the elements which have **only one value** (i.e. *singular*) like `billNumber`, `createDate`, and `billType`. There are also elements which have information *nested* in them like `recordedVotes`, `committees`, and `actions`.
 
-In cases where your data are entirely singular nodes, you may be able to use `xmlToDataFrame()` and be done. You'll need to use `xmlParse()` which creates an `r str_c(class(xmlParse(bill_xml)), collapse = "/")` object. In this example, we need to use `getNodeSet(., [path =] "//bill")` to select only nodes under `<bill>`[^6] because we have the metadata node mentioned above.
+The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
 
-[^6]: When you're working with both the `{XML}` and `{xml2}` libraries, it is important to note that their functions often rely on different object types. In the case of `xmlToDataFrame()`, it does not take `{xml_document}` or `{xml_node}` objects. If you try to use them, you'll see an error like this:
-
-    ```{r}
-    #| label: xml-df-error
-    #| error: true
-
-    xmlToDataFrame(bill_xml)
-
-    ```
-
-```{r}
-#| label: xml-to-df
-#| class-output: code-block-h
-# First you need to use the xmlParse function
-bill_xml_parse = xmlParse(bill_xml)
-
-# You can wrap a variable assignment in ( ) to print it, 
-# or in this case pass it to another function via the pipe %>% 
-( bill_xml_df_attempt = xmlToDataFrame(getNodeSet(bill_xml_parse, "//bill")) ) %>% 
-  # View the dataframe structure
-  glimpse()
-```
-
-Because the congressional data has singular and nested element structures, a number of fields like `committees`, `actions`, and `sponsors` have had their values combined into a single column. With nested data, you may need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame, but this approach can work for simpler XML structures. The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
-
-::: {.callout-tip appearance="simple"}
+::: callout-tip
 ## Look at your data
 
 In fact, you could even say *stare* at it. Understanding the structure and contents of your data is essential for designing a solution to consistently process the data.
@@ -159,53 +138,75 @@ In fact, you could even say *stare* at it. Understanding the structure and conte
 
 # Define the output
 
-As well as looking at your data, it's also usually helpful to look to your intended output. This determines how to transform the data.
+As well as looking at your data, it's also helpful to think about your intended output. This determines what you need to do to transform the data. Depending on the structure of your XML data, there are a lot of different options.
 
-**Example:** I want the congressional data to have one row per bill, with the nested characteristics stored in list columns. This will produce a comprehensive dataset which can easily be subset and transformed to various levels of observation as needed. The end result should look like this:
+In the case of congressional data, we have multiple levels of observation - bill, action, vote, and individual legislator votes. To organize the data in a way that preserves each, we can use rows, columns, separate tables linked by some combination of ID variables, or we can use [list columns](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html). Columns in a data frame are typically *atomic vectors*[^7] of equal length, but list columns enable us to store data of varying length and type, including data frames themselves. This makes them a perfect solution for the nested characteristics of the congressional data. Using `{tidyr}`, we will `nest()`/`unnest()` these columns as needed. The end result will look like this:
+
+[^7]: Atomic vectors are vectors with elements of the same type (e.g. numeric, character, etc.) as opposed to *general vectors*, or lists, which can contain a variety of types.
 
 ```{r}
 #| label: example-bill
 #| echo: false
 #| message: false
-#| column: screen-inset-shaded
+
 example_bill_df = extract_bill_status(bill_xml_link, log_types = NULL)
 
-example_bill_df %>% # glimpse() # here to check the data
-  select(
-    -bill_id, -where(is_list) # remove list columns?
-  ) %>%
+glimpse(example_bill_df)
+```
+
+```{r}
+#| label: example-bill-rt
+#| echo: false
+#| eval: false
+example_bill_df %>% #glimpse() # here to check the data
+  # select(
+  #   -bill_id, -where(is_list) # remove list columns?
+  # ) %>%
   reactable::reactable(
     theme = moke_rt(),
     compact = T,
     resizable = T,
     wrap = F,
     columns = list(
-      "latest_action_action_date" = colDef(name = "action_date", 
-                                           width = 115,
-                                           format = colFormat(date = T)),
-     "latest_action_text" = colDef(name = "action_text",
-                                   minWidth = 180,
-                                   maxWidth = 240),
-       "constitutional_authority_statement_text" = colDef(show=F),
+      "bill_number" = colDef(width = 100),
       "create_date" = colDef(format = colFormat(date = T), width = 100),
       "update_date" = colDef(format = colFormat(date = T), width = 100),
-      "introduced_date" = colDef(format = colFormat(date = T), width = 135),
-      "congress" = colDef(width = 80),
-     "origin_chamber" = colDef(show=F),
-      "version" = colDef(show = F, width = 80),
-      "bill_number" = colDef(width = 100),
+      "origin_chamber" = colDef(show=F),
       "bill_type" = colDef(width = 80),
-      "title" = colDef(minWidth = 180)
+      "introduced_date" = colDef(format = colFormat(date = T), width = 130),
+      "congress" = colDef(width = 80),
+      "constitutional_authority_statement_text" = colDef(show=F),
+      "title" = colDef(minWidth = 180),
+      "version" = colDef(show = F, width = 80),
+      "policy_areas" = colDef(width = 120),
+      "legislative_subjects" = colDef(width = 200),
+      "bill_summaries" = colDef(show=F),
+      "bill_titles" = colDef(show=F),
+      "bill_text_versions" = colDef(show=F),
+      "latest_action_action_date" = colDef(name = "action_date", 
+                                           width = 110,
+                                           format = colFormat(date = T)),
+      "latest_action_text" = colDef(name = "action_text",
+                                    minWidth = 200),
+      "committees" = colDef(minWidth = 80),
+      "votes" = colDef(width = 80),
+      "actions" = colDef(width = 80),
+      "action_counts" = colDef(show=F),
+      "sponsors" = colDef(width = 80),
+      "cosponsors" = colDef(width = 80)
     ), 
     columnGroups = list(
       colGroup(name = "Latest Action",
                             columns = c("latest_action_action_date",
-                                        "latest_action_text"))
+                                        "latest_action_text")),
+      colGroup(name = "Nested Data",
+                            columns = c("committees", "votes", "actions", 
+                                        "sponsors", "cosponsors"))
     )
   )
 ```
 
-With the following list columns (among others):
+Here's a `glimpse()` of some of the nested data:
 
 ::: panel-tabset
 ## Committees
