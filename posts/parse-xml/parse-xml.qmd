@@ -246,19 +246,74 @@ glimpse(example_bill_df[["sponsors"]])
 
 # Parsing
 
-With this output in mind and an understanding of the data structure, we can break down the process into extracting singular elements, and nested elements. In both cases, we convert XML to a list and use `{purrr]` to flatten and transform the list into the desired output format.
+With an understanding of your data's structure and your intended output, let's break down the process into extracting 1) singular elements i.e. only one value, and 2) nested elements. Your output should inform what you do with both, but for either case I convert XML to a list and use `{purrr]` to flatten and transform the list into a data frame.
 
-For more complex cases like this, I would implore you to write functions[^7]. Functions can make your code more reliable, easier to debug, and they make you think critically about how you are handling data.
+::: callout-tip
+## Write Functions
 
-[^7]: [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/) is a good place to start learning about writing functions.
+For more complex cases, I would implore you to write functions. They make your code more reliable, easier to debug, and make you think critically about how you are handling data. A good resource to start learning about writing functions is [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/).
+:::
 
 ## Singular elements
 
-In the bookstore example, each of the book's children were singular, which means they are well suited to be flattened into a dataframe. In the congressional data, we'll need to single out the singular elements like `billNumber` and `billType` before converting to a dataframe. To do this, I find nodes which meet two criteria: 1) the node does not have any child elements, and 2) the node is not an empty string.
+You can think of singular elements as the contents of a single cell in a data frame. In the bookstore example, you could arrange each book as a row and each child node as a column.
 
-`xml_find_all()` extracts nodes based on an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) string and returns an `{xml_nodeset}` which can be coerced to a list using `as_list()`. As the function's help file says, "XPath is like regular expressions for trees". When writing an XPath expression, you are selecting the nodes which match the given pattern. In this case `//bill/*` selects all the child nodes in a bill node, while the text `[` within the square brackets `]` indexes these nodes to select those which have no children using the XPath function `count` and nodes which are not empty strings[^8].
+```{r}
+bookstore_xml_text = '<bookstore>
+  <book category="children">
+    <title>Harry Potter</title>
+    <author>J K. Rowling</author>
+    <year>2005</year>
+    <price>29.99</price>
+  </book>
+  <book category="web">
+    <title>Learning XML</title>
+    <author>Erik T. Ray</author>
+    <year>2003</year>
+    <price>39.95</price>
+  </book>
+</bookstore>'
 
-[^8]: In the process of writing this, I discovered that using XPath made this \~5x faster but I include the R function because XPath can be tricky and it may be useful to some.
+bookstore_xml_parsed = xmlParse(bookstore_xml_text)
+
+(bookstore_xml_df = xmlToDataFrame(bookstore_xml_parsed))
+```
+
+In cases where your data are entirely singular nodes, you can convert XML to a dataframe using two functions from `{XML}`[^8]: `xmlParse()` and `xmlToDataFrame()`. Because the congressional data has singular and nested element structures, the nested data in fields like `committees`, `actions`, and `sponsors` are combined into single columns. If your data is not all singular nodes like this, you'll need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
+
+[^8]: When you're working with both the `{XML}` and `{xml2}` libraries, it is important to note that their functions often rely on different object types. In the case of `xmlToDataFrame()`, it does not take `{xml_document}` or `{xml_node}` objects. If you try to use them, you'll see an error like this:
+
+    ```{r}
+    #| label: xml-df-error
+    #| error: true
+
+    xmlToDataFrame(bill_xml)
+    ```
+
+```{r}
+#| label: xml-to-df
+#| class-output: code-block-h
+
+# First you need to use the xmlParse function
+bill_xml_parse = xmlParse(bill_xml)
+
+xmlToDataFrame(getNodeSet(bill_xml_parse, "//bill")) %>% 
+  glimpse()
+```
+
+::: callout-note
+## Note
+
+In this example, we actually need to use `getNodeSet(., [path =] "//bill")` to select only nodes in `<bill>`. If we just passed `bill_xml_parse`, we would get a dataframe with two rows because the top-level nodes are bill and the metadata identifier node `<dublinCore>`.
+:::
+
+To start building our congressional bill dataset, we need to isolate singular elements like `billNumber` and `billType` by selecting nodes which meet two criteria: 1) the node does not have any child nodes of its own, and 2) the node is not an empty string. I use to extract nodes based on an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) string. It returns an `{xml_nodeset}` which is then coerced to a list using `as_list()`.
+
+As the help file for `xml_find_all()` says, "XPath is like regular expressions for trees". The expression selects the nodes which match the given path or pattern[^9]. In the code below `//bill/*` selects the child nodes in a bill. The expressions `[` within the square brackets `]` are called predicates which I use to find nodes which have no children with the XPath `count` function and nodes which are not empty strings[^10].
+
+[^9]: [A very useful table of XPath syntax](https://www.w3schools.com/XML/xpath_syntax.asp){target="_blank"}
+
+[^10]: In the process of writing this, I discovered that using XPath made this \~5x faster than an equivalent function in R.
 
     ```{r}
     #| label: singular-nodes
