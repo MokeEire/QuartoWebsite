@@ -79,17 +79,21 @@ Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Ma
 </bookstore>
 ```
 
-The `<bookstore>` parent, or *root* element contains child elements called `<book>` which themselves have child elements -- `<title>`, `<author>`, `<year>`, and `<price>`. XML can be thought of as a tree, where each tree branch can have multiple leaves, or none.
+The `<bookstore>` is the parent, or *root* element. The parent element contains two `<book>`s which have the elements contained in the tags -- `<title>`, `<author>`, `<year>`, and `<price>`. XML can be thought of as a tree, where each tree branch can have multiple leaves, or none.
 
-Note the book elements also have `category` attributes. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML. This post will touch on data stored using both methods. To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
+::: {.callout-note appearance="simple"}
+## Note that attributes are denoted by key/value assignment in a tag.
+
+In `<book category="children">`, the book's category is stored as an attribute. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML. This post will touch on data stored using both methods. To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
+:::
 
 # Navigating XML with R
 
-To illustrate potential complexities of XML structures, I'll be using congressional bill data provided by the [United States Government Publishing Office (GPO)](https://www.gpo.gov/). To follow along, you can download the sample XML bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021")[^3]. As always, the first step of data analysis is to look at the documentation. Luckily, GovInfo provides a [user guide](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md) for the Bill Status data.
+To illustrate potential complexities of XML structures, I'll be using congressional bill data provided by the [United States Government Publishing Office (GPO)](https://www.gpo.gov/). You can follow along by downloading the sample XML bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021")[^3].
 
 [^3]: I chose the bill [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)only because it contains good examples of the challenges of parsing XML data, so consider this a standard *retweets ≠ endorsements* situation*.*
 
-In terms of R packages, four are most important for this article. `{XML}` and `{xml2}`[^4] provide functions for reading in XML data while `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) helps us parse and flatten the data into tabular form. To start, read in the file with `read_xml()` , which returns an `xml_document`[^5] object.
+Four R packages are important for this article. `{XML}` and `{xml2}`[^4] provide functions for reading in XML data while `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) helps us parse and flatten the data into tabular form. To start, read in the file with `read_xml()` , which returns an `xml_document`[^5] object.
 
 [^4]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
 
@@ -103,7 +107,6 @@ In terms of R packages, four are most important for this article. `{XML}` and `{
 library(tidyverse)
 library(XML)
 library(xml2)
-
 
 bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 
