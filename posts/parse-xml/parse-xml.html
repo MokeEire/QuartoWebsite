@@ -624,7 +624,7 @@ $ version                              &lt;chr&gt; "1.0.0"</code></pre>
 <span><span class="va">actions_list</span> <span class="op">=</span> <span class="fu"><a href="http://xml2.r-lib.org/reference/as_list.html">as_list</a></span><span class="op">(</span><span class="va">actions_xml</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Look at first action</span></span>
-<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">actions_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="va">actions_list</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, width <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stdout">
 <pre><code>List of 6
  $ actionDate  :List of 1
@@ -697,7 +697,7 @@ $ action_time                  &lt;chr&gt; NA, "19:46:03", "19:46:02", "19:46:02
 $ action_code                  &lt;chr&gt; NA, "H38310", "H37300", "8000", "H30000",…</code></pre>
 </div>
 </div>
-<p>It is useful to be explicit about the data types when you plan to combine rows into a data frame or <code><a href="https://tidyr.tidyverse.org/reference/nest.html">unnest()</a></code> the data in the future. I do this using <code><a href="https://readr.tidyverse.org/reference/type_convert.html">type_convert()</a></code> to ensure the columns have a specific datatype. To add these actions data as a list column to <code>bill_df</code> we can simply use dollar assignment.</p>
+<p>When you plan to combine rows into a data frame or <code><a href="https://tidyr.tidyverse.org/reference/nest.html">unnest()</a></code> the data in the future, it is useful to be explicit about the expected data types of each column. This can be done using <code><a href="https://readr.tidyverse.org/reference/type_convert.html">type_convert()</a></code>. Because we are only adding a single row of data to <code>bill_df</code> we can encase the actions in a list and use dollar assignment. If you were adding multiple rows of data, you would need to make sure that you are adding a column of the same length as <code>bill_df</code>.</p>
 <div class="cell">
 <details open=""><summary>Code</summary><div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">actions_df</span> <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/type_convert.html">type_convert</a></span><span class="op">(</span><span class="va">actions_df</span>,</span>
 <span>                          col_types <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/cols.html">cols</a></span><span class="op">(</span></span>
@@ -717,7 +717,7 @@ $ action_code                  &lt;chr&gt; NA, "H38310", "H37300", "8000", "H300
 </details>
 </div>
 </section><section id="nested-xml" class="level3"><h3 class="anchored" data-anchor-id="nested-xml">Nested XML</h3>
-<p>Sometimes you can even have links to other XML files in a node, as we can see in the <code>&lt;recordedVotes&gt;</code> element. Votes are particularly interesting because it provides a more discrete measure of our representatives’ behaviour.</p>
+<p>So we’ve dealt with cases with multiple child elements, but you can also have links to XML files within those child elements as you can see in the <code>&lt;url&gt;</code> element below.<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a></p>
 <div class="cell">
 <details open=""><summary>Code</summary><div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="op">(</span><span class="va">bill_recorded_vote_nodes</span> <span class="op">=</span> <span class="fu"><a href="http://xml2.r-lib.org/reference/xml_find_all.html">xml_find_all</a></span><span class="op">(</span><span class="va">bill_node</span>, <span class="st">"recordedVotes/recordedVote"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details><div class="cell-output cell-output-stdout">
@@ -725,7 +725,20 @@ $ action_code                  &lt;chr&gt; NA, "H38310", "H37300", "8000", "H300
 [1] &lt;recordedVote&gt;\n  &lt;rollNumber&gt;188&lt;/rollNumber&gt;\n  &lt;url&gt;https://clerk.hous ...</code></pre>
 </div>
 </div>
-<p>You may have spotted why votes are interesting elements to parse because inside the <code>&lt;url&gt;</code> element we find <strong>another</strong> <strong>XML file</strong>!<a href="#fn11" class="footnote-ref" id="fnref11" role="doc-noteref"><sup>11</sup></a> Before we dive into that can of worms, I’ll convert the top-level nodes to a list and flatten it into columns. Note we use <code><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr()</a></code> with <code>votes_list</code> because there could be multiple vote objects.</p>
+<p>Before we dive one level deeper, to start building our vote-level data frame, we can convert the top-level nodes to a list and flatten it into columns.</p>
+<div class="callout-note callout callout-style-simple callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We use <code><a href="https://purrr.tidyverse.org/reference/map.html">map_dfr()</a></code> with <code>votes_list</code> because there could be multiple vote objects.</p>
+</div>
+</div>
 <div class="cell">
 <details open=""><summary>Code</summary><div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Coerce nodes to list</span></span>
 <span><span class="va">recorded_votes_list</span> <span class="op">=</span> <span class="fu"><a href="http://xml2.r-lib.org/reference/as_list.html">as_list</a></span><span class="op">(</span><span class="va">bill_recorded_vote_nodes</span><span class="op">)</span></span>
@@ -744,7 +757,7 @@ $ date           &lt;chr&gt; "2021-06-28T23:46:02Z"
 $ sessionNumber  &lt;chr&gt; "1"</code></pre>
 </div>
 </div>
-<p>Now we want to get the vote roll XML file, so we go back to <code><a href="http://xml2.r-lib.org/reference/read_xml.html">read_xml()</a></code> . There are two main nodes - <code>&lt;vote-metadata&gt;</code> and <code>&lt;vote-data&gt;</code>. One node contains the aggregated vote information, while <code>&lt;vote-data&gt;</code> contains the legislator-level vote data. Let’s try to parse the legislator-level data first. Here is the XML for a single legislator’s vote:</p>
+<p>Now we want to get the vote roll XML file, so we’ll need to use <code><a href="http://xml2.r-lib.org/reference/read_xml.html">read_xml()</a></code> . There are two main nodes - <code>&lt;vote-metadata&gt;</code> and <code>&lt;vote-data&gt;</code>. One node contains the aggregated vote information, while <code>&lt;vote-data&gt;</code> contains the legislator-level vote data. Let’s parse the legislator-level data first. Here is the XML for a single legislator’s vote:</p>
 <div class="cell">
 <details open=""><summary>Code</summary><div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vote_roll_xml</span> <span class="op">=</span> <span class="fu"><a href="http://xml2.r-lib.org/reference/read_xml.html">read_xml</a></span><span class="op">(</span><span class="va">recorded_votes_df</span><span class="op">$</span><span class="va">url</span><span class="op">)</span></span>
 <span></span>
@@ -1137,8 +1150,8 @@ $ votes                                &lt;list&gt; [&lt;tbl_df[1 x 8]&gt;], [&l
 </details><div class="cell-output cell-output-stdout">
 <pre><code>Unit: microseconds
                expr  min   lq mean median   uq  max neval
- xml_singular_nodes 1165 1185 1310   1209 1242 6967   100
-       xml_find_all  204  210  241    227  248  616   100</code></pre>
+ xml_singular_nodes 1193 1220 1329   1242 1274 7234   100
+       xml_find_all  209  220  245    234  248  557   100</code></pre>
 </div>
 </div>
 <a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a>
@@ -1731,7 +1744,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb54-479"><a href="#cb54-479" aria-hidden="true" tabindex="-1"></a>actions_list = as_list(actions_xml)</span>
 <span id="cb54-480"><a href="#cb54-480" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-481"><a href="#cb54-481" aria-hidden="true" tabindex="-1"></a># Look at first action</span>
-<span id="cb54-482"><a href="#cb54-482" aria-hidden="true" tabindex="-1"></a>glimpse(actions_list[[1]])</span>
+<span id="cb54-482"><a href="#cb54-482" aria-hidden="true" tabindex="-1"></a>glimpse(actions_list[[1]], width = 60)</span>
 <span id="cb54-483"><a href="#cb54-483" aria-hidden="true" tabindex="-1"></a>```</span>
 <span id="cb54-484"><a href="#cb54-484" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-485"><a href="#cb54-485" aria-hidden="true" tabindex="-1"></a>For an individual action, we have the date, a list of committees related to the action, some administrative information, the text and type of action. To deal with this, we can write a function (or set of functions) like the ones below to transform actions from a list to a data frame with their own nested elements.</span>
@@ -1808,7 +1821,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb54-562"><a href="#cb54-562" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
 <span id="cb54-563"><a href="#cb54-563" aria-hidden="true" tabindex="-1"></a>```</span>
 <span id="cb54-564"><a href="#cb54-564" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-565"><a href="#cb54-565" aria-hidden="true" tabindex="-1"></a>It is useful to be explicit about the data types when you plan to combine rows into a data frame or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.</span>
+<span id="cb54-565"><a href="#cb54-565" aria-hidden="true" tabindex="-1"></a>When you plan to combine rows into a data frame or `unnest()` the data in the future, it is useful to be explicit about the expected data types of each column. This can be done using `type_convert()`. Because we are only adding a single row of data to `bill_df` we can encase the actions in a list and use dollar assignment. If you were adding multiple rows of data, you would need to make sure that you are adding a column of the same length as `bill_df`.</span>
 <span id="cb54-566"><a href="#cb54-566" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-569"><a href="#cb54-569" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb54-570"><a href="#cb54-570" aria-hidden="true" tabindex="-1"></a>#| label: actions-dfr</span>
@@ -1856,237 +1869,243 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb54-614"><a href="#cb54-614" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb54-615"><a href="#cb54-615" aria-hidden="true" tabindex="-1"></a>### Nested XML</span>
 <span id="cb54-616"><a href="#cb54-616" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-617"><a href="#cb54-617" aria-hidden="true" tabindex="-1"></a>Sometimes you can even have links to other XML files in a node, as we can see in the `&lt;<span class="kw">recordedVotes</span>&gt;` element. Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour.</span>
+<span id="cb54-617"><a href="#cb54-617" aria-hidden="true" tabindex="-1"></a>So we've dealt with cases with multiple child elements, but you can also have links to XML files within those child elements as you can see in the `&lt;<span class="kw">url</span>&gt;` element below.[^11]</span>
 <span id="cb54-618"><a href="#cb54-618" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-621"><a href="#cb54-621" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-622"><a href="#cb54-622" aria-hidden="true" tabindex="-1"></a>#| label: vote-nodes-contents</span>
-<span id="cb54-623"><a href="#cb54-623" aria-hidden="true" tabindex="-1"></a>(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote"))</span>
-<span id="cb54-624"><a href="#cb54-624" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-625"><a href="#cb54-625" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-626"><a href="#cb54-626" aria-hidden="true" tabindex="-1"></a>You may have spotted why votes are interesting elements to parse because inside the `&lt;<span class="kw">url</span>&gt;` element we find **another** **XML file**![^11] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.</span>
+<span id="cb54-619"><a href="#cb54-619" aria-hidden="true" tabindex="-1"></a>[^11]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}</span>
+<span id="cb54-620"><a href="#cb54-620" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-623"><a href="#cb54-623" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-624"><a href="#cb54-624" aria-hidden="true" tabindex="-1"></a>#| label: vote-nodes-contents</span>
+<span id="cb54-625"><a href="#cb54-625" aria-hidden="true" tabindex="-1"></a>(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote"))</span>
+<span id="cb54-626"><a href="#cb54-626" aria-hidden="true" tabindex="-1"></a>```</span>
 <span id="cb54-627"><a href="#cb54-627" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-628"><a href="#cb54-628" aria-hidden="true" tabindex="-1"></a>[^11]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}</span>
+<span id="cb54-628"><a href="#cb54-628" aria-hidden="true" tabindex="-1"></a>Before we dive one level deeper, to start building our vote-level data frame, we can convert the top-level nodes to a list and flatten it into columns.</span>
 <span id="cb54-629"><a href="#cb54-629" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-632"><a href="#cb54-632" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-633"><a href="#cb54-633" aria-hidden="true" tabindex="-1"></a>#| label: vote-nodes-df</span>
-<span id="cb54-634"><a href="#cb54-634" aria-hidden="true" tabindex="-1"></a># Coerce nodes to list</span>
-<span id="cb54-635"><a href="#cb54-635" aria-hidden="true" tabindex="-1"></a>recorded_votes_list = as_list(bill_recorded_vote_nodes)</span>
-<span id="cb54-636"><a href="#cb54-636" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-637"><a href="#cb54-637" aria-hidden="true" tabindex="-1"></a>(recorded_votes_df = map_dfr(recorded_votes_list, flatten_dfc)) %&gt;% </span>
-<span id="cb54-638"><a href="#cb54-638" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
-<span id="cb54-639"><a href="#cb54-639" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-640"><a href="#cb54-640" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-641"><a href="#cb54-641" aria-hidden="true" tabindex="-1"></a>Now we want to get the vote roll XML file, so we go back to `read_xml()` . There are two main nodes - `&lt;<span class="kw">vote-metadata</span>&gt;` and `&lt;<span class="kw">vote-data</span>&gt;`. One node contains the aggregated vote information, while `&lt;<span class="kw">vote-data</span>&gt;` contains the legislator-level vote data. Let's try to parse the legislator-level data first. Here is the XML for a single legislator's vote:</span>
+<span id="cb54-630"><a href="#cb54-630" aria-hidden="true" tabindex="-1"></a>::: {.callout-note appearance="simple"}</span>
+<span id="cb54-631"><a href="#cb54-631" aria-hidden="true" tabindex="-1"></a>## Note</span>
+<span id="cb54-632"><a href="#cb54-632" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-633"><a href="#cb54-633" aria-hidden="true" tabindex="-1"></a>We use `map_dfr()` with `votes_list` because there could be multiple vote objects.</span>
+<span id="cb54-634"><a href="#cb54-634" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb54-635"><a href="#cb54-635" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-638"><a href="#cb54-638" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-639"><a href="#cb54-639" aria-hidden="true" tabindex="-1"></a>#| label: vote-nodes-df</span>
+<span id="cb54-640"><a href="#cb54-640" aria-hidden="true" tabindex="-1"></a># Coerce nodes to list</span>
+<span id="cb54-641"><a href="#cb54-641" aria-hidden="true" tabindex="-1"></a>recorded_votes_list = as_list(bill_recorded_vote_nodes)</span>
 <span id="cb54-642"><a href="#cb54-642" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-645"><a href="#cb54-645" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-646"><a href="#cb54-646" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-xml</span>
-<span id="cb54-647"><a href="#cb54-647" aria-hidden="true" tabindex="-1"></a>vote_roll_xml = read_xml(recorded_votes_df$url)</span>
+<span id="cb54-643"><a href="#cb54-643" aria-hidden="true" tabindex="-1"></a>(recorded_votes_df = map_dfr(recorded_votes_list, flatten_dfc)) %&gt;% </span>
+<span id="cb54-644"><a href="#cb54-644" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-645"><a href="#cb54-645" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-646"><a href="#cb54-646" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-647"><a href="#cb54-647" aria-hidden="true" tabindex="-1"></a>Now we want to get the vote roll XML file, so we'll need to use `read_xml()` . There are two main nodes - `&lt;<span class="kw">vote-metadata</span>&gt;` and `&lt;<span class="kw">vote-data</span>&gt;`. One node contains the aggregated vote information, while `&lt;<span class="kw">vote-data</span>&gt;` contains the legislator-level vote data. Let's parse the legislator-level data first. Here is the XML for a single legislator's vote:</span>
 <span id="cb54-648"><a href="#cb54-648" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-649"><a href="#cb54-649" aria-hidden="true" tabindex="-1"></a>vote_data = xml_find_all(vote_roll_xml, "vote-data")</span>
-<span id="cb54-650"><a href="#cb54-650" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-651"><a href="#cb54-651" aria-hidden="true" tabindex="-1"></a>vote_legislators = vote_data %&gt;% </span>
-<span id="cb54-652"><a href="#cb54-652" aria-hidden="true" tabindex="-1"></a>  xml_find_all("recorded-vote")</span>
-<span id="cb54-653"><a href="#cb54-653" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-654"><a href="#cb54-654" aria-hidden="true" tabindex="-1"></a>(legislators_list = as_list(vote_legislators))[1] %&gt;% </span>
-<span id="cb54-655"><a href="#cb54-655" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-651"><a href="#cb54-651" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-652"><a href="#cb54-652" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-xml</span>
+<span id="cb54-653"><a href="#cb54-653" aria-hidden="true" tabindex="-1"></a>vote_roll_xml = read_xml(recorded_votes_df$url)</span>
+<span id="cb54-654"><a href="#cb54-654" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-655"><a href="#cb54-655" aria-hidden="true" tabindex="-1"></a>vote_data = xml_find_all(vote_roll_xml, "vote-data")</span>
 <span id="cb54-656"><a href="#cb54-656" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-657"><a href="#cb54-657" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-658"><a href="#cb54-658" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-659"><a href="#cb54-659" aria-hidden="true" tabindex="-1"></a>With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we can flatten the XML into one row per legislator but we lose all the attributes.</span>
-<span id="cb54-660"><a href="#cb54-660" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-663"><a href="#cb54-663" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-664"><a href="#cb54-664" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-data-flat</span>
-<span id="cb54-665"><a href="#cb54-665" aria-hidden="true" tabindex="-1"></a>(vote_roll_flattened = vote_data %&gt;% </span>
-<span id="cb54-666"><a href="#cb54-666" aria-hidden="true" tabindex="-1"></a>  as_list() %&gt;% </span>
-<span id="cb54-667"><a href="#cb54-667" aria-hidden="true" tabindex="-1"></a>  flatten_dfr() %&gt;% </span>
-<span id="cb54-668"><a href="#cb54-668" aria-hidden="true" tabindex="-1"></a>    unnest(everything()))</span>
-<span id="cb54-669"><a href="#cb54-669" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-670"><a href="#cb54-670" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-671"><a href="#cb54-671" aria-hidden="true" tabindex="-1"></a>Instead we'll need to extract the attributes before we flatten the data. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.</span>
-<span id="cb54-672"><a href="#cb54-672" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-675"><a href="#cb54-675" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-676"><a href="#cb54-676" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-leg-df</span>
-<span id="cb54-677"><a href="#cb54-677" aria-hidden="true" tabindex="-1"></a>(legislator_vote_df = legislators_list %&gt;% </span>
-<span id="cb54-678"><a href="#cb54-678" aria-hidden="true" tabindex="-1"></a>    # Modify one level deeper using map_at to target legislator elements</span>
-<span id="cb54-679"><a href="#cb54-679" aria-hidden="true" tabindex="-1"></a>    map(map_at, "legislator", attributes) %&gt;% </span>
-<span id="cb54-680"><a href="#cb54-680" aria-hidden="true" tabindex="-1"></a>    map_dfr(flatten_dfc))</span>
-<span id="cb54-681"><a href="#cb54-681" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-682"><a href="#cb54-682" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-683"><a href="#cb54-683" aria-hidden="true" tabindex="-1"></a>Now we have a table of legislator voting data! But what about the `&lt;<span class="kw">vote-metadata</span>&gt;`? Everything other than the `&lt;<span class="kw">vote-totals</span>&gt;` element is singular so we can get that out of the way the same way as before:</span>
-<span id="cb54-684"><a href="#cb54-684" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-687"><a href="#cb54-687" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-688"><a href="#cb54-688" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-metadata-xml</span>
-<span id="cb54-689"><a href="#cb54-689" aria-hidden="true" tabindex="-1"></a>vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")</span>
+<span id="cb54-657"><a href="#cb54-657" aria-hidden="true" tabindex="-1"></a>vote_legislators = vote_data %&gt;% </span>
+<span id="cb54-658"><a href="#cb54-658" aria-hidden="true" tabindex="-1"></a>  xml_find_all("recorded-vote")</span>
+<span id="cb54-659"><a href="#cb54-659" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-660"><a href="#cb54-660" aria-hidden="true" tabindex="-1"></a>(legislators_list = as_list(vote_legislators))[1] %&gt;% </span>
+<span id="cb54-661"><a href="#cb54-661" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-662"><a href="#cb54-662" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-663"><a href="#cb54-663" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-664"><a href="#cb54-664" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-665"><a href="#cb54-665" aria-hidden="true" tabindex="-1"></a>With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we can flatten the XML into one row per legislator but we lose all the attributes.</span>
+<span id="cb54-666"><a href="#cb54-666" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-669"><a href="#cb54-669" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-670"><a href="#cb54-670" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-data-flat</span>
+<span id="cb54-671"><a href="#cb54-671" aria-hidden="true" tabindex="-1"></a>(vote_roll_flattened = vote_data %&gt;% </span>
+<span id="cb54-672"><a href="#cb54-672" aria-hidden="true" tabindex="-1"></a>  as_list() %&gt;% </span>
+<span id="cb54-673"><a href="#cb54-673" aria-hidden="true" tabindex="-1"></a>  flatten_dfr() %&gt;% </span>
+<span id="cb54-674"><a href="#cb54-674" aria-hidden="true" tabindex="-1"></a>    unnest(everything()))</span>
+<span id="cb54-675"><a href="#cb54-675" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-676"><a href="#cb54-676" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-677"><a href="#cb54-677" aria-hidden="true" tabindex="-1"></a>Instead we'll need to extract the attributes before we flatten the data. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.</span>
+<span id="cb54-678"><a href="#cb54-678" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-681"><a href="#cb54-681" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-682"><a href="#cb54-682" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-leg-df</span>
+<span id="cb54-683"><a href="#cb54-683" aria-hidden="true" tabindex="-1"></a>(legislator_vote_df = legislators_list %&gt;% </span>
+<span id="cb54-684"><a href="#cb54-684" aria-hidden="true" tabindex="-1"></a>    # Modify one level deeper using map_at to target legislator elements</span>
+<span id="cb54-685"><a href="#cb54-685" aria-hidden="true" tabindex="-1"></a>    map(map_at, "legislator", attributes) %&gt;% </span>
+<span id="cb54-686"><a href="#cb54-686" aria-hidden="true" tabindex="-1"></a>    map_dfr(flatten_dfc))</span>
+<span id="cb54-687"><a href="#cb54-687" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-688"><a href="#cb54-688" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-689"><a href="#cb54-689" aria-hidden="true" tabindex="-1"></a>Now we have a table of legislator voting data! But what about the `&lt;<span class="kw">vote-metadata</span>&gt;`? Everything other than the `&lt;<span class="kw">vote-totals</span>&gt;` element is singular so we can get that out of the way the same way as before:</span>
 <span id="cb54-690"><a href="#cb54-690" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-691"><a href="#cb54-691" aria-hidden="true" tabindex="-1"></a>vote_singular_nodes = xml_singular_nodes(vote_metadata)</span>
-<span id="cb54-692"><a href="#cb54-692" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-693"><a href="#cb54-693" aria-hidden="true" tabindex="-1"></a>(vote_df = as_list(vote_singular_nodes) %&gt;% </span>
-<span id="cb54-694"><a href="#cb54-694" aria-hidden="true" tabindex="-1"></a>  # as_list() doesn't retain element names so we set names ourselves</span>
-<span id="cb54-695"><a href="#cb54-695" aria-hidden="true" tabindex="-1"></a>  setNames(xml_name(vote_singular_nodes)) %&gt;% </span>
-<span id="cb54-696"><a href="#cb54-696" aria-hidden="true" tabindex="-1"></a>  flatten_dfc()) %&gt;% </span>
-<span id="cb54-697"><a href="#cb54-697" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
-<span id="cb54-698"><a href="#cb54-698" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-699"><a href="#cb54-699" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-700"><a href="#cb54-700" aria-hidden="true" tabindex="-1"></a>The `&lt;<span class="kw">vote-totals</span>&gt;` are a bit of a unique little element, with 3 different types of nodes. This is another opportunity for us to be choosy with our data. The first node is table headers, which we don't need because the elements are tagged anyway. From these, we really only need the `&lt;<span class="kw">totals-by-party</span>&gt;` nodes as long as the totals of which agree with `&lt;<span class="kw">totals-by-vote</span>&gt;` , which is worth checking.</span>
-<span id="cb54-701"><a href="#cb54-701" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-704"><a href="#cb54-704" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-705"><a href="#cb54-705" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-metadata-totals-contents</span>
-<span id="cb54-706"><a href="#cb54-706" aria-hidden="true" tabindex="-1"></a>#| layout-nrow: 1</span>
-<span id="cb54-707"><a href="#cb54-707" aria-hidden="true" tabindex="-1"></a>(vote_totals = xml_find_all(vote_metadata, "vote-totals")) %&gt;% </span>
-<span id="cb54-708"><a href="#cb54-708" aria-hidden="true" tabindex="-1"></a>  xml_contents()</span>
-<span id="cb54-709"><a href="#cb54-709" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-710"><a href="#cb54-710" aria-hidden="true" tabindex="-1"></a>vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")</span>
-<span id="cb54-711"><a href="#cb54-711" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-712"><a href="#cb54-712" aria-hidden="true" tabindex="-1"></a>party_vote_totals_df = as_list(vote_totals_by_party) %&gt;% </span>
-<span id="cb54-713"><a href="#cb54-713" aria-hidden="true" tabindex="-1"></a>  map_dfr(flatten_dfc) %&gt;% </span>
-<span id="cb54-714"><a href="#cb54-714" aria-hidden="true" tabindex="-1"></a>    type_convert()</span>
+<span id="cb54-693"><a href="#cb54-693" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-694"><a href="#cb54-694" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-metadata-xml</span>
+<span id="cb54-695"><a href="#cb54-695" aria-hidden="true" tabindex="-1"></a>vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")</span>
+<span id="cb54-696"><a href="#cb54-696" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-697"><a href="#cb54-697" aria-hidden="true" tabindex="-1"></a>vote_singular_nodes = xml_singular_nodes(vote_metadata)</span>
+<span id="cb54-698"><a href="#cb54-698" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-699"><a href="#cb54-699" aria-hidden="true" tabindex="-1"></a>(vote_df = as_list(vote_singular_nodes) %&gt;% </span>
+<span id="cb54-700"><a href="#cb54-700" aria-hidden="true" tabindex="-1"></a>  # as_list() doesn't retain element names so we set names ourselves</span>
+<span id="cb54-701"><a href="#cb54-701" aria-hidden="true" tabindex="-1"></a>  setNames(xml_name(vote_singular_nodes)) %&gt;% </span>
+<span id="cb54-702"><a href="#cb54-702" aria-hidden="true" tabindex="-1"></a>  flatten_dfc()) %&gt;% </span>
+<span id="cb54-703"><a href="#cb54-703" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-704"><a href="#cb54-704" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-705"><a href="#cb54-705" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-706"><a href="#cb54-706" aria-hidden="true" tabindex="-1"></a>The `&lt;<span class="kw">vote-totals</span>&gt;` are a bit of a unique little element, with 3 different types of nodes. This is another opportunity for us to be choosy with our data. The first node is table headers, which we don't need because the elements are tagged anyway. From these, we really only need the `&lt;<span class="kw">totals-by-party</span>&gt;` nodes as long as the totals of which agree with `&lt;<span class="kw">totals-by-vote</span>&gt;` , which is worth checking.</span>
+<span id="cb54-707"><a href="#cb54-707" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-710"><a href="#cb54-710" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-711"><a href="#cb54-711" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-metadata-totals-contents</span>
+<span id="cb54-712"><a href="#cb54-712" aria-hidden="true" tabindex="-1"></a>#| layout-nrow: 1</span>
+<span id="cb54-713"><a href="#cb54-713" aria-hidden="true" tabindex="-1"></a>(vote_totals = xml_find_all(vote_metadata, "vote-totals")) %&gt;% </span>
+<span id="cb54-714"><a href="#cb54-714" aria-hidden="true" tabindex="-1"></a>  xml_contents()</span>
 <span id="cb54-715"><a href="#cb54-715" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-716"><a href="#cb54-716" aria-hidden="true" tabindex="-1"></a>(totals_by_vote = xml_find_all(vote_totals, "totals-by-vote")) %&gt;% </span>
-<span id="cb54-717"><a href="#cb54-717" aria-hidden="true" tabindex="-1"></a>  xml_contents()</span>
-<span id="cb54-718"><a href="#cb54-718" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-719"><a href="#cb54-719" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-720"><a href="#cb54-720" aria-hidden="true" tabindex="-1"></a>Once we have our nodeset (which at last are all singular), we use same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.</span>
+<span id="cb54-716"><a href="#cb54-716" aria-hidden="true" tabindex="-1"></a>vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")</span>
+<span id="cb54-717"><a href="#cb54-717" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-718"><a href="#cb54-718" aria-hidden="true" tabindex="-1"></a>party_vote_totals_df = as_list(vote_totals_by_party) %&gt;% </span>
+<span id="cb54-719"><a href="#cb54-719" aria-hidden="true" tabindex="-1"></a>  map_dfr(flatten_dfc) %&gt;% </span>
+<span id="cb54-720"><a href="#cb54-720" aria-hidden="true" tabindex="-1"></a>    type_convert()</span>
 <span id="cb54-721"><a href="#cb54-721" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-724"><a href="#cb54-724" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-725"><a href="#cb54-725" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
-<span id="cb54-726"><a href="#cb54-726" aria-hidden="true" tabindex="-1"></a>#| include: false</span>
-<span id="cb54-727"><a href="#cb54-727" aria-hidden="true" tabindex="-1"></a># Check if totals match</span>
-<span id="cb54-728"><a href="#cb54-728" aria-hidden="true" tabindex="-1"></a>as_list(totals_by_vote) %&gt;% </span>
-<span id="cb54-729"><a href="#cb54-729" aria-hidden="true" tabindex="-1"></a>  map_dfr(flatten_dfc)</span>
-<span id="cb54-730"><a href="#cb54-730" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-731"><a href="#cb54-731" aria-hidden="true" tabindex="-1"></a>summarise(party_vote_totals, </span>
-<span id="cb54-732"><a href="#cb54-732" aria-hidden="true" tabindex="-1"></a>          across(.cols = -party, sum, na.rm=T))</span>
-<span id="cb54-733"><a href="#cb54-733" aria-hidden="true" tabindex="-1"></a># They do!</span>
-<span id="cb54-734"><a href="#cb54-734" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-735"><a href="#cb54-735" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-736"><a href="#cb54-736" aria-hidden="true" tabindex="-1"></a>Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together.</span>
-<span id="cb54-737"><a href="#cb54-737" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-740"><a href="#cb54-740" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-741"><a href="#cb54-741" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-build</span>
-<span id="cb54-742"><a href="#cb54-742" aria-hidden="true" tabindex="-1"></a>vote_roll_df = vote_df %&gt;% </span>
-<span id="cb54-743"><a href="#cb54-743" aria-hidden="true" tabindex="-1"></a>  mutate(legislator_votes = list(legislator_vote_df),</span>
-<span id="cb54-744"><a href="#cb54-744" aria-hidden="true" tabindex="-1"></a>         party_votes = list(party_vote_totals_df)) %&gt;% </span>
-<span id="cb54-745"><a href="#cb54-745" aria-hidden="true" tabindex="-1"></a>    janitor::clean_names()</span>
-<span id="cb54-746"><a href="#cb54-746" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-747"><a href="#cb54-747" aria-hidden="true" tabindex="-1"></a>(recorded_votes_df = recorded_votes_df %&gt;% </span>
-<span id="cb54-748"><a href="#cb54-748" aria-hidden="true" tabindex="-1"></a>  mutate(vote_roll = list(vote_roll_df))) %&gt;% </span>
-<span id="cb54-749"><a href="#cb54-749" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
-<span id="cb54-750"><a href="#cb54-750" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-751"><a href="#cb54-751" aria-hidden="true" tabindex="-1"></a>bill_df$votes = list(recorded_votes_df)</span>
-<span id="cb54-752"><a href="#cb54-752" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-753"><a href="#cb54-753" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-754"><a href="#cb54-754" aria-hidden="true" tabindex="-1"></a>...all the way until we've gotten back to the bill-level. Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.</span>
-<span id="cb54-755"><a href="#cb54-755" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-758"><a href="#cb54-758" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-759"><a href="#cb54-759" aria-hidden="true" tabindex="-1"></a>#| label: unnest-actions</span>
-<span id="cb54-760"><a href="#cb54-760" aria-hidden="true" tabindex="-1"></a>unnest(bill_df, actions) %&gt;% </span>
-<span id="cb54-761"><a href="#cb54-761" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
-<span id="cb54-762"><a href="#cb54-762" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-763"><a href="#cb54-763" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-764"><a href="#cb54-764" aria-hidden="true" tabindex="-1"></a>I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^12].</span>
-<span id="cb54-765"><a href="#cb54-765" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-766"><a href="#cb54-766" aria-hidden="true" tabindex="-1"></a>[^12]: Ctrl/Cmd+F: `extract_bill_status`</span>
-<span id="cb54-767"><a href="#cb54-767" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-768"><a href="#cb54-768" aria-hidden="true" tabindex="-1"></a># TL;DR: Main Points</span>
+<span id="cb54-722"><a href="#cb54-722" aria-hidden="true" tabindex="-1"></a>(totals_by_vote = xml_find_all(vote_totals, "totals-by-vote")) %&gt;% </span>
+<span id="cb54-723"><a href="#cb54-723" aria-hidden="true" tabindex="-1"></a>  xml_contents()</span>
+<span id="cb54-724"><a href="#cb54-724" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-725"><a href="#cb54-725" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-726"><a href="#cb54-726" aria-hidden="true" tabindex="-1"></a>Once we have our nodeset (which at last are all singular), we use same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.</span>
+<span id="cb54-727"><a href="#cb54-727" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-730"><a href="#cb54-730" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-731"><a href="#cb54-731" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
+<span id="cb54-732"><a href="#cb54-732" aria-hidden="true" tabindex="-1"></a>#| include: false</span>
+<span id="cb54-733"><a href="#cb54-733" aria-hidden="true" tabindex="-1"></a># Check if totals match</span>
+<span id="cb54-734"><a href="#cb54-734" aria-hidden="true" tabindex="-1"></a>as_list(totals_by_vote) %&gt;% </span>
+<span id="cb54-735"><a href="#cb54-735" aria-hidden="true" tabindex="-1"></a>  map_dfr(flatten_dfc)</span>
+<span id="cb54-736"><a href="#cb54-736" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-737"><a href="#cb54-737" aria-hidden="true" tabindex="-1"></a>summarise(party_vote_totals, </span>
+<span id="cb54-738"><a href="#cb54-738" aria-hidden="true" tabindex="-1"></a>          across(.cols = -party, sum, na.rm=T))</span>
+<span id="cb54-739"><a href="#cb54-739" aria-hidden="true" tabindex="-1"></a># They do!</span>
+<span id="cb54-740"><a href="#cb54-740" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-741"><a href="#cb54-741" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-742"><a href="#cb54-742" aria-hidden="true" tabindex="-1"></a>Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together.</span>
+<span id="cb54-743"><a href="#cb54-743" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-746"><a href="#cb54-746" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-747"><a href="#cb54-747" aria-hidden="true" tabindex="-1"></a>#| label: vote-roll-build</span>
+<span id="cb54-748"><a href="#cb54-748" aria-hidden="true" tabindex="-1"></a>vote_roll_df = vote_df %&gt;% </span>
+<span id="cb54-749"><a href="#cb54-749" aria-hidden="true" tabindex="-1"></a>  mutate(legislator_votes = list(legislator_vote_df),</span>
+<span id="cb54-750"><a href="#cb54-750" aria-hidden="true" tabindex="-1"></a>         party_votes = list(party_vote_totals_df)) %&gt;% </span>
+<span id="cb54-751"><a href="#cb54-751" aria-hidden="true" tabindex="-1"></a>    janitor::clean_names()</span>
+<span id="cb54-752"><a href="#cb54-752" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-753"><a href="#cb54-753" aria-hidden="true" tabindex="-1"></a>(recorded_votes_df = recorded_votes_df %&gt;% </span>
+<span id="cb54-754"><a href="#cb54-754" aria-hidden="true" tabindex="-1"></a>  mutate(vote_roll = list(vote_roll_df))) %&gt;% </span>
+<span id="cb54-755"><a href="#cb54-755" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-756"><a href="#cb54-756" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-757"><a href="#cb54-757" aria-hidden="true" tabindex="-1"></a>bill_df$votes = list(recorded_votes_df)</span>
+<span id="cb54-758"><a href="#cb54-758" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-759"><a href="#cb54-759" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-760"><a href="#cb54-760" aria-hidden="true" tabindex="-1"></a>...all the way until we've gotten back to the bill-level. Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.</span>
+<span id="cb54-761"><a href="#cb54-761" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-764"><a href="#cb54-764" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-765"><a href="#cb54-765" aria-hidden="true" tabindex="-1"></a>#| label: unnest-actions</span>
+<span id="cb54-766"><a href="#cb54-766" aria-hidden="true" tabindex="-1"></a>unnest(bill_df, actions) %&gt;% </span>
+<span id="cb54-767"><a href="#cb54-767" aria-hidden="true" tabindex="-1"></a>  glimpse()</span>
+<span id="cb54-768"><a href="#cb54-768" aria-hidden="true" tabindex="-1"></a>```</span>
 <span id="cb54-769"><a href="#cb54-769" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-770"><a href="#cb54-770" aria-hidden="true" tabindex="-1"></a>Processing XML documents can be simple depending on their structure, so try the simplest method if you can. If your data is making use of XML's flexibility you might but it can be boiled down to these steps:</span>
+<span id="cb54-770"><a href="#cb54-770" aria-hidden="true" tabindex="-1"></a>I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^12].</span>
 <span id="cb54-771"><a href="#cb54-771" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-772"><a href="#cb54-772" aria-hidden="true" tabindex="-1"></a>1.  **Explore the structure**</span>
+<span id="cb54-772"><a href="#cb54-772" aria-hidden="true" tabindex="-1"></a>[^12]: Ctrl/Cmd+F: `extract_bill_status`</span>
 <span id="cb54-773"><a href="#cb54-773" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-774"><a href="#cb54-774" aria-hidden="true" tabindex="-1"></a>&gt; Go through any available documentation, and when you read in the XML file you can use functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` .</span>
+<span id="cb54-774"><a href="#cb54-774" aria-hidden="true" tabindex="-1"></a># TL;DR: Main Points</span>
 <span id="cb54-775"><a href="#cb54-775" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-776"><a href="#cb54-776" aria-hidden="true" tabindex="-1"></a>2.  **Define the output**</span>
+<span id="cb54-776"><a href="#cb54-776" aria-hidden="true" tabindex="-1"></a>Processing XML documents can be simple depending on their structure, so try the simplest method if you can. If your data is making use of XML's flexibility you might but it can be boiled down to these steps:</span>
 <span id="cb54-777"><a href="#cb54-777" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-778"><a href="#cb54-778" aria-hidden="true" tabindex="-1"></a>&gt; Consider what you want the output to look like and think about how it needs to be transformed to match this target.</span>
+<span id="cb54-778"><a href="#cb54-778" aria-hidden="true" tabindex="-1"></a>1.  **Explore the structure**</span>
 <span id="cb54-779"><a href="#cb54-779" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-780"><a href="#cb54-780" aria-hidden="true" tabindex="-1"></a>3.  **Process a single element** (write a function if it gets too complicated)</span>
+<span id="cb54-780"><a href="#cb54-780" aria-hidden="true" tabindex="-1"></a>&gt; Go through any available documentation, and when you read in the XML file you can use functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` .</span>
 <span id="cb54-781"><a href="#cb54-781" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-782"><a href="#cb54-782" aria-hidden="true" tabindex="-1"></a>&gt; Get one element into the form you want. Writing functions can help you think through the data transformations being applied and make your code easier to read.</span>
+<span id="cb54-782"><a href="#cb54-782" aria-hidden="true" tabindex="-1"></a>2.  **Define the output**</span>
 <span id="cb54-783"><a href="#cb54-783" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-784"><a href="#cb54-784" aria-hidden="true" tabindex="-1"></a>4.  **Apply to all elements**</span>
+<span id="cb54-784"><a href="#cb54-784" aria-hidden="true" tabindex="-1"></a>&gt; Consider what you want the output to look like and think about how it needs to be transformed to match this target.</span>
 <span id="cb54-785"><a href="#cb54-785" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-786"><a href="#cb54-786" aria-hidden="true" tabindex="-1"></a>&gt; Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.</span>
+<span id="cb54-786"><a href="#cb54-786" aria-hidden="true" tabindex="-1"></a>3.  **Process a single element** (write a function if it gets too complicated)</span>
 <span id="cb54-787"><a href="#cb54-787" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-788"><a href="#cb54-788" aria-hidden="true" tabindex="-1"></a>Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.</span>
+<span id="cb54-788"><a href="#cb54-788" aria-hidden="true" tabindex="-1"></a>&gt; Get one element into the form you want. Writing functions can help you think through the data transformations being applied and make your code easier to read.</span>
 <span id="cb54-789"><a href="#cb54-789" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-792"><a href="#cb54-792" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-793"><a href="#cb54-793" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
-<span id="cb54-794"><a href="#cb54-794" aria-hidden="true" tabindex="-1"></a>#| include: false</span>
-<span id="cb54-795"><a href="#cb54-795" aria-hidden="true" tabindex="-1"></a>parse_vote_roll = function(vote, logger, bill_type, bill_num){</span>
-<span id="cb54-796"><a href="#cb54-796" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb54-797"><a href="#cb54-797" aria-hidden="true" tabindex="-1"></a>  tryCatch(</span>
-<span id="cb54-798"><a href="#cb54-798" aria-hidden="true" tabindex="-1"></a>    {</span>
-<span id="cb54-799"><a href="#cb54-799" aria-hidden="true" tabindex="-1"></a>      vote_xml = read_xml(vote, options = "RECOVER")</span>
-<span id="cb54-800"><a href="#cb54-800" aria-hidden="true" tabindex="-1"></a>      vote_data = xml_find_all(vote_xml, "vote-data")</span>
-<span id="cb54-801"><a href="#cb54-801" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-802"><a href="#cb54-802" aria-hidden="true" tabindex="-1"></a>      vote_roll_children = xml_children(vote_roll_xml)</span>
-<span id="cb54-803"><a href="#cb54-803" aria-hidden="true" tabindex="-1"></a>      vote_data = xml_find_all(vote_roll_xml, "vote-data")</span>
-<span id="cb54-804"><a href="#cb54-804" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-805"><a href="#cb54-805" aria-hidden="true" tabindex="-1"></a>      # Vote data</span>
-<span id="cb54-806"><a href="#cb54-806" aria-hidden="true" tabindex="-1"></a>      vote_legislators = vote_data %&gt;% </span>
-<span id="cb54-807"><a href="#cb54-807" aria-hidden="true" tabindex="-1"></a>        xml_find_all("recorded-vote")</span>
-<span id="cb54-808"><a href="#cb54-808" aria-hidden="true" tabindex="-1"></a>      legislators_list = as_list(vote_legislators)</span>
-<span id="cb54-809"><a href="#cb54-809" aria-hidden="true" tabindex="-1"></a>      legislator_vote_df = legislators_list %&gt;% </span>
-<span id="cb54-810"><a href="#cb54-810" aria-hidden="true" tabindex="-1"></a>        # Modify one level deeper using map_at to target legislator elements</span>
-<span id="cb54-811"><a href="#cb54-811" aria-hidden="true" tabindex="-1"></a>        map(map_at, "legislator", attributes) %&gt;% </span>
-<span id="cb54-812"><a href="#cb54-812" aria-hidden="true" tabindex="-1"></a>        map_dfr(flatten_dfc)</span>
-<span id="cb54-813"><a href="#cb54-813" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-814"><a href="#cb54-814" aria-hidden="true" tabindex="-1"></a>      # Vote metadata</span>
-<span id="cb54-815"><a href="#cb54-815" aria-hidden="true" tabindex="-1"></a>      vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")</span>
-<span id="cb54-816"><a href="#cb54-816" aria-hidden="true" tabindex="-1"></a>      vote_singular_nodes = xml_singular_nodes(vote_metadata)</span>
-<span id="cb54-817"><a href="#cb54-817" aria-hidden="true" tabindex="-1"></a>      (vote_df = as_list(vote_singular_nodes) %&gt;% </span>
-<span id="cb54-818"><a href="#cb54-818" aria-hidden="true" tabindex="-1"></a>          # as_list() doesn't retain element names so we set names ourselves</span>
-<span id="cb54-819"><a href="#cb54-819" aria-hidden="true" tabindex="-1"></a>          setNames(xml_name(vote_singular_nodes)) %&gt;% </span>
-<span id="cb54-820"><a href="#cb54-820" aria-hidden="true" tabindex="-1"></a>          flatten_dfc())</span>
-<span id="cb54-821"><a href="#cb54-821" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-822"><a href="#cb54-822" aria-hidden="true" tabindex="-1"></a>      # Vote totals</span>
-<span id="cb54-823"><a href="#cb54-823" aria-hidden="true" tabindex="-1"></a>      vote_totals = xml_find_all(vote_metadata, "vote-totals")</span>
-<span id="cb54-824"><a href="#cb54-824" aria-hidden="true" tabindex="-1"></a>      vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")</span>
-<span id="cb54-825"><a href="#cb54-825" aria-hidden="true" tabindex="-1"></a>      party_vote_totals_df = vote_totals_by_party %&gt;% </span>
-<span id="cb54-826"><a href="#cb54-826" aria-hidden="true" tabindex="-1"></a>        as_list() %&gt;% </span>
-<span id="cb54-827"><a href="#cb54-827" aria-hidden="true" tabindex="-1"></a>        map_dfr(flatten_dfc) %&gt;% </span>
-<span id="cb54-828"><a href="#cb54-828" aria-hidden="true" tabindex="-1"></a>        type_convert()</span>
-<span id="cb54-829"><a href="#cb54-829" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-830"><a href="#cb54-830" aria-hidden="true" tabindex="-1"></a>      vote_roll_df = vote_df %&gt;% </span>
-<span id="cb54-831"><a href="#cb54-831" aria-hidden="true" tabindex="-1"></a>        mutate(legislator_votes = list(legislator_vote_df),</span>
-<span id="cb54-832"><a href="#cb54-832" aria-hidden="true" tabindex="-1"></a>               party_votes = list(party_vote_totals_df)) %&gt;% </span>
-<span id="cb54-833"><a href="#cb54-833" aria-hidden="true" tabindex="-1"></a>        janitor::clean_names()</span>
-<span id="cb54-834"><a href="#cb54-834" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-835"><a href="#cb54-835" aria-hidden="true" tabindex="-1"></a>      vote_list = as_list(vote_data)</span>
-<span id="cb54-836"><a href="#cb54-836" aria-hidden="true" tabindex="-1"></a>      </span>
-<span id="cb54-837"><a href="#cb54-837" aria-hidden="true" tabindex="-1"></a>      flatten_dfr(vote_list) %&gt;% </span>
-<span id="cb54-838"><a href="#cb54-838" aria-hidden="true" tabindex="-1"></a>        unnest(everything())</span>
-<span id="cb54-839"><a href="#cb54-839" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb54-840"><a href="#cb54-840" aria-hidden="true" tabindex="-1"></a>    error=function(cond) {</span>
-<span id="cb54-841"><a href="#cb54-841" aria-hidden="true" tabindex="-1"></a>      log_info(logger, </span>
-<span id="cb54-842"><a href="#cb54-842" aria-hidden="true" tabindex="-1"></a>               bill_type = bill_type,</span>
-<span id="cb54-843"><a href="#cb54-843" aria-hidden="true" tabindex="-1"></a>               bill_num = bill_num, </span>
-<span id="cb54-844"><a href="#cb54-844" aria-hidden="true" tabindex="-1"></a>               "ERROR: Vote roll could not be parsed")</span>
-<span id="cb54-845"><a href="#cb54-845" aria-hidden="true" tabindex="-1"></a>      # Choose a return value in case of error</span>
-<span id="cb54-846"><a href="#cb54-846" aria-hidden="true" tabindex="-1"></a>      return(tibble())</span>
-<span id="cb54-847"><a href="#cb54-847" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb54-848"><a href="#cb54-848" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb54-849"><a href="#cb54-849" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb54-850"><a href="#cb54-850" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb54-851"><a href="#cb54-851" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb54-852"><a href="#cb54-852" aria-hidden="true" tabindex="-1"></a>```</span>
-<span id="cb54-853"><a href="#cb54-853" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-854"><a href="#cb54-854" aria-hidden="true" tabindex="-1"></a># Other helpful articles</span>
-<span id="cb54-855"><a href="#cb54-855" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-856"><a href="#cb54-856" aria-hidden="true" tabindex="-1"></a>Here are some of the helpful articles I came across in the course of writing this:</span>
-<span id="cb54-857"><a href="#cb54-857" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-858"><a href="#cb54-858" aria-hidden="true" tabindex="-1"></a>-   [From XML to Excel for Data Analysis](https://towardsdatascience.com/from-xml-to-excel-for-data-analysis-ac0c0c765b7d "Introduction to Processing XML In Python")</span>
-<span id="cb54-859"><a href="#cb54-859" aria-hidden="true" tabindex="-1"></a>-   [Reading XML files in R](https://medium.com/geekculture/reading-xml-files-in-r-3122c3a2a8d9)</span>
-<span id="cb54-860"><a href="#cb54-860" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-861"><a href="#cb54-861" aria-hidden="true" tabindex="-1"></a># Session Info</span>
-<span id="cb54-862"><a href="#cb54-862" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-863"><a href="#cb54-863" aria-hidden="true" tabindex="-1"></a>Version information about R, OS, and loaded packages.</span>
-<span id="cb54-864"><a href="#cb54-864" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-867"><a href="#cb54-867" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb54-868"><a href="#cb54-868" aria-hidden="true" tabindex="-1"></a>#| label: session-info</span>
-<span id="cb54-869"><a href="#cb54-869" aria-hidden="true" tabindex="-1"></a>#| echo: false</span>
-<span id="cb54-870"><a href="#cb54-870" aria-hidden="true" tabindex="-1"></a>sessioninfo::session_info("loaded")</span>
-<span id="cb54-871"><a href="#cb54-871" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-790"><a href="#cb54-790" aria-hidden="true" tabindex="-1"></a>4.  **Apply to all elements**</span>
+<span id="cb54-791"><a href="#cb54-791" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-792"><a href="#cb54-792" aria-hidden="true" tabindex="-1"></a>&gt; Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.</span>
+<span id="cb54-793"><a href="#cb54-793" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-794"><a href="#cb54-794" aria-hidden="true" tabindex="-1"></a>Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.</span>
+<span id="cb54-795"><a href="#cb54-795" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-798"><a href="#cb54-798" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-799"><a href="#cb54-799" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
+<span id="cb54-800"><a href="#cb54-800" aria-hidden="true" tabindex="-1"></a>#| include: false</span>
+<span id="cb54-801"><a href="#cb54-801" aria-hidden="true" tabindex="-1"></a>parse_vote_roll = function(vote, logger, bill_type, bill_num){</span>
+<span id="cb54-802"><a href="#cb54-802" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb54-803"><a href="#cb54-803" aria-hidden="true" tabindex="-1"></a>  tryCatch(</span>
+<span id="cb54-804"><a href="#cb54-804" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb54-805"><a href="#cb54-805" aria-hidden="true" tabindex="-1"></a>      vote_xml = read_xml(vote, options = "RECOVER")</span>
+<span id="cb54-806"><a href="#cb54-806" aria-hidden="true" tabindex="-1"></a>      vote_data = xml_find_all(vote_xml, "vote-data")</span>
+<span id="cb54-807"><a href="#cb54-807" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-808"><a href="#cb54-808" aria-hidden="true" tabindex="-1"></a>      vote_roll_children = xml_children(vote_roll_xml)</span>
+<span id="cb54-809"><a href="#cb54-809" aria-hidden="true" tabindex="-1"></a>      vote_data = xml_find_all(vote_roll_xml, "vote-data")</span>
+<span id="cb54-810"><a href="#cb54-810" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-811"><a href="#cb54-811" aria-hidden="true" tabindex="-1"></a>      # Vote data</span>
+<span id="cb54-812"><a href="#cb54-812" aria-hidden="true" tabindex="-1"></a>      vote_legislators = vote_data %&gt;% </span>
+<span id="cb54-813"><a href="#cb54-813" aria-hidden="true" tabindex="-1"></a>        xml_find_all("recorded-vote")</span>
+<span id="cb54-814"><a href="#cb54-814" aria-hidden="true" tabindex="-1"></a>      legislators_list = as_list(vote_legislators)</span>
+<span id="cb54-815"><a href="#cb54-815" aria-hidden="true" tabindex="-1"></a>      legislator_vote_df = legislators_list %&gt;% </span>
+<span id="cb54-816"><a href="#cb54-816" aria-hidden="true" tabindex="-1"></a>        # Modify one level deeper using map_at to target legislator elements</span>
+<span id="cb54-817"><a href="#cb54-817" aria-hidden="true" tabindex="-1"></a>        map(map_at, "legislator", attributes) %&gt;% </span>
+<span id="cb54-818"><a href="#cb54-818" aria-hidden="true" tabindex="-1"></a>        map_dfr(flatten_dfc)</span>
+<span id="cb54-819"><a href="#cb54-819" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-820"><a href="#cb54-820" aria-hidden="true" tabindex="-1"></a>      # Vote metadata</span>
+<span id="cb54-821"><a href="#cb54-821" aria-hidden="true" tabindex="-1"></a>      vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")</span>
+<span id="cb54-822"><a href="#cb54-822" aria-hidden="true" tabindex="-1"></a>      vote_singular_nodes = xml_singular_nodes(vote_metadata)</span>
+<span id="cb54-823"><a href="#cb54-823" aria-hidden="true" tabindex="-1"></a>      (vote_df = as_list(vote_singular_nodes) %&gt;% </span>
+<span id="cb54-824"><a href="#cb54-824" aria-hidden="true" tabindex="-1"></a>          # as_list() doesn't retain element names so we set names ourselves</span>
+<span id="cb54-825"><a href="#cb54-825" aria-hidden="true" tabindex="-1"></a>          setNames(xml_name(vote_singular_nodes)) %&gt;% </span>
+<span id="cb54-826"><a href="#cb54-826" aria-hidden="true" tabindex="-1"></a>          flatten_dfc())</span>
+<span id="cb54-827"><a href="#cb54-827" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-828"><a href="#cb54-828" aria-hidden="true" tabindex="-1"></a>      # Vote totals</span>
+<span id="cb54-829"><a href="#cb54-829" aria-hidden="true" tabindex="-1"></a>      vote_totals = xml_find_all(vote_metadata, "vote-totals")</span>
+<span id="cb54-830"><a href="#cb54-830" aria-hidden="true" tabindex="-1"></a>      vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")</span>
+<span id="cb54-831"><a href="#cb54-831" aria-hidden="true" tabindex="-1"></a>      party_vote_totals_df = vote_totals_by_party %&gt;% </span>
+<span id="cb54-832"><a href="#cb54-832" aria-hidden="true" tabindex="-1"></a>        as_list() %&gt;% </span>
+<span id="cb54-833"><a href="#cb54-833" aria-hidden="true" tabindex="-1"></a>        map_dfr(flatten_dfc) %&gt;% </span>
+<span id="cb54-834"><a href="#cb54-834" aria-hidden="true" tabindex="-1"></a>        type_convert()</span>
+<span id="cb54-835"><a href="#cb54-835" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-836"><a href="#cb54-836" aria-hidden="true" tabindex="-1"></a>      vote_roll_df = vote_df %&gt;% </span>
+<span id="cb54-837"><a href="#cb54-837" aria-hidden="true" tabindex="-1"></a>        mutate(legislator_votes = list(legislator_vote_df),</span>
+<span id="cb54-838"><a href="#cb54-838" aria-hidden="true" tabindex="-1"></a>               party_votes = list(party_vote_totals_df)) %&gt;% </span>
+<span id="cb54-839"><a href="#cb54-839" aria-hidden="true" tabindex="-1"></a>        janitor::clean_names()</span>
+<span id="cb54-840"><a href="#cb54-840" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-841"><a href="#cb54-841" aria-hidden="true" tabindex="-1"></a>      vote_list = as_list(vote_data)</span>
+<span id="cb54-842"><a href="#cb54-842" aria-hidden="true" tabindex="-1"></a>      </span>
+<span id="cb54-843"><a href="#cb54-843" aria-hidden="true" tabindex="-1"></a>      flatten_dfr(vote_list) %&gt;% </span>
+<span id="cb54-844"><a href="#cb54-844" aria-hidden="true" tabindex="-1"></a>        unnest(everything())</span>
+<span id="cb54-845"><a href="#cb54-845" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb54-846"><a href="#cb54-846" aria-hidden="true" tabindex="-1"></a>    error=function(cond) {</span>
+<span id="cb54-847"><a href="#cb54-847" aria-hidden="true" tabindex="-1"></a>      log_info(logger, </span>
+<span id="cb54-848"><a href="#cb54-848" aria-hidden="true" tabindex="-1"></a>               bill_type = bill_type,</span>
+<span id="cb54-849"><a href="#cb54-849" aria-hidden="true" tabindex="-1"></a>               bill_num = bill_num, </span>
+<span id="cb54-850"><a href="#cb54-850" aria-hidden="true" tabindex="-1"></a>               "ERROR: Vote roll could not be parsed")</span>
+<span id="cb54-851"><a href="#cb54-851" aria-hidden="true" tabindex="-1"></a>      # Choose a return value in case of error</span>
+<span id="cb54-852"><a href="#cb54-852" aria-hidden="true" tabindex="-1"></a>      return(tibble())</span>
+<span id="cb54-853"><a href="#cb54-853" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb54-854"><a href="#cb54-854" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb54-855"><a href="#cb54-855" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb54-856"><a href="#cb54-856" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb54-857"><a href="#cb54-857" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb54-858"><a href="#cb54-858" aria-hidden="true" tabindex="-1"></a>```</span>
+<span id="cb54-859"><a href="#cb54-859" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-860"><a href="#cb54-860" aria-hidden="true" tabindex="-1"></a># Other helpful articles</span>
+<span id="cb54-861"><a href="#cb54-861" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-862"><a href="#cb54-862" aria-hidden="true" tabindex="-1"></a>Here are some of the helpful articles I came across in the course of writing this:</span>
+<span id="cb54-863"><a href="#cb54-863" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-864"><a href="#cb54-864" aria-hidden="true" tabindex="-1"></a>-   [From XML to Excel for Data Analysis](https://towardsdatascience.com/from-xml-to-excel-for-data-analysis-ac0c0c765b7d "Introduction to Processing XML In Python")</span>
+<span id="cb54-865"><a href="#cb54-865" aria-hidden="true" tabindex="-1"></a>-   [Reading XML files in R](https://medium.com/geekculture/reading-xml-files-in-r-3122c3a2a8d9)</span>
+<span id="cb54-866"><a href="#cb54-866" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-867"><a href="#cb54-867" aria-hidden="true" tabindex="-1"></a># Session Info</span>
+<span id="cb54-868"><a href="#cb54-868" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-869"><a href="#cb54-869" aria-hidden="true" tabindex="-1"></a>Version information about R, OS, and loaded packages.</span>
+<span id="cb54-870"><a href="#cb54-870" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-873"><a href="#cb54-873" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb54-874"><a href="#cb54-874" aria-hidden="true" tabindex="-1"></a>#| label: session-info</span>
+<span id="cb54-875"><a href="#cb54-875" aria-hidden="true" tabindex="-1"></a>#| echo: false</span>
+<span id="cb54-876"><a href="#cb54-876" aria-hidden="true" tabindex="-1"></a>sessioninfo::session_info("loaded")</span>
+<span id="cb54-877"><a href="#cb54-877" aria-hidden="true" tabindex="-1"></a>```</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
