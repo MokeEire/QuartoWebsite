@@ -56,13 +56,11 @@ knit_print.data.frame = function(x, ...){
 
 # What is XML?
 
-If someone asked me what my least favourite data format to work with is, I would of course say PDF, but XML would not be far behind it. Unlike Excel spreadsheets, text files, and other tabular formats, (e)Xtensible Markup Language (XML) is designed to store any "arbitrary" structure[^1] of data. This flexibility makes XML useful for all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. Although working with XML may not be as simple as with tabular data, the contents can be much richer.
+Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility makes XML useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. At its core, XML is just "information wrapped in tags". Here is an example of information a bookstore might have in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp) :
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
 [^2]: The *x* at the end of Microsoft file types (e.g. .docx, .xlsx, .pptx) stands for XML.
-
-At its core, XML is just "information wrapped in tags". Here is an example from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp) of information a bookstore might have in XML format:
 
 ``` xml
 <bookstore>
