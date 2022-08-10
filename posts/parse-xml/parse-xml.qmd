@@ -54,13 +54,15 @@ knit_print.data.frame = function(x, ...){
 -   List, map, and flatten your data into a tabular format using `{purrr}` and using list columns with `{tidyr}`
 :::
 
-# What is XML?
-
-Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility makes XML useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. At its core, XML is just "information wrapped in tags". Here is an example of information a bookstore might have in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp) :
+Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility makes XML useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. If you have found the data you need and are trying to wrestle it from XML into a more analysis-friendly format, then this article is for you.
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
 [^2]: The *x* at the end of Microsoft file types (e.g. .docx, .xlsx, .pptx) stands for XML.
+
+# What is XML?
+
+At its core, XML is just "information wrapped in tags". Here is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp) :
 
 ``` xml
 <bookstore>
