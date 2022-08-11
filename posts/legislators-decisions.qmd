@@ -1,0 +1,59 @@
+---
+title: "Why we need to think about our legislator's decisions"
+subtitle: ""
+date: "2022-07-14"
+draft: true
+categories: 
+  - policy
+  - governance
+  - decision-making
+format: 
+  html: 
+    toc: true
+    code-link: true
+    code-fold: show
+    code-tools: true
+    comments:
+      hypothesis: true
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+#| echo: false
+library(extrafont)
+library(reactable)
+
+source("https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R")
+bill_xml_link = "https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"
+bill_xml_file = read_xml(bill_xml_link)
+```
+
+```{r}
+#| label: df-print-fct
+#| include: false
+
+knit_print.data.frame = function(x, ...){
+  knitr::knit_print(
+    reactable(x,
+              compact = T, 
+              resizable = T,
+              ),
+    ...
+    )
+}
+```
+
+Governance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.
+
+Congress seems to be struggling to pass laws in the first place, regardless of the individual law's effectiveness. It is troubling when significant legislative efforts, like the Inflation Reduction Act, only has support from one side of the aisle. One would hope the legislative process improves the quality of legislation as a bill goes from idea to law, and that the institution itself would get better at not only drafting legislation, but debating and revising it too.
+
+Questions I want to answer:
+
+-   What parts of the legislative process rely on human judgement? \
+    Obviously a lot, but what are the discrete decisions made through the committees, on the floor, and in between.
+
+-   Are there elements of the decision-making context, for which there is evidence of bias, noise, or decision-hygiene interventions?
+
+-   What kind of options are there for studying decision-making in legislatures?
