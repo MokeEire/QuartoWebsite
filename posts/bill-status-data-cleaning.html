@@ -157,7 +157,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
         <nav id="TOC" role="doc-toc"><h2 id="toc-title">On this page</h2>
    
   <ul>
-<li><a href="#source" id="toc-source" class="nav-link active" data-scroll-target="#source">Source</a></li>
+<li>
+<a href="#source" id="toc-source" class="nav-link active" data-scroll-target="#source">Source</a>
+  <ul class="collapse">
+<li><a href="#resources" id="toc-resources" class="nav-link" data-scroll-target="#resources">Resources</a></li>
+  </ul>
+</li>
   <li>
 <a href="#method" id="toc-method" class="nav-link" data-scroll-target="#method">Method</a>
   <ul class="collapse">
@@ -195,10 +200,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header><section id="source" class="level1"><h1>Source</h1>
 <p>This data source is derived from govinfo’s <code>BILLSTATUS</code> bulk data, which can be found <a href="https://www.govinfo.gov/bulkdata">here</a>. The US Government Publishing Office collects and provides records of all the bills that pass through congress, including the committees which consider the bill, the legislators who sponsor, or co-sponsor the bill, and any action taken on the bill while it is in congress e.g.&nbsp;votes and debates. To better understand and analyze legislative decision-making institutions, I have processed and cleaned the bulk data files for the 117th congress to prepare them in nested tabular format<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<section id="resources" class="level2"><h2 class="anchored" data-anchor-id="resources">Resources</h2>
 <ul>
-<li><p><a href="https://www.govinfo.gov/">govinfo website</a></p></li>
-<li><p><a href="https://github.com/usgpo/api">govinfo API documentation on github</a></p></li>
-</ul></section><section id="method" class="level1"><h1>Method</h1>
+<li><p><a href="https://www.govinfo.gov/bulkdata">govinfo bulk data</a></p></li>
+<li><p><a href="https://github.com/usgpo/api">govinfo API documentation</a></p></li>
+<li><p><a href="https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md">Bill Status XML User Guide</a></p></li>
+<li><p><a href="https://www.congress.gov/legislative-process">congress.gov legislative process overview</a></p></li>
+<li><p><a href="https://www.loc.gov/pictures/resource/ppmsca.33996/">US Congress legislative status steps diagram</a></p></li>
+</ul></section></section><section id="method" class="level1"><h1>Method</h1>
 <p><strong>Cleaning script:</strong> <a href="https://github.com/MokeEire/my-reps/blob/master/R/clean_data.R" class="uri">https://github.com/MokeEire/my-reps/blob/master/R/clean_data.R</a></p>
 <p><strong>Data processing functions</strong>: <a href="https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R" class="uri">https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R</a></p>
 <p>To process the data, it was first collected in a file directory that mimics that of govinfo’s web directory e.g.&nbsp;<code>./&lt;CONGRESS&gt;/&lt;BILL TYPE&gt;/&lt;FILE&gt;.xml</code> . The cleaning script and the functions used to process the data can be found above. The step-by-step process to parse each individual file is described below:</p>
@@ -589,243 +598,251 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ot">[^1]: </span>Meaning for characteristics which cannot be represented in a single row tidily, they are nested in a list column. This gives the user the flexibility to change the level of observation depending on their analytical aim.</span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">govinfo website</span><span class="co">](https://www.govinfo.gov/)</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resources</span></span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">govinfo API documentation on github</span><span class="co">](https://github.com/usgpo/api)</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">govinfo bulk data</span><span class="co">](https://www.govinfo.gov/bulkdata)</span></span>
 <span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu"># Method</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">govinfo API documentation</span><span class="co">](https://github.com/usgpo/api)</span></span>
 <span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>**Cleaning script:** <span class="ot">&lt;https://github.com/MokeEire/my-reps/blob/master/R/clean_data.R&gt;</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">Bill Status XML User Guide</span><span class="co">](https://github.com/usgpo/bill-status/blob/main/BILLSTATUS-XML_User_User-Guide.md)</span></span>
 <span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>**Data processing functions**: <span class="ot">&lt;https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R&gt;</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">congress.gov legislative process overview</span><span class="co">](https://www.congress.gov/legislative-process)</span></span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>To process the data, it was first collected in a file directory that mimics that of govinfo's web directory e.g. <span class="in">`./&lt;CONGRESS&gt;/&lt;BILL TYPE&gt;/&lt;FILE&gt;.xml`</span> . The cleaning script and the functions used to process the data can be found above. The step-by-step process to parse each individual file is described below:</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">US Congress legislative status steps diagram</span><span class="co">](https://www.loc.gov/pictures/resource/ppmsca.33996/)</span></span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Read in the XML file with <span class="in">`{xml2}`</span> and store it as an <span class="in">`{xml_document}`</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Extract the child elements of the <span class="in">`&lt;bill&gt;`</span> node which meet the criteria below, convert the nodeset to a list object, and flatten the list object to a dataframe.</span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>The element has 0 children</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="fu"># Method</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>**Cleaning script:** <span class="ot">&lt;https://github.com/MokeEire/my-reps/blob/master/R/clean_data.R&gt;</span></span>
 <span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>The value is not an empty string</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Extract the child elements of <span class="in">`&lt;bill&gt;`</span> node which have at least 1 child themselves.</span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>This includes committees, votes, actions, and bill (co)sponsors</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>Convert each element from step #3 to a nodeset, process and flatten the data into a tabular form which suits the characteristic. For example:</span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Actions are processed into a dataframe which contains one row per action, with nested columns for committees and subcommittees listed on each action.</span>
-<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Votes are processed into a dataframe which contains one row per vote, with nested columns for vote roll information at the party and legislator levels.</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>**Data processing functions**: <span class="ot">&lt;https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R&gt;</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>To process the data, it was first collected in a file directory that mimics that of govinfo's web directory e.g. <span class="in">`./&lt;CONGRESS&gt;/&lt;BILL TYPE&gt;/&lt;FILE&gt;.xml`</span> . The cleaning script and the functions used to process the data can be found above. The step-by-step process to parse each individual file is described below:</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Read in the XML file with <span class="in">`{xml2}`</span> and store it as an <span class="in">`{xml_document}`</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>Extract the child elements of the <span class="in">`&lt;bill&gt;`</span> node which meet the criteria below, convert the nodeset to a list object, and flatten the list object to a dataframe.</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>The element has 0 children</span>
 <span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code</span></span>
-<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>These steps are contained in a function named <span class="co">[</span><span class="ot">`extract_bill_status()`</span><span class="co">](https://github.com/MokeEire/my-reps/blob/4b10e13f431f0bdc19edcbc1430536d7b0734e09/R/parsing_functions.R#L506-L728)</span> found at the *Data processing functions* link above. <span class="co">&lt;!--# This section will walk through the logic and code for this function and the various helper functions used throughout. --&gt;</span></span>
-<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: extract-bill-status-fct</span></span>
-<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "`extract_bill_status()` function"</span></span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>extract_bill_status <span class="ot">=</span> <span class="cf">function</span>(xml_file, </span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>                               <span class="at">nested_attributes =</span> <span class="fu">c</span>(<span class="st">"committees"</span>, <span class="st">"votes"</span>, <span class="st">"actions"</span>, <span class="st">"sponsors"</span>, <span class="st">"cosponsors"</span>),</span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>                               <span class="at">get_votes =</span> T,</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>                               <span class="at">col_specs =</span> attribute_col_types,</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>                               <span class="at">log_threshold =</span> <span class="st">"INFO"</span>,</span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>                               <span class="at">log_types =</span> <span class="fu">c</span>(<span class="st">"file"</span>, <span class="st">"console"</span>)){</span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create logger</span></span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>  logger <span class="ot">=</span> <span class="fu">create_logger</span>(<span class="at">log_threshold =</span> log_threshold, </span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>                         <span class="at">log_types =</span> log_types)</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>  bill_xml <span class="ot">=</span> <span class="fu">xml_child</span>(<span class="fu">read_xml</span>(xml_file), <span class="st">"bill"</span>)</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>  <span class="co"># singletons = xml_singular_nodes(bill_xml)</span></span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>  singletons <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/*[count(./*) = 0 and not(string-length(.) = 0)]"</span>)</span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Singletons strewn together</span></span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  bill_df <span class="ot">=</span> <span class="fu">flatten_dfc</span>(</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(</span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map</span>(singletons, xml_text), </span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>      <span class="fu">xml_name</span>(singletons))</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract non-singular base attributes ----</span></span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Policy area</span></span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>  policy_areas <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"policyArea/name"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_chr</span>(flatten_chr)</span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Subjects</span></span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>  bill_subjects <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"subjects/billSubjects/legislativeSubjects/item/name"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_chr</span>(flatten_chr)</span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Summaries</span></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  bill_summaries <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"summaries/billSummaries/item"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Titles</span></span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>  bill_titles <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"titles/item"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Text versions</span></span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>  bill_text_versions <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"textVersions/item"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(map_at, <span class="st">"formats"</span>, map_dfr, flatten_dfc) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Latest action</span></span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>  latest_action <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"latestAction"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(flatten_dfc) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(<span class="sc">~</span><span class="fu">rename_with</span>(.x, <span class="sc">~</span><span class="fu">str_c</span>(<span class="st">"latestAction_"</span>, .)))</span>
-<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>policy_areas <span class="ot">=</span> <span class="fu">list</span>(policy_areas)</span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>legislative_subjects <span class="ot">=</span> <span class="fu">list</span>(bill_subjects)</span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_summaries <span class="ot">=</span> <span class="fu">list</span>(bill_summaries)</span>
-<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_titles <span class="ot">=</span> <span class="fu">list</span>(bill_titles)</span>
-<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_text_versions <span class="ot">=</span> <span class="fu">list</span>(bill_text_versions)</span>
-<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>  bill_df <span class="ot">=</span> <span class="fu">bind_cols</span>(bill_df, latest_action)</span>
-<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Reading XML"</span>)</span>
-<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Committees ---------</span></span>
-<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing committees"</span>)</span>
-<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>  committees <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/committees/billCommittees/item"</span>)</span>
-<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"committees"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(committees)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
-<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
-<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>    committees_list <span class="ot">=</span> <span class="fu">as_list</span>(committees)</span>
-<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>    committees_df <span class="ot">=</span> <span class="fu">map_dfr</span>(committees_list, parse_committee) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
-<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>committees <span class="ot">=</span> <span class="fu">list</span>(committees_df)</span>
-<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>committees <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
-<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Votes ---------</span></span>
-<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing votes"</span>)</span>
-<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>  votes_node <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/recordedVotes/recordedVote"</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>The value is not an empty string</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Extract the child elements of <span class="in">`&lt;bill&gt;`</span> node which have at least 1 child themselves.</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>This includes committees, votes, actions, and bill (co)sponsors</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>Convert each element from step #3 to a nodeset, process and flatten the data into a tabular form which suits the characteristic. For example:</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Actions are processed into a dataframe which contains one row per action, with nested columns for committees and subcommittees listed on each action.</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Votes are processed into a dataframe which contains one row per vote, with nested columns for vote roll information at the party and legislator levels.</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Code</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>These steps are contained in a function named <span class="co">[</span><span class="ot">`extract_bill_status()`</span><span class="co">](https://github.com/MokeEire/my-reps/blob/4b10e13f431f0bdc19edcbc1430536d7b0734e09/R/parsing_functions.R#L506-L728)</span> found at the *Data processing functions* link above. <span class="co">&lt;!--# This section will walk through the logic and code for this function and the various helper functions used throughout. --&gt;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: extract-bill-status-fct</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: "`extract_bill_status()` function"</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>extract_bill_status <span class="ot">=</span> <span class="cf">function</span>(xml_file, </span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>                               <span class="at">nested_attributes =</span> <span class="fu">c</span>(<span class="st">"committees"</span>, <span class="st">"votes"</span>, <span class="st">"actions"</span>, <span class="st">"sponsors"</span>, <span class="st">"cosponsors"</span>),</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>                               <span class="at">get_votes =</span> T,</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>                               <span class="at">col_specs =</span> attribute_col_types,</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>                               <span class="at">log_threshold =</span> <span class="st">"INFO"</span>,</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>                               <span class="at">log_types =</span> <span class="fu">c</span>(<span class="st">"file"</span>, <span class="st">"console"</span>)){</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create logger</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>  logger <span class="ot">=</span> <span class="fu">create_logger</span>(<span class="at">log_threshold =</span> log_threshold, </span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>                         <span class="at">log_types =</span> log_types)</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>  bill_xml <span class="ot">=</span> <span class="fu">xml_child</span>(<span class="fu">read_xml</span>(xml_file), <span class="st">"bill"</span>)</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>  <span class="co"># singletons = xml_singular_nodes(bill_xml)</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>  singletons <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/*[count(./*) = 0 and not(string-length(.) = 0)]"</span>)</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Singletons strewn together</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>  bill_df <span class="ot">=</span> <span class="fu">flatten_dfc</span>(</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map</span>(singletons, xml_text), </span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>      <span class="fu">xml_name</span>(singletons))</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract non-singular base attributes ----</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Policy area</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>  policy_areas <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"policyArea/name"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_chr</span>(flatten_chr)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Subjects</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>  bill_subjects <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"subjects/billSubjects/legislativeSubjects/item/name"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_chr</span>(flatten_chr)</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Summaries</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>  bill_summaries <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"summaries/billSummaries/item"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Titles</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>  bill_titles <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"titles/item"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Text versions</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  bill_text_versions <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"textVersions/item"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(map_at, <span class="st">"formats"</span>, map_dfr, flatten_dfc) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(flatten_dfc)</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Latest action</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>  latest_action <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"latestAction"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map</span>(flatten_dfc) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(<span class="sc">~</span><span class="fu">rename_with</span>(.x, <span class="sc">~</span><span class="fu">str_c</span>(<span class="st">"latestAction_"</span>, .)))</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>policy_areas <span class="ot">=</span> <span class="fu">list</span>(policy_areas)</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>legislative_subjects <span class="ot">=</span> <span class="fu">list</span>(bill_subjects)</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_summaries <span class="ot">=</span> <span class="fu">list</span>(bill_summaries)</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_titles <span class="ot">=</span> <span class="fu">list</span>(bill_titles)</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>  bill_df<span class="sc">$</span>bill_text_versions <span class="ot">=</span> <span class="fu">list</span>(bill_text_versions)</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>  bill_df <span class="ot">=</span> <span class="fu">bind_cols</span>(bill_df, latest_action)</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Reading XML"</span>)</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Committees ---------</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing committees"</span>)</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>  committees <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/committees/billCommittees/item"</span>)</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"committees"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(committees)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>    committees_list <span class="ot">=</span> <span class="fu">as_list</span>(committees)</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>    committees_df <span class="ot">=</span> <span class="fu">map_dfr</span>(committees_list, parse_committee) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>committees <span class="ot">=</span> <span class="fu">list</span>(committees_df)</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>committees <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"votes"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(votes_node)<span class="sc">&gt;</span><span class="dv">0</span> <span class="sc">&amp;&amp;</span> get_votes){</span>
-<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
-<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>    votes_list <span class="ot">=</span> <span class="fu">as_list</span>(votes_node)</span>
-<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>    votes_df <span class="ot">=</span> <span class="fu">map_dfr</span>(votes_list, flatten_dfc)</span>
-<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add Vote tallies</span></span>
-<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>    vote_rolls_df <span class="ot">=</span> votes_df <span class="sc">%&gt;%</span> </span>
-<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">vote_roll =</span> <span class="fu">map</span>(url, parse_vote_roll, </span>
-<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>                             <span class="at">logger =</span> logger, </span>
-<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>                             <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>                             <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber),</span>
-<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>             <span class="at">roll_found =</span> <span class="fu">map_lgl</span>(vote_roll, <span class="sc">~</span>(<span class="fu">nrow</span>(.) <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
-<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>votes <span class="ot">=</span> <span class="fu">list</span>(vote_rolls_df)</span>
-<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>votes <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
-<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Actions ---------</span></span>
-<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing actions"</span>)</span>
-<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>  bill_actions <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/actions/item"</span>)</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Votes ---------</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing votes"</span>)</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>  votes_node <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/recordedVotes/recordedVote"</span>)</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"votes"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(votes_node)<span class="sc">&gt;</span><span class="dv">0</span> <span class="sc">&amp;&amp;</span> get_votes){</span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>    votes_list <span class="ot">=</span> <span class="fu">as_list</span>(votes_node)</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>    votes_df <span class="ot">=</span> <span class="fu">map_dfr</span>(votes_list, flatten_dfc)</span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add Vote tallies</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>    vote_rolls_df <span class="ot">=</span> votes_df <span class="sc">%&gt;%</span> </span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">vote_roll =</span> <span class="fu">map</span>(url, parse_vote_roll, </span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>                             <span class="at">logger =</span> logger, </span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>                             <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>                             <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber),</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>             <span class="at">roll_found =</span> <span class="fu">map_lgl</span>(vote_roll, <span class="sc">~</span>(<span class="fu">nrow</span>(.) <span class="sc">&gt;</span> <span class="dv">0</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>votes <span class="ot">=</span> <span class="fu">list</span>(vote_rolls_df)</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>votes <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"actions"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_actions)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
-<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>    bill_action_counts <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/actions/*[not(self::item)]"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfc</span>(flatten_dfc) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename_with</span>(<span class="at">.cols =</span> <span class="fu">everything</span>(), <span class="sc">~</span><span class="fu">str_c</span>(<span class="st">"actions_"</span>, .)) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"action"</span>, <span class="at">names_prefix =</span> <span class="st">"actions_"</span>, <span class="at">values_to =</span> <span class="st">"count"</span>)</span>
-<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
-<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>    actions_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_actions) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_action) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>      <span class="fu">type_convert</span>(<span class="at">col_types =</span> col_specs<span class="sc">$</span>actions) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
-<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>actions <span class="ot">=</span> <span class="fu">list</span>(actions_df)</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Actions ---------</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing actions"</span>)</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>  bill_actions <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/actions/item"</span>)</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"actions"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_actions)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>    bill_action_counts <span class="ot">=</span> <span class="fu">as_list</span>(<span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/actions/*[not(self::item)]"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfc</span>(flatten_dfc) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename_with</span>(<span class="at">.cols =</span> <span class="fu">everything</span>(), <span class="sc">~</span><span class="fu">str_c</span>(<span class="st">"actions_"</span>, .)) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>      <span class="fu">pivot_longer</span>(<span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"action"</span>, <span class="at">names_prefix =</span> <span class="st">"actions_"</span>, <span class="at">values_to =</span> <span class="st">"count"</span>)</span>
 <span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>action_counts <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">type_convert</span>(bill_action_counts,</span>
-<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">action =</span> <span class="fu">col_character</span>(), <span class="at">count =</span> <span class="fu">col_integer</span>())))</span>
-<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>actions <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
-<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sponsors ---------</span></span>
-<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing sponsors"</span>)</span>
-<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>  bill_sponsors <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/sponsors/item"</span>)</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>    actions_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_actions) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_action) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>      <span class="fu">type_convert</span>(<span class="at">col_types =</span> col_specs<span class="sc">$</span>actions) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>actions <span class="ot">=</span> <span class="fu">list</span>(actions_df)</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>action_counts <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">type_convert</span>(bill_action_counts,</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">action =</span> <span class="fu">col_character</span>(), <span class="at">count =</span> <span class="fu">col_integer</span>())))</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>actions <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"sponsors"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_sponsors)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
-<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
-<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>    sponsors_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_sponsors) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_sponsor) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
-<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>sponsors <span class="ot">=</span> <span class="fu">list</span>(sponsors_df)</span>
-<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>sponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
-<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Cosponsors ---------</span></span>
-<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
-<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing cosponsors"</span>)</span>
-<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>  bill_cosponsors <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/cosponsors/item"</span>)</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Sponsors ---------</span></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing sponsors"</span>)</span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>  bill_sponsors <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/sponsors/item"</span>)</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"sponsors"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_sponsors)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    sponsors_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_sponsors) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_sponsor) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>sponsors <span class="ot">=</span> <span class="fu">list</span>(sponsors_df)</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>sponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"cosponsors"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_cosponsors)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
-<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
-<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>    cosponsors_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_cosponsors) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_sponsor, <span class="at">role =</span> <span class="st">"cosponsor"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
-<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>cosponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">type_convert</span>(cosponsors_df, <span class="at">col_types =</span> col_specs<span class="sc">$</span>cosponsors))</span>
-<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>cosponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
-<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>  finished_df <span class="ot">=</span> <span class="fu">as_tibble</span>(bill_df) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>    janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Combine bill type and number to create an ID</span></span>
-<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unite</span>(bill_id, bill_type, bill_number, <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">remove =</span> F)</span>
-<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_info</span>(logger, </span>
-<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>            <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
-<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>            <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
-<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Complete"</span>)</span>
-<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(finished_df,</span>
-<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(<span class="fu">ends_with</span>(<span class="st">"date"</span>), as_datetime),</span>
-<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>         <span class="at">actions =</span> <span class="fu">map</span>(actions, mutate, </span>
-<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>                       <span class="at">action_type =</span> <span class="fu">factor</span>(action_type, </span>
-<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"IntroReferral"</span>, <span class="st">"Committee"</span>, <span class="st">"Floor"</span>, </span>
-<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>                                                       <span class="st">"Discharge"</span>, <span class="st">"President"</span>, <span class="st">"BecameLaw"</span>), </span>
-<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">ordered =</span> T))</span>
-<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>         )</span>
-<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a><span class="fu"># Download options</span></span>
-<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>Coming soon!</span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Cosponsors ---------</span></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_debug</span>(logger, </span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>           <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>           <span class="st">"Parsing cosponsors"</span>)</span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>  bill_cosponsors <span class="ot">=</span> <span class="fu">xml_find_all</span>(bill_xml, <span class="st">"//bill/cosponsors/item"</span>)</span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="st">"cosponsors"</span> <span class="sc">%in%</span> nested_attributes <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(bill_cosponsors)<span class="sc">&gt;</span><span class="dv">0</span>){</span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Coerce nodes to list</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>    cosponsors_df <span class="ot">=</span> <span class="fu">as_list</span>(bill_cosponsors) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>      <span class="fu">map_dfr</span>(parse_sponsor, <span class="at">role =</span> <span class="st">"cosponsor"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>      janitor<span class="sc">::</span><span class="fu">clean_names</span>()</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>cosponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">type_convert</span>(cosponsors_df, <span class="at">col_types =</span> col_specs<span class="sc">$</span>cosponsors))</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>    bill_df<span class="sc">$</span>cosponsors <span class="ot">=</span> <span class="fu">list</span>(<span class="fu">tibble</span>())</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>  finished_df <span class="ot">=</span> <span class="fu">as_tibble</span>(bill_df) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>    janitor<span class="sc">::</span><span class="fu">clean_names</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Combine bill type and number to create an ID</span></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unite</span>(bill_id, bill_type, bill_number, <span class="at">sep =</span> <span class="st">"-"</span>, <span class="at">remove =</span> F)</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">log_info</span>(logger, </span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>            <span class="at">bill_type =</span> bill_df<span class="sc">$</span>billType,</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>            <span class="at">bill_num =</span> bill_df<span class="sc">$</span>billNumber,</span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Complete"</span>)</span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(finished_df,</span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>         <span class="fu">across</span>(<span class="fu">ends_with</span>(<span class="st">"date"</span>), as_datetime),</span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a>         <span class="at">actions =</span> <span class="fu">map</span>(actions, mutate, </span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>                       <span class="at">action_type =</span> <span class="fu">factor</span>(action_type, </span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"IntroReferral"</span>, <span class="st">"Committee"</span>, <span class="st">"Floor"</span>, </span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>                                                       <span class="st">"Discharge"</span>, <span class="st">"President"</span>, <span class="st">"BecameLaw"</span>), </span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>                                            <span class="at">ordered =</span> T))</span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>         )</span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a><span class="fu"># Download options</span></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>Coming soon!</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
