@@ -1,5 +1,5 @@
 ---
-title: "Why we need to think about our legislator's decisions"
+title: "Institutional decision-making"
 subtitle: ""
 date: "2022-07-14"
 draft: true
@@ -45,13 +45,15 @@ knit_print.data.frame = function(x, ...){
 }
 ```
 
+Institutional decision-making is one of the most pervasive and impactful challenges humans face today. It is ultimately with and through institutions that the climate crisis, global conflicts, and pandemic responses are tackled. The systems of the modern world in which institutions exist are densely connected so there are likely second- and third-order benefits of improving a single institution's decision-making.
+
 Governance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.
 
 Congress seems to be struggling to pass laws in the first place, regardless of the individual law's effectiveness. It is troubling when significant legislative efforts, like the Inflation Reduction Act, only has support from one side of the aisle. One would hope the legislative process improves the quality of legislation as a bill goes from idea to law, and that the institution itself would get better at not only drafting legislation, but debating and revising it too.
 
 Questions I want to answer:
 
--   What parts of the legislative process rely on human judgement? \
+-   What parts of the legislative process rely on human judgement?\
     Obviously a lot, but what are the discrete decisions made through the committees, on the floor, and in between.
 
 -   Are there elements of the decision-making context, for which there is evidence of bias, noise, or decision-hygiene interventions?
