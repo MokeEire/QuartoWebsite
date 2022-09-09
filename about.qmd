@@ -2,20 +2,22 @@
 title: "Mark Barrett"
 image: me-circle.png
 about:
-  template: marquee
+  template: trestles
   image-width: 280px
   links:
-    - icon: twitter
-      text: twitter
-      href: https://twitter.com/Mmm_JuicyFruit
     - icon: github
       text: Github
       href: https://github.com/MokeEire
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/Mmm_JuicyFruit
 ---
 
-I am an analyst with a passion for behavioural science, R, and public policy. 
-This website is for building a data analytics and visualization portfolio, and writing about policy and my research process.
-My interests include **decision-making**, **governance institutions**, and **information systems**, and particularly areas where these topics coincide.
+I am an analyst with a passion for behavioural science, public policy, and R. 
+The purpose of this website is to build a data analysis portfolio and write about policy issues that matter to me.
+
+I am interested in **decision-making**, **governance institutions**, and **information systems**, and particularly where these topics overlap.
+
 
 ## Education
 
@@ -24,11 +26,14 @@ B.S in Economics & Psychology | Aug. 2012 - May 2016
 
 ## Experience
 
-**RAND Corporation** | Research Assistant | Apr. 2016 - Feb. 2020
+**RAND Corporation**  
+Research Assistant | Apr. 2016 - Feb. 2020
 
-**CBRE** | Sr. Research Data Analyst | Mar. 2020 - May 2022
+**CBRE**  
+Sr. Research Data Analyst | Mar. 2020 - May 2022
 
-**Karl Storz** | Sr. Business Analyst | June 2022 - present
+**Karl Storz**  
+Sr. Business Analyst | June 2022 - present
 
 
 
