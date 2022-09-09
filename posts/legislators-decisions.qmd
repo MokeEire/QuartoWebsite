@@ -17,35 +17,9 @@ format:
       hypothesis: true
 ---
 
-```{r}
-#| label: setup
-#| message: false
-#| warning: false
-#| echo: false
-library(extrafont)
-library(reactable)
+The existential challenges of modern society sometimes feel insurmountable, and perhaps when the problems are as big as climate crises, pandemics, and global conflicts, solutions should feel out of reach for individuals. Instead it is institutions like governments and corporations which wield enough power to affect change But it's clear even in our recent past that coordinating human effort through institutions like governments. And it is But when individuals and communities form institutionsinto
 
-source("https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R")
-bill_xml_link = "https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"
-bill_xml_file = read_xml(bill_xml_link)
-```
-
-```{r}
-#| label: df-print-fct
-#| include: false
-
-knit_print.data.frame = function(x, ...){
-  knitr::knit_print(
-    reactable(x,
-              compact = T, 
-              resizable = T,
-              ),
-    ...
-    )
-}
-```
-
-Institutional decision-making is one of the most pervasive and impactful challenges humans face today. It is ultimately with and through institutions that the climate crisis, global conflicts, and pandemic responses are tackled. The systems of the modern world in which institutions exist are densely connected so there are likely second- and third-order benefits of improving a single institution's decision-making.
+to Improving how our institutions make decisions is one of most broadly impactful issues we can address today. The last five decades of behavioural science research has greatly expanded our understanding of judgement and decision-making, and where and how errors can occur in our thinking. We have tested various interventions for the past few decades in the form of *nudges*, or *boosts*, to get a better understanding of the contextual factors that help or hinder decisions. Identifying and evaluating institutions which suffer from error-prone decision mechanisms could . A world with more effective institutions is one in which we can address problems, coordinate resources, and improve the quality of life across the globe.
 
 Governance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.
 
