@@ -269,12 +269,20 @@ glimpse(example_bill_df[["sponsors"]])
 
 # Parsing
 
-With an understanding of your data's structure and your intended output, let's break down the process into extracting 1) singular elements i.e. only one value, and 2) nested elements. Your output should inform what you do with both, but for either case I convert XML to a list and use `{purrr]` to flatten and transform the list into a data frame.
+Okay now you should have an idea of what *your data* *is*, and what *you* *want your data to be*.
+
+With an understanding of your data's structure and your intended output, let's break down the process into extracting 1) singular elements i.e. only one value, and 2) nested elements. Your output should inform what you do with both, but for either case I convert XML to a list and use `{purrr}` to flatten and transform the list into a data frame.
 
 ::: callout-tip
 ## Write Functions
 
-For more complex cases, I would implore you to write functions. They make your code more reliable, easier to debug, and make you think critically about how you are handling data. A good resource to start learning about writing functions is [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/).
+If you find yourself doing similar transformations in multiple cases or copy-pasting some piece of code more than once, I would implore you to write functions because they:
+
+1.  make your code more reliable
+2.  make you think critically about how you're modifying the data
+3.  are easier to debug
+
+A good resource to start learning about writing functions is [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/).
 :::
 
 ## Singular elements
@@ -302,9 +310,9 @@ bookstore_xml_parsed = xmlParse(bookstore_xml_text)
 (bookstore_xml_df = xmlToDataFrame(bookstore_xml_parsed))
 ```
 
-In cases where your data are entirely singular nodes, you can convert XML to a dataframe using two functions from `{XML}`[^8]: `xmlParse()` and `xmlToDataFrame()`. Because the congressional data has singular and nested element structures, the nested data in fields like `committees`, `actions`, and `sponsors` are combined into single columns. If your data is not all singular nodes like this, you'll need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
+In cases where your data are entirely singular nodes, you can convert XML to a dataframe using two functions from `{XML}`[^9]: `xmlParse()` and `xmlToDataFrame()`. Because the congressional data has singular and nested element structures, the nested data in fields like `committees`, `actions`, and `sponsors` are combined into single columns. If your data is not all singular nodes like this, you'll need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
 
-[^8]: When you're working with both the `{XML}` and `{xml2}` libraries, it is important to note that their functions often rely on different object types. In the case of `xmlToDataFrame()`, it does not take `{xml_document}` or `{xml_node}` objects. If you try to use them, you'll see an error like this:
+[^9]: When you're working with both the `{XML}` and `{xml2}` libraries, it is important to note that their functions often rely on different object types. In the case of `xmlToDataFrame()`, it does not take `{xml_document}` or `{xml_node}` objects. If you try to use them, you'll see an error like this:
 
     ```{r}
     #| label: xml-df-error
@@ -315,7 +323,6 @@ In cases where your data are entirely singular nodes, you can convert XML to a d
 
 ```{r}
 #| label: xml-to-df
-#| class-output: code-block-h
 
 # First you need to use the xmlParse function
 bill_xml_parse = xmlParse(bill_xml)
@@ -332,11 +339,11 @@ In this example, we actually need to use `getNodeSet(., [path =] "//bill")` to s
 
 To start building our congressional bill dataset, we need to isolate singular elements like `billNumber` and `billType` by selecting nodes which meet two criteria: 1) the node does not have any child nodes of its own, and 2) the node is not an empty string. I use to extract nodes based on an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) string. It returns an `{xml_nodeset}` which is then coerced to a list using `as_list()`.
 
-As the help file for `xml_find_all()` says, "XPath is like regular expressions for trees". The expression selects the nodes which match the given path or pattern[^9]. In the code below `//bill/*` selects the child nodes in a bill. The expressions `[` within the square brackets `]` are called predicates which I use to find nodes which have no children with the XPath `count` function and nodes which are not empty strings[^10].
+As the help file for `xml_find_all()` says, "XPath is like regular expressions for trees". The expression selects the nodes which match the given path or pattern[^10]. In the code below `//bill/*` selects the child nodes in a bill. The expressions `[` within the square brackets `]` are called predicates which I use to find nodes which have no children with the XPath `count` function and nodes which are not empty strings[^11].
 
-[^9]: [A very useful table of XPath syntax](https://www.w3schools.com/XML/xpath_syntax.asp){target="_blank"}
+[^10]: [A very useful table of XPath syntax](https://www.w3schools.com/XML/xpath_syntax.asp){target="_blank"}
 
-[^10]: In the process of writing this, I discovered that using XPath made this \~5x faster than an equivalent function in R.
+[^11]: In the process of writing this, I discovered that using XPath made this \~5x faster than an equivalent function in R.
 
     ```{r}
     #| label: singular-nodes
@@ -422,19 +429,13 @@ reactable(bill_df,
 
 ## Nested elements
 
-At this point I should be clear about one of my assumptions: that performance with list-columns scales reasonably in various dimensions. I have yet to hit a computational wall[^11], but I am sure at some point it would be much smarter to store this information in a relational database. In either case you may come across elements with multiple children, multiple children with their own sub-elements, and elements with nested XML data. I'll be As you dive deeper into your data you'll likely have to decide which information you're extracting and how.
+Parsing XML when your data is all singular is straightforward, but often XML will use a nested data structure. In this case the congressional data, actions and votes on each bill are stored in their own container elements. We can transform the data in these containers to nested data frames and use the `nest()`/`unnest()` functionality of `{tidyr}` to change the level of observation as needed.
 
-[^11]: Parsing \~12,000 congressional bills takes 20 minutes for my computer.
-
-To include actions and votes, we can take advantage of the `nest()`/`unnest()` functionality of `{tidyr}`. We use the same steps as before to convert the XML to a list and then nest them in a list column.
-
-### Multiple children
-
-This section's still under construction, if you're reading this and you're not someone I sent this to I am impressed you've managed to reach this corner of the internet.
+To create each data frame, we isolate the nodes using XPath, and use the same steps as before to convert the XML to a list and then nest them in a list column.
 
 ### Multiple children with sub-elements
 
-The actions node has an `<item>` child node for each congressional action taken for a bill, such as being introduced, sent to a committee, debated on the floor, etc.. Just as before, we use `as_list()` to convert the `{xml_nodeset}` to a list.
+Actions are stored in a container node where each `<item>` represents a congressional action taken for a bill, such as being introduced, sent to a committee, debated on the floor, etc. Just as before, we use `as_list()` to convert the `{xml_nodeset}` to a list.
 
 ```{r}
 #| label: actions-list
@@ -445,10 +446,10 @@ actions_xml = xml_find_all(bill_node, "actions/item")
 actions_list = as_list(actions_xml)
 
 # Look at first action
-glimpse(actions_list[[1]])
+glimpse(actions_list[[1]], width = 50)
 ```
 
-In the individual action container, we have the date, a list of committees related to the action, some administrative information, the text and type of action. To deal with this, we can write a function (or set of functions) like the ones below to process an action.
+For an individual action, we have the date, a list of committees related to the action, some administrative information, the text and type of action. To deal with this, we can write a function (or set of functions) like the ones below to transform actions from a list to a data frame with their own nested elements.
 
 ```{r}
 #| label: actions-functions
@@ -471,10 +472,11 @@ flatten_dfc_rename = function(list_to_flatten,
 # Parse actions from list to data frame
 parse_action = function(action){
   action %>% 
-    # Flatten+rename sourceSystem elements
+    # Flatten + rename sourceSystem elements
     map_at("sourceSystem", ~flatten_dfc_rename(.x, "source")) %>% 
-    # Flatten+rename committees
+    # Flatten + rename committees
     map_at("committees", function(committee){
+      # using map_at and map_dfr to create a data frame row for each committee
       map_dfr(committee, ~flatten_dfc_rename(.x, "committee"))
     }) %>% 
     # Flatten object to data frame
@@ -521,26 +523,30 @@ Using the `{purrr}` library's `map_dfr()`, we apply this function to each action
   glimpse()
 ```
 
-It is useful to be explicit about the data types when you plan to combine rows into a data frame or `unnest()` the data in the future. I do this using `type_convert()` to ensure the columns have a specific datatype. To add these actions data as a list column to `bill_df` we can simply use dollar assignment.
+When you plan to combine rows into a data frame or `unnest()` the data in the future, it is useful to be explicit about the expected data types of each column. This can be done using `type_convert()`. Because we are only adding a single row of data to `bill_df` we can encase the actions in a list and use dollar assignment. If you were adding multiple rows of data, you would need to make sure that you are adding a column of the same length as `bill_df`.
 
 ```{r}
 #| label: actions-dfr
 #| code-fold: show
 
-actions_df = type_convert(actions_df,
-                          col_types = cols(
-                            action_date = col_date(), 
-                            action_time = col_time(),
-                            action_committee_systemCode = col_character(), 
-                            action_committee_name = col_character(), 
-                            action_source_code = col_character(),
-                            action_source_name = col_character(),
-                            action_text = col_character(), 
-                            action_type = col_character(), 
-                            action_code = col_character()
-                            )
-                          )
+# Specify column data types
+actions_col_types = cols(
+  action_date = col_date(),
+  action_time = col_time(),
+  action_committee_systemCode = col_character(), 
+  action_committee_name = col_character(), 
+  action_source_code = col_character(),
+  action_source_name = col_character(),
+  action_text = col_character(), 
+  action_type = col_character(), 
+  action_code = col_character()
+  )
 
+# Convert column types
+actions_df = type_convert(actions_df,
+                          col_types = actions_col_types)
+
+# Assign actions as data frame within a list
 bill_df$actions = list(actions_df)
 ```
 
@@ -569,16 +575,24 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 
 ### Nested XML
 
-Sometimes you can even have links to other XML files in a node, as we can see in the `<recordedVotes>` element. Votes are particularly interesting because it provides a more discrete measure of our representatives' behaviour.
+So we've dealt with cases with multiple child elements, but you can also have links to XML files within those child elements as you can see in the `<url>` element below.[^12]
+
+[^12]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}
 
 ```{r}
 #| label: vote-nodes-contents
-(bill_recorded_vote_nodes = xml_find_all(bill_node, "recordedVotes/recordedVote"))
+
+# Find recordedVote nodes inside recordedVote container
+bill_recorded_vote_nodes = xml_find_all(
+  bill_node, 
+  "recordedVotes/recordedVote"
+  )
+
+# Look at the nodeset contents
+xml_contents(bill_recorded_vote_nodes)
 ```
 
-You may have spotted why votes are interesting elements to parse because inside the `<url>` element we find **another** **XML file**![^12] Before we dive into that can of worms, I'll convert the top-level nodes to a list and flatten it into columns. Note we use `map_dfr()` with `votes_list` because there could be multiple vote objects.
-
-[^12]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}
+Before we dive one level deeper, to start building our vote-level data frame, we can convert the top-level nodes to a list and flatten it into columns.
 
 ```{r}
 #| label: vote-nodes-df
@@ -589,7 +603,13 @@ recorded_votes_list = as_list(bill_recorded_vote_nodes)
   glimpse()
 ```
 
-Now we want to get the vote roll XML file, so we go back to `read_xml()` . There are two main nodes - `<vote-metadata>` and `<vote-data>`. One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. Let's try to parse the legislator-level data first. Here is the XML for a single legislator's vote:
+::: {.callout-note appearance="simple"}
+## Note
+
+We use `flatten_dfc()` to flatten each vote element into a data frame as columns and then `map_dfr()` rolls them all up as rows into a single data frame.
+:::
+
+Now we want to get the vote roll XML file, so we'll need to use `read_xml()` . There are two main nodes - `<vote-metadata>` and `<vote-data>`. One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. Let's parse the legislator-level data first. Here is the XML for a single legislator's vote:
 
 ```{r}
 #| label: vote-roll-xml
