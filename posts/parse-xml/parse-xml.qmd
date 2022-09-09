@@ -54,7 +54,7 @@ knit_print.data.frame = function(x, ...){
 -   List, map, and flatten your data into a tabular format using `{purrr}` and using list columns with `{tidyr}`
 :::
 
-Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility makes XML useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. If you have found the data you need and are trying to wrestle it from XML into a more analysis-friendly format, then this article is for you.
+Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility is useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. Unfortunately, this can make data quite difficult to parse and analyze in tabular format. If you are trying to wrestle some data from XML into an analysis-friendly form, then this article is for you.
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
@@ -62,7 +62,7 @@ Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Ma
 
 # What is XML?
 
-At its core, XML is just "information wrapped in tags". Here is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp) :
+At its core, XML is "information wrapped in tags". The structure of XML can be thought of as branches of a tree, with each branch having one or more leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp). `<bookstore>` is the parent, or *root* element in the example above. The book store has two `<book>` child elements containing their own child elements which are individual data points about the book.
 
 ``` xml
 <bookstore>
