@@ -664,6 +664,7 @@ The `<vote-totals>` are a bit of a unique little element, with 3 different types
 
 ```{r}
 #| label: vote-roll-metadata-totals-contents
+#| message: false
 #| layout-nrow: 1
 (vote_totals = xml_find_all(vote_metadata, "vote-totals")) %>% 
   xml_contents()
@@ -678,7 +679,7 @@ party_vote_totals_df = as_list(vote_totals_by_party) %>%
   xml_contents()
 ```
 
-Once we have our nodeset (which at last are all singular), we use same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.
+Once we have our nodeset (which at last are all singular), we use the same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.
 
 ```{r}
 #| eval: false
@@ -692,7 +693,7 @@ summarise(party_vote_totals,
 # They do!
 ```
 
-Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together.
+Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together and nest it until we've gotten back to the bill-level i.e. the vote roll data frame goes in the votes data frame, which goes in the bill data frame.
 
 ```{r}
 #| label: vote-roll-build
@@ -708,7 +709,7 @@ vote_roll_df = vote_df %>%
 bill_df$votes = list(recorded_votes_df)
 ```
 
-...all the way until we've gotten back to the bill-level. Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.
+Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.
 
 ```{r}
 #| label: unnest-actions
@@ -722,15 +723,15 @@ I'll stop there for brevity's sake, but you can find the code for extracting the
 
 # TL;DR: Main Points
 
-Processing XML documents can be simple depending on their structure, so try the simplest method if you can. If your data is making use of XML's flexibility you might but it can be boiled down to these steps:
+Transforming XML into a tabular format can be tricky depending on the structure. Start by understanding how the data is organized, what you want it to look like, and what level of detail you are looking at.
 
 1.  **Explore the structure**
 
-> Go through any available documentation, and when you read in the XML file you can use functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` .
+> Look through any available documentation, always. When you read in the XML file, functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` will show you the structure you're dealing with.
 
 2.  **Define the output**
 
-> Consider what you want the output to look like and think about how it needs to be transformed to match this target.
+> Consider what you want the output to look like and think about how the data needs to be transformed to match this.
 
 3.  **Process a single element** (write a function if it gets too complicated)
 
@@ -738,7 +739,7 @@ Processing XML documents can be simple depending on their structure, so try the 
 
 4.  **Apply to all elements**
 
-> Focus on processing of the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of multiple files.
+> Focus on processing the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of all the files in your dataset.
 
 Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.
 
@@ -810,6 +811,8 @@ Here are some of the helpful articles I came across in the course of writing thi
 
 -   [From XML to Excel for Data Analysis](https://towardsdatascience.com/from-xml-to-excel-for-data-analysis-ac0c0c765b7d "Introduction to Processing XML In Python")
 -   [Reading XML files in R](https://medium.com/geekculture/reading-xml-files-in-r-3122c3a2a8d9)
+-   [Converting nested XML to dataframe in R](https://urbandatapalette.com/post/2021-03-xml-dataframe-r/)
+-   [Parse and process XML (and HTML) with xml2](https://www.rstudio.com/blog/xml2/)
 
 # Session Info
 
