@@ -81,55 +81,73 @@ At its core, XML is "information wrapped in tags". The structure of XML can be t
 </bookstore>
 ```
 
-The `<bookstore>` is the parent, or *root* element. The parent element contains two `<book>`s which have the elements contained in the tags -- `<title>`, `<author>`, `<year>`, and `<price>`. XML can be thought of as a tree, where each tree branch can have multiple leaves, or none.
+Takeaways:
+
+1.  `<bookstore>` is the parent, or *root* element
+2.  The book store has two `<book>` child elements
+3.  Each book element contains their own child elements which are individual data points about each book
 
 ::: {.callout-note appearance="simple"}
-## Note that attributes are denoted by key/value assignment in a tag.
+## Note
 
-In `<book category="children">`, the book's category is stored as an attribute. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML. This post will touch on data stored using both methods. To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
+Attributes are denoted by key/value assignment in a tag. In the example above, the book's category is stored as an attribute. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML[^3]. However, you'll still likely run into data stored in attributes so we'll touch on extracting data from both.
 :::
+
+[^3]: To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
 
 # Navigating XML with R
 
-To illustrate potential complexities of XML structures, I'll be using congressional bill data provided by the [United States Government Publishing Office (GPO)](https://www.gpo.gov/). You can follow along by downloading the sample XML bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021")[^3].
+I'll be using congressional bill data from the [United States Government Publishing Office (GPO)](https://www.gpo.gov/) to illustrate potential complexities of XML structures. You can follow along by downloading the sample bill[^4] [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021").
 
-[^3]: I chose the bill [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)only because it contains good examples of the challenges of parsing XML data, so consider this a standard *retweets ≠ endorsements* situation*.*
+[^4]: I chose the bill [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)only because it contains good examples of the challenges of parsing XML data, so consider this a standard *retweets ≠ endorsements* situation*.*
 
-Four R packages are important for this article. `{XML}` and `{xml2}`[^4] provide functions for reading in XML data while `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) helps us parse and flatten the data into tabular form. To start, read in the file with `read_xml()` , which returns an `xml_document`[^5] object.
+I'll be using four very helpful R packages throughout this post:
 
-[^4]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
+-   `{XML}` and `{xml2}` provide functions for reading in and parsing XML[^5]
 
-[^5]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+-   `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) help us wrangle lists and transform XML to data frames.
+
+[^5]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
+
+To read in the file, you can pass the URL or file path of the XML file to `read_xml()` , which returns an `xml_document` object[^6].
+
+[^6]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
 
 ```{r}
 #| label: read-xml
 #| code-fold: show
 #| code-summary: "Load and view XML file"
 
+# copy the comment below to install the packages
+# install.packages(c("tidyverse", "XML", "xml2))
 library(tidyverse)
 library(XML)
 library(xml2)
 
+# Read XML file
 bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 
-# Look at the xml_document's contents
+# Look at xml_document's contents
 xml_contents(bill_xml)
 ```
 
-We can see the document has two top-level nodes - one `<bill>` node and one called `<dublinCore>`[^6] In this case we can look just at the `<bill>` node using `xml_child()`.
+The top-level nodes are `<bill>` and `<dublinCore>`[^7]. The latter is a metadata identifier and doesn't contain bill-related information, so we can use `xml_child()` to select just data inside the `<bill>` node.
 
-[^6]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
+[^7]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
 
 ```{r}
 #| code-fold: show
 #| label: xml-bill-child
 #| code-overflow: wrap
 # Return child nodes named bill
-
 (bill_node = xml_child(bill_xml, "bill"))
 ```
 
-So if we want to have a data frame with one row per bill, we have a few different kinds of elements to deal with. Firstly there are the elements which have **only one value** (i.e. *singular*) like `billNumber`, `createDate`, and `billType`. There are also elements which have information *nested* in them like `recordedVotes`, `committees`, and `actions`.
+So now we have all the bill data in one place. How do we get it into a data frame?
+
+# Define the output
+
+Before we start transforming the data, it's important to think about what kind of data frame you want to produce. This will determine how the data is manipulated and depending on the structure of your XML data, there can be a lot of different options.
 
 The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
 
@@ -139,28 +157,30 @@ The importance of understanding the structure of your data brings us to one of t
 In fact, you could even say *stare* at it. Understanding the structure and contents of your data is essential for designing a solution to consistently process the data.
 :::
 
-# Define the output
+I want to create a data frame of congressional bills where each bill forms a single row. Elements which have **only one value** (i.e. *singular*) like `billNumber`, `createDate`, and `billType` are straightforward, but there are also *nested* elements like `recordedVotes`, `committees`, and `actions` which each have multiple data points. In some cases you may want to store multiple attributes in a *wide* format e.g. storing committees as `committee_1`, `committee_2`, etc. I will be storing each nested element in a *long* format, meaning one row per vote, committee, and action.
 
-As well as looking at your data, it's also helpful to think about your intended output. This determines what you need to do to transform the data. Depending on the structure of your XML data, there are a lot of different options.
+In order to construct both a bill-level data frame and retain nested elements, we'll be taking advantage of `{tidyr}`'s `nest()` function, which nests data inside [list columns](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html). Columns in a data frame are typically *atomic vectors*[^8] of equal length, but list columns enable us to store data of varying length and type, including data frames themselves. The end result will look like this:
 
-In the case of congressional data, we have multiple levels of observation - bill, action, vote, and individual legislator votes. To organize the data in a way that preserves each, we can use rows, columns, separate tables linked by some combination of ID variables, or we can use [list columns](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html). Columns in a data frame are typically *atomic vectors*[^7] of equal length, but list columns enable us to store data of varying length and type, including data frames themselves. This makes them a perfect solution for the nested characteristics of the congressional data. Using `{tidyr}`, we will `nest()`/`unnest()` these columns as needed. The end result will look like this:
-
-[^7]: Atomic vectors are vectors with elements of the same type (e.g. numeric, character, etc.) as opposed to *general vectors*, or lists, which can contain a variety of types.
+[^8]: Atomic vectors are vectors with elements of the same type (e.g. numeric, character, etc.) as opposed to *general vectors*, or lists, which can contain a variety of types.
 
 ```{r}
 #| label: example-bill
 #| echo: false
 #| message: false
+#| column: page
 
-example_bill_df = extract_bill_status(bill_xml_link, log_types = NULL)
+library(knitr)
+(example_bill_df = extract_bill_status(bill_xml_link, log_types = NULL)) %>% 
+  kable()
 
-glimpse(example_bill_df)
+# glimpse(example_bill_df)
 ```
 
 ```{r}
 #| label: example-bill-rt
 #| echo: false
-#| eval: false
+#| eval: true
+#| column: page
 example_bill_df %>% #glimpse() # here to check the data
   # select(
   #   -bill_id, -where(is_list) # remove list columns?
