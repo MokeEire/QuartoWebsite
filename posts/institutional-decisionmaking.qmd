@@ -1,0 +1,42 @@
+---
+title: "Why improving institutional decision-making will save the world"
+subtitle: "Or at least make it easier to get things done around here."
+date: "2022-07-14"
+draft: true
+categories: 
+  - policy
+  - governance
+  - decision-making
+format: 
+  html: 
+    toc: true
+    code-link: true
+    code-fold: show
+    code-tools: true
+    comments:
+      hypothesis: true
+---
+
+Improving the effectiveness and quality of powerful institutions' decision-making is one of the most important things we can do in the 21st century. In the face of challenges as complex and structurally interdependent as climate change and AI safety, we need institutions which are driven by holistic, altruistically-defined aims, and are designed to effectively achieve those aims. For most institutions, the processes in place to achieve their intended outcomes involve human judgement, intuition, and collaboration, which likely introduces a variety of errors in judgement. Using research from behavioural science to inoculate and support decision-making from biases and judgement errors will enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
+
+Improving powerful institutions' decision-making is one of the most important things we can do in the 21st century. It is through these institutions that challenges as complex and structurally interdependent as climate change and AI safety can be tackled. The last five decades of behavioural science research has illuminated the degree to which errors occur in our decision-making, as well as the contextual factors associated with them.
+which are most powerful in these domains to ensure holistic, altruistically-defined aims, and are designed to effectively achieve those aims. For most institutions, the processes in place to achieve their intended outcomes involve human judgement, intuition, and collaboration, which likely introduces a variety of errors in judgement. Using research from behavioural science to inoculate and support decision-making from biases and judgement errors will enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
+
+Institutional decision-making is a necessarily broad combination of terms so it is important to clarify what is meant by each. I will borrow definitions from the [Effective Institutions Project](https://forum.effectivealtruism.org/posts/ttpSEgE3by7AAhQ7w/improving-institutional-decision-making-which-institutions-a#Background) because they do an excellent job of balancing comprehensiveness and brevity.
+
+> ...when we speak of "**decision-making**," we are using that term broadly to refer to *all of the aspects of the process leading up to an institution's actions over which that institution has agency*.
+
+> The definition of an **institution** is not completely standardized across disciplines or academic fields, but in this context we mean *a formally organized group of people, usually delineated by some sort of legal entity (or an interconnected set of such entities) in the jurisdiction(s) in which that group operates*.
+
+Governance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.
+
+Congress seems to be struggling to pass laws in the first place, regardless of the individual law's effectiveness. It is troubling when significant legislative efforts, like the Inflation Reduction Act, only has support from one side of the aisle. One would hope the legislative process improves the quality of legislation as a bill goes from idea to law, and that the institution itself would get better at not only drafting legislation, but debating and revising it too.
+
+Questions I want to answer:
+
+-   What parts of the legislative process rely on human judgement?\
+    Obviously a lot, but what are the discrete decisions made through the committees, on the floor, and in between.
+
+-   Are there elements of the decision-making context, for which there is evidence of bias, noise, or decision-hygiene interventions?
+
+-   What kind of options are there for studying decision-making in legislatures?
