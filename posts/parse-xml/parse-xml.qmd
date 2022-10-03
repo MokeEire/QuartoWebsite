@@ -67,87 +67,84 @@ At its core, XML is "information wrapped in tags". Think of XML's structure as b
 </bookstore>
 ```
 
-Takeaways:
+`<bookstore>` is the parent, or *root* element in the example above. The two `<book>` elements are the bookstore's *children*, each of which has individual data points in *child* elements (e.g. `<title>`) and *attributes* e.g. `<book category="children">` stores the book's category as an attribute.
 
-1.  `<bookstore>` is the parent, or *root* element
-2.  The book store has two `<book>` child elements
-3.  Each book element contains their own child elements which are individual data points about each book
-
-::: {.callout-note appearance="simple"}
+::: {.callout-note appearance="minimal"}
 ## Note
 
-Attributes are denoted by key/value assignment in a tag. In the example above, the book's category is stored as an attribute. Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML[^3]. However, you'll still likely run into data stored in attributes so we'll touch on extracting data from both.
+Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML[^3]. However, you'll still likely run into data stored in attributes so we'll touch on extracting data from both.
 :::
 
 [^3]: To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
 
 # Navigating XML with R
 
-I'll be using congressional bill data from the [United States Government Publishing Office (GPO)](https://www.gpo.gov/) to illustrate potential complexities of XML structures. You can follow along by downloading the sample bill[^4] [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021").
+If you've never used R before, this will be a bit of a rough point to start learning. Instead I would recommend checking [RStudio's beginners guide](https://education.rstudio.com/learn/beginner/), so for the remainder of the post I will assume some familiarity with R. Four packages I use throughout this post are listed below. If you don't understand how a function works or want to see the function reference, click on the function in the code and it *should* bring you to the function's help page.
 
-[^4]: I chose the bill [*HR-391: Global Health Security Act of 2021*](https://www.govinfo.gov/app/details/BILLS-117hr391rfs)only because it contains good examples of the challenges of parsing XML data, so consider this a standard *retweets ≠ endorsements* situation*.*
-
-I'll be using four very helpful R packages throughout this post:
-
--   `{XML}` and `{xml2}` provide functions for reading in and parsing XML[^5]
+-   `{XML}` and `{xml2}` provide functions for reading in and parsing XML[^4]
 
 -   `{purrr}` and `{tidyr}` (loaded as part of the `{tidyverse}` package) help us wrangle lists and transform XML to data frames.
 
-[^5]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
-
-To read in the file, you can pass the URL or file path of the XML file to `read_xml()` , which returns an `xml_document` object[^6].
-
-[^6]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+[^4]: Between `{XML}` and `{xml2}` there are numerous ways to load XML data with R. I generally prefer `{xml2}` but I suggest looking through the packages' documentation to find the right function for your task
 
 ```{r}
-#| label: read-xml
+#| label: load-libs
 #| code-fold: show
-#| code-summary: "Load and view XML file"
-
+#| code-summary: "Load libraries"
 # copy the comment below to install the packages
 # install.packages(c("tidyverse", "XML", "xml2))
 library(tidyverse)
 library(XML)
 library(xml2)
 
+```
+
+To illustrate potential complexities of XML structures I'll be using [congressional bill status data](https://www.govinfo.gov/bulkdata/BILLSTATUS) from the US GPO's [GovInfo service](https://www.govinfo.gov/). In particular, you can download the sample bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021") (chosen for its examples of challenges parsing XML).
+
+First we need to read in the XML file. You can pass the URL or file path of the XML file to `read_xml()` to create an `xml_document` object[^5]. To see the contents of the file you've just loaded you can use `xml_contents()` or enter the object's name (here `bill_xml`) in the console.
+
+[^5]: `xml_document` is one of the "key classes" used in the `{xml2}` library, the others being `xml_node` (a single node), and `xml_nodeset` (a set of nodes).
+
+```{r}
+#| label: read-xml
+#| code-fold: show
+#| code-summary: "Load and view XML file"
+
 # Read XML file
 bill_xml = read_xml("https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml")
 
 # Look at xml_document's contents
 xml_contents(bill_xml)
+
 ```
 
-The top-level nodes are `<bill>` and `<dublinCore>`[^7]. The latter is a metadata identifier and doesn't contain bill-related information, so we can use `xml_child()` to select just data inside the `<bill>` node.
+We have two top-level nodes - `<bill>` and `<dublinCore>`[^6]. The latter is actually a metadata identifier and doesn't contain bill-related information. We can use `xml_child()` to select only elements inside the `<bill>` node, returning an XML nodeset that looks like this:
 
-[^7]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
+[^6]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
 
 ```{r}
-#| code-fold: show
 #| label: xml-bill-child
-#| code-overflow: wrap
-# Return child nodes named bill
-(bill_node = xml_child(bill_xml, "bill"))
-```
+#| code-fold: show
+#| column: page-right
+#| code-summary: "Select first matching child element"
 
-So now we have all the bill data in one place. How do we get it into a data frame?
+(bill_node = xml_child(bill_xml, "bill"))
+
+```
 
 # Define the output
 
-Before we start transforming the data, it's important to think about what kind of data frame you want to produce. This will determine how the data is manipulated and depending on the structure of your XML data, there can be a lot of different options.
+Now we have the bill XML loaded and we've already stripped away some data we don't need but before diving deeper, it's helpful to think about the how you want to the processed XML data to be structured. For example, in the bill status data I might want to collect party-level votes. This could take the form of one row per party per bill with a column for yeas, nays, and abstentions[^7]. Perhaps I want to look at the policy areas of bills which became law. Instead of processing the entire file and then selecting the data I want, I can select only the nodes I need at the outset before transforming the data into a data frame. This will likely save you some time in cases where you have a lot of data.
 
-The importance of understanding the structure of your data brings us to one of the cardinal rules of data analysis:
+[^7]: For example
 
-::: callout-tip
-## Look at your data
+    | Bill     | Party    | $\cdots$ | Yeas     | Nays     | Abstentions |
+    |----------|----------|----------|----------|----------|-------------|
+    | HR-1     | R        | $\cdots$ | 221      | 0        | 1           |
+    | HR-1     | D        | $\cdots$ | 0        | 212      | 1           |
+    | $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$ | $\vdots$    |
 
-In fact, you could even say *stare* at it. Understanding the structure and contents of your data is essential for designing a solution to consistently process the data.
-:::
-
-I want to create a data frame of congressional bills where each bill forms a single row. Elements which have **only one value** (i.e. *singular*) like `billNumber`, `createDate`, and `billType` are straightforward, but there are also *nested* elements like `recordedVotes`, `committees`, and `actions` which each have multiple data points. In some cases you may want to store multiple attributes in a *wide* format e.g. storing committees as `committee_1`, `committee_2`, etc. I will be storing each nested element in a *long* format, meaning one row per vote, committee, and action.
-
-In order to construct both a bill-level data frame and retain nested elements, we'll be taking advantage of `{tidyr}`'s `nest()` function, which nests data inside [list columns](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html). Columns in a data frame are typically *atomic vectors*[^8] of equal length, but list columns enable us to store data of varying length and type, including data frames themselves. The end result will look like this:
-
-[^8]: Atomic vectors are vectors with elements of the same type (e.g. numeric, character, etc.) as opposed to *general vectors*, or lists, which can contain a variety of types.
+    : Potential structure for party-level votes
 
 ```{r}
 #| label: example-bill
@@ -155,12 +152,13 @@ In order to construct both a bill-level data frame and retain nested elements, w
 #| message: false
 #| column: page
 
-library(knitr)
-(example_bill_df = extract_bill_status(bill_xml_link, log_types = NULL)) %>% 
-  kable()
+example_bill_df = extract_bill_status(bill_xml_url, log_types = NULL)
 
-# glimpse(example_bill_df)
 ```
+
+With the congressional bills data, I defined my output as a bill-level dataset, i.e. one bill per row, storing *nested* elements like `recordedVotes`, `committees`, and `actions` inside [list columns](https://jennybc.github.io/purrr-tutorial/ls13_list-columns.html). While columns in a data frame are typically *atomic vectors*[^8] of equal length, list columns enable us to store data of varying length and type, including data frames themselves. Using `{tidyr}`'s `unnest()` function, we can expand this nested data into regular data frame columns. Here is what this output will look like:
+
+[^8]: Atomic vectors are vectors with elements of the same type (e.g. numeric, character, etc.) as opposed to *general vectors*, or lists, which can contain a variety of types.
 
 ```{r}
 #| label: example-bill-rt
@@ -168,20 +166,18 @@ library(knitr)
 #| eval: true
 #| column: page
 example_bill_df %>% #glimpse() # here to check the data
-  # select(
-  #   -bill_id, -where(is_list) # remove list columns?
-  # ) %>%
   reactable::reactable(
     theme = moke_rt(),
     compact = T,
     resizable = T,
     wrap = F,
     columns = list(
-      "bill_number" = colDef(width = 100),
+      "bill_id" = colDef(show=F),
+      "bill_number" = colDef(name = "Bill No.", width = 80),
       "create_date" = colDef(format = colFormat(date = T), width = 100),
       "update_date" = colDef(format = colFormat(date = T), width = 100),
       "origin_chamber" = colDef(show=F),
-      "bill_type" = colDef(width = 80),
+      "bill_type" = colDef(name = "Bill type", width = 60),
       "introduced_date" = colDef(format = colFormat(date = T), width = 130),
       "congress" = colDef(width = 80),
       "constitutional_authority_statement_text" = colDef(show=F),
@@ -198,7 +194,8 @@ example_bill_df %>% #glimpse() # here to check the data
       "latest_action_text" = colDef(name = "action_text",
                                     minWidth = 200),
       "committees" = colDef(minWidth = 80),
-      "votes" = colDef(width = 80),
+      "house_votes" = colDef(width = 80),
+      "senate_votes" = colDef(width = 80),
       "actions" = colDef(width = 80),
       "action_counts" = colDef(show=F),
       "sponsors" = colDef(width = 80),
@@ -209,10 +206,12 @@ example_bill_df %>% #glimpse() # here to check the data
                             columns = c("latest_action_action_date",
                                         "latest_action_text")),
       colGroup(name = "Nested Data",
-                            columns = c("committees", "votes", "actions", 
+                            columns = c("committees", "house_votes", 
+                                        "senate_votes", "actions", 
                                         "sponsors", "cosponsors"))
     )
   )
+
 ```
 
 Here's a `glimpse()` of some of the nested data:
@@ -223,7 +222,8 @@ Here's a `glimpse()` of some of the nested data:
 ```{r}
 #| label: glimpse-committees
 #| echo: false
-glimpse(example_bill_df[["committees"]])
+
+glimpse(example_bill_df[["committees"]], width = 100)
 
 ```
 
@@ -232,7 +232,8 @@ glimpse(example_bill_df[["committees"]])
 ```{r}
 #| label: glimpse-votes
 #| echo: false
-glimpse(example_bill_df[["votes"]])
+
+glimpse(example_bill_df[["house_votes"]], width = 90)
 
 ```
 
@@ -241,7 +242,7 @@ glimpse(example_bill_df[["votes"]])
 ```{r}
 #| label: glimpse-actio
 #| echo: false
-glimpse(example_bill_df[["actions"]])
+glimpse(example_bill_df[["actions"]], width = 80)
 ```
 
 ## Sponsors
@@ -249,15 +250,17 @@ glimpse(example_bill_df[["actions"]])
 ```{r}
 #| label: glimpse-sponsors
 #| echo: false
-glimpse(example_bill_df[["sponsors"]])
+glimpse(example_bill_df[["sponsors"]], width = 70)
 ```
 :::
 
-# Parsing
+# From XML to Data Frame
 
-Okay now you should have an idea of what *your data* *is*, and what *you* *want your data to be*.
+How your XML is structured, and how you want to structure your tabular output will determine how you need to process the XML file. In general, this will involve the following steps:
 
-With an understanding of your data's structure and your intended output, let's break down the process into extracting 1) singular elements i.e. only one value, and 2) nested elements. Your output should inform what you do with both, but for either case I convert XML to a list and use `{purrr}` to flatten and transform the list into a data frame.
+1.  Select the XML nodes you want to include in your dataset.
+2.  Convert the XML to a list.
+3.  `flatten()` the list into a data frame.
 
 ::: callout-tip
 ## Write Functions
