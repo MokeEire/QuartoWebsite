@@ -61,10 +61,10 @@
     },
     "XML": {
       "Package": "XML",
-      "Version": "3.99-0.10",
+      "Version": "3.99-0.11",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "f140675d766cf765bf06a5f14afb149d",
+      "Hash": "1b8a72068e9137d4dcd1df27d092e3cc",
       "Requirements": []
     },
     "askpass": {
