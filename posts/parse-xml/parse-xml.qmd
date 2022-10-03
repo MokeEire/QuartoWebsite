@@ -1,6 +1,6 @@
 ---
 title: "Parsing XML with R"
-subtitle: "Untangling congressional legislative data"
+subtitle: "Untangling data from complex XML structures using `{XML}` and `{xml2}`"
 date: "2022-07-14"
 categories: 
   - data
