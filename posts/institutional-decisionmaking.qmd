@@ -1,7 +1,7 @@
 ---
 title: "Why improving institutional decision-making will save the world"
 subtitle: "Or at least make it easier to get things done around here."
-date: "2022-07-14"
+date: "2022-10-03"
 draft: true
 categories: 
   - policy
@@ -15,28 +15,42 @@ format:
     code-tools: true
     comments:
       hypothesis: true
+editor: 
+  markdown: 
+    wrap: sentence
 ---
 
-Improving the effectiveness and quality of powerful institutions' decision-making is one of the most important things we can do in the 21st century. In the face of challenges as complex and structurally interdependent as climate change and AI safety, we need institutions which are driven by holistic, altruistically-defined aims, and are designed to effectively achieve those aims. For most institutions, the processes in place to achieve their intended outcomes involve human judgement, intuition, and collaboration, which likely introduces a variety of errors in judgement. Using research from behavioural science to inoculate and support decision-making from biases and judgement errors will enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
+Improving powerful institutions' decision-making is one of the most important things we can do in the 21st century.
+This post outlines why our most pressing problems could benefit from an institutional decision-making lens, as well as some on-going challenges which I believe are particularly ripe for some institutional improvements.
+Global challenges like climate change and AI safety require a huge degree of co-ordination from national and international institutions, and in particular they may need institutions to make decisions that are not popular in the short term, but very necessary in the long term.
+Governments need to reduce emissions and reduce their reliance on fossil fuels, but making such costly decisions in the face of global health and economic crises is not going to seem palatable to any politician who wishes to be re-elected in the near future.
+AI research labs must ensure that our understanding of AI ethics and safety are sufficient to prevent an AI from developing beyond our control, but this is both less exciting and less profitable.
+Meanwhile, systems which determine the information we receive are being run by corporations which explicitly do not have responsibility for the content posted on their platforms.
+That is not to say they should bear this responsibility, because that would likely lead to overly-conservative censorship of content to avoid litigation.
+But when misinformation is proliferating on platforms, the founder of Facebook is pleading for Congress to step in, and legislators are demonstrating a profound lack of expertise in the technologies at hand, we need to improve the decisions being made in one or both of these institutions.
 
-Improving powerful institutions' decision-making is one of the most important things we can do in the 21st century. It is through these institutions that challenges as complex and structurally interdependent as climate change and AI safety can be tackled. The last five decades of behavioural science research has illuminated the degree to which errors occur in our decision-making, as well as the contextual factors associated with them.
-which are most powerful in these domains to ensure holistic, altruistically-defined aims, and are designed to effectively achieve those aims. For most institutions, the processes in place to achieve their intended outcomes involve human judgement, intuition, and collaboration, which likely introduces a variety of errors in judgement. Using research from behavioural science to inoculate and support decision-making from biases and judgement errors will enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
-
-Institutional decision-making is a necessarily broad combination of terms so it is important to clarify what is meant by each. I will borrow definitions from the [Effective Institutions Project](https://forum.effectivealtruism.org/posts/ttpSEgE3by7AAhQ7w/improving-institutional-decision-making-which-institutions-a#Background) because they do an excellent job of balancing comprehensiveness and brevity.
-
-> ...when we speak of "**decision-making**," we are using that term broadly to refer to *all of the aspects of the process leading up to an institution's actions over which that institution has agency*.
+Institutional decision-making is frustratingly vague so it is important to clarify what is meant by both *institutions* and *decision-making*.
+I will borrow definitions from the [Effective Institutions Project](https://forum.effectivealtruism.org/posts/ttpSEgE3by7AAhQ7w/improving-institutional-decision-making-which-institutions-a#Background) because they do an excellent job of balancing comprehensiveness and brevity.
 
 > The definition of an **institution** is not completely standardized across disciplines or academic fields, but in this context we mean *a formally organized group of people, usually delineated by some sort of legal entity (or an interconnected set of such entities) in the jurisdiction(s) in which that group operates*.
 
-Governance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.
+> ...when we speak of "**decision-making**," we are using that term broadly to refer to *all of the aspects of the process leading up to an institution's actions over which that institution has agency*.
 
-Congress seems to be struggling to pass laws in the first place, regardless of the individual law's effectiveness. It is troubling when significant legislative efforts, like the Inflation Reduction Act, only has support from one side of the aisle. One would hope the legislative process improves the quality of legislation as a bill goes from idea to law, and that the institution itself would get better at not only drafting legislation, but debating and revising it too.
+So put together, it means we want to understand the processes of a (usually) legal entity for achieving its aims.
+In the case of governments, these aims are usually to provide a safe, economically viable state for its citizens and residents, while corporations are usually required to deliver as much value to shareholders as possible.
+Considering what an institution actually *intends* to do is related to the first of two pathways defined by the Effective Institutions Project for improving institutional decision-making.
+It is particularly important that powerful institutions, whose decisions can have broad second- and third-order consequences, are driven to improve global outcomes and factor in the scope of their impact beyond the likely more narrow set of interests that determine their actions.
+Once an institution at least has aims which are consistent with improving global outcomes, the next step is to understand the effectiveness of their process for achieving their aims.
 
-Questions I want to answer:
+This is where behavioural science comes in.
+The last five decades of behavioural science research has been ground-breaking to say the least.
+Researchers have identified how errors occur in our decision-making, how different contexts affect our thinking, and what this actually means for criminal justice outcomes, hiring decisions, and many more.
+For most institutions, the processes in place to achieve their intended outcomes necessarily involve human judgement, intuition, and group decision-making, which likely introduces a variety of errors in judgement.
+In the face of challenges as complex and structurally interdependent as climate change and AI safety, we need institutions which are driven by holistic, altruistically-defined aims, and are designed to effectively achieve those aims.
+Using research from behavioural science to inoculate and support decision-making from biases and judgement errors could enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
 
--   What parts of the legislative process rely on human judgement?\
-    Obviously a lot, but what are the discrete decisions made through the committees, on the floor, and in between.
+::: callout-warning
+## Under Construction
 
--   Are there elements of the decision-making context, for which there is evidence of bias, noise, or decision-hygiene interventions?
-
--   What kind of options are there for studying decision-making in legislatures?
+More to come soon.
+:::
