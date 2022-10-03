@@ -274,32 +274,13 @@ If you find yourself doing similar transformations in multiple cases or copy-pas
 A good resource to start learning about writing functions is [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/).
 :::
 
-## Singular elements
+## Convert an XML nodeset to a data frame
 
-You can think of singular elements as the contents of a single cell in a data frame. In the bookstore example, you could arrange each book as a row and each child node as a column.
+When converting XML into a data frame, one of the simplest cases to deal with is a set of nodes which each have a single value. You can think of singular nodes as the contents of a single cell in a data frame. When your data are entirely made up of nodes like this, you can convert XML to a data frame using two functions from `{XML}`:
 
-```{r}
-bookstore_xml_text = '<bookstore>
-  <book category="children">
-    <title>Harry Potter</title>
-    <author>J K. Rowling</author>
-    <year>2005</year>
-    <price>29.99</price>
-  </book>
-  <book category="web">
-    <title>Learning XML</title>
-    <author>Erik T. Ray</author>
-    <year>2003</year>
-    <price>39.95</price>
-  </book>
-</bookstore>'
+-   `xmlParse()` parses an XML file into an R structure[^9] representing the XML tree
 
-bookstore_xml_parsed = xmlParse(bookstore_xml_text)
-
-(bookstore_xml_df = xmlToDataFrame(bookstore_xml_parsed))
-```
-
-In cases where your data are entirely singular nodes, you can convert XML to a dataframe using two functions from `{XML}`[^9]: `xmlParse()` and `xmlToDataFrame()`. Because the congressional data has singular and nested element structures, the nested data in fields like `committees`, `actions`, and `sponsors` are combined into single columns. If your data is not all singular nodes like this, you'll need to do a little bit more work to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
+-   `xmlToDataFrame()` extracts data from an XML document directly into a data frame, but with limited flexibility
 
 [^9]: When you're working with both the `{XML}` and `{xml2}` libraries, it is important to note that their functions often rely on different object types. In the case of `xmlToDataFrame()`, it does not take `{xml_document}` or `{xml_node}` objects. If you try to use them, you'll see an error like this:
 
@@ -310,27 +291,36 @@ In cases where your data are entirely singular nodes, you can convert XML to a d
     xmlToDataFrame(bill_xml)
     ```
 
+::: callout-note
+## Note
+
+In the example below, we need to use `getNodeSet(., [path =] "//bill")` to select only nodes in `<bill>`. If we just passed `bill_xml_parse`, we would get a dataframe with two rows because the top-level nodes are bill and the metadata identifier node `<dublinCore>`.
+:::
+
 ```{r}
 #| label: xml-to-df
-
-# First you need to use the xmlParse function
+# First we need to use xmlParse function to create XMLDocument object
 bill_xml_parse = xmlParse(bill_xml)
 
 xmlToDataFrame(getNodeSet(bill_xml_parse, "//bill")) %>% 
   glimpse()
+
 ```
 
-::: callout-note
-## Note
+Because the congressional data has elements like `committees`, `actions`, and `sponsors` which contain multiple sub-elements, the contents are combined into single columns. When parsing nested XML like this, it might require multiple steps to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
 
-In this example, we actually need to use `getNodeSet(., [path =] "//bill")` to select only nodes in `<bill>`. If we just passed `bill_xml_parse`, we would get a dataframe with two rows because the top-level nodes are bill and the metadata identifier node `<dublinCore>`.
-:::
+In this case, the first step is to isolate singular elements like `billNumber` and `billType`, and deal with nested elements individually afterwards.
 
-To start building our congressional bill dataset, we need to isolate singular elements like `billNumber` and `billType` by selecting nodes which meet two criteria: 1) the node does not have any child nodes of its own, and 2) the node is not an empty string. I use to extract nodes based on an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) string. It returns an `{xml_nodeset}` which is then coerced to a list using `as_list()`.
+Singular elements are nodes which meet two criteria:
 
-As the help file for `xml_find_all()` says, "XPath is like regular expressions for trees". The expression selects the nodes which match the given path or pattern[^10]. In the code below `//bill/*` selects the child nodes in a bill. The expressions `[` within the square brackets `]` are called predicates which I use to find nodes which have no children with the XPath `count` function and nodes which are not empty strings[^11].
+1.  the node does not have any child nodes of its own, and
+2.  the node is not an empty string.
+
+We can use `xml_find_all()` to filter an XML document with [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language). The XPATH expression selects the nodes which match the given path or pattern[^10] in a similar way as regular expressions. As the function's help file says, "XPath is like regular expressions for trees".
 
 [^10]: [A very useful table of XPath syntax](https://www.w3schools.com/XML/xpath_syntax.asp){target="_blank"}
+
+In the code below the `[` expressions within the square brackets `]` are called predicates which I use to find nodes which have no children with the XPath `count` function and nodes which are not empty strings[^11]. This returns an `{xml_nodeset}` which can be coerced to a list using `as_list()`.
 
 [^11]: In the process of writing this, I discovered that using XPath made this \~5x faster than an equivalent function in R.
 
@@ -373,17 +363,15 @@ As the help file for `xml_find_all()` says, "XPath is like regular expressions f
 ```{r}
 #| label: singular-nodes-list
 #| code-fold: show
-
-singular_nodes = xml_find_all(
-  bill_xml, 
-  "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]"
-  )
+singular_nodes = xml_find_all(bill_xml, 
+                              # //bill/* selects the child nodes in a bill
+                              "//bill/*[count(./*) = 0 and not(string-length(.) = 0)]")
 
 (singular_list = as_list(singular_nodes)) %>% 
   glimpse()
 ```
 
-Note that we didn't retain the element names so we need to assign them ourselves. When your data is in a named list, you can flatten each element in the list into a **d**ata **f**rame **c**olumn using purrr's `flatten_dfc()` .
+Now that we have the data we want in a list, we can flatten each element in the list into a **d**ata **f**rame **c**olumn using purrr's `flatten_dfc()`. However, notice the elements in a `singular_list` are not named. If we flatten this list to a data frame, our columns also won't have any column names. We can use `xml_name()` to create a character vector of the nodes' names in combination with `setNames()` to create a named list. Just make sure `singular_list` and `singular_nodes` are the same length and in the same order.
 
 ```{r}
 #| label: singular-nodes-list-named
@@ -391,9 +379,16 @@ Note that we didn't retain the element names so we need to assign them ourselves
 singular_list_named = setNames(singular_list, 
                                 xml_name(singular_nodes))
 
+```
+
+When flattened, a named list becomes a data frame with column names in tow.
+
+```{r}
 (bill_df = flatten_dfc(singular_list_named)) %>% 
   glimpse()
 ```
+
+With the singular nodes transformed, we have the base of our data frame. The next step is to choose a nested element, define its structure in the output, and transform the XML accordingly.
 
 ```{r}
 #| label: singular-nodes-rt
@@ -403,26 +398,24 @@ singular_list_named = setNames(singular_list,
 reactable(bill_df,
           theme = moke_rt(),
             columns = list(
-              "constitutionalAuthorityStatementText" = colDef(show=F),
-              "createDate" = colDef(format = colFormat(date = T), width = 100),
-              "updateDate" = colDef(format = colFormat(date = T), width = 100),
-              "introducedDate" = colDef(format = colFormat(date = T), width = 120),
+              "constitutional_authority_statement_text" = colDef(show=F),
+              "create_date" = colDef(format = colFormat(date = T), width = 100),
+              "update_date" = colDef(format = colFormat(date = T), width = 100),
+              "introduced_date" = colDef(format = colFormat(date = T), width = 120),
               "congress" = colDef(width = 90),
-              "originChamber" = colDef(show=F),
+              "origin_chamber" = colDef(show=F),
               "version" = colDef(show=F, width = 80),
-              "billNumber" = colDef(width = 105),
-              "billType" = colDef(width = 85),
+              "bill_number" = colDef(width = 105),
+              "bill_type" = colDef(width = 85),
               "title" = colDef(minWidth = 180)
             ))
 ```
 
-## Nested elements
+# Dealing with nested data
 
-Parsing XML when your data is all singular is straightforward, but often XML will use a nested data structure. In this case the congressional data, actions and votes on each bill are stored in their own container elements. We can transform the data in these containers to nested data frames and use the `nest()`/`unnest()` functionality of `{tidyr}` to change the level of observation as needed.
+In congressional XML data, the actions and votes on a bill are stored in containers. To collect this information and keep our dataset at the bill-level, we can transform each container into data frames using the same steps as before and then assign them as a list columns in our `bill_df` data frame.
 
-To create each data frame, we isolate the nodes using XPath, and use the same steps as before to convert the XML to a list and then nest them in a list column.
-
-### Multiple children with sub-elements
+## Transforming nested data into list columns
 
 Actions are stored in a container node where each `<item>` represents a congressional action taken for a bill, such as being introduced, sent to a committee, debated on the floor, etc. Just as before, we use `as_list()` to convert the `{xml_nodeset}` to a list.
 
@@ -562,7 +555,7 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
                                           col_types = cols(action = col_character(), count = col_integer())))
 ```
 
-### Nested XML
+## When they put XML in your XML
 
 So we've dealt with cases with multiple child elements, but you can also have links to XML files within those child elements as you can see in the `<url>` element below.[^12]
 
