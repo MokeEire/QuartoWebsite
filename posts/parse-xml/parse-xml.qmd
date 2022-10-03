@@ -25,24 +25,16 @@ library(extrafont)
 library(reactable)
 
 source("https://github.com/MokeEire/my-reps/raw/master/R/parsing_functions.R")
-bill_xml_link = "https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"
-bill_xml_file = read_xml(bill_xml_link)
+bill_xml_url = "https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml"
+bill_xml_file = read_xml(bill_xml_url)
+
 ```
 
-```{r}
-#| label: df-print-fct
-#| include: false
+Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. XML's flexibility is useful for storing information like financial transactions and recipes to webpage content and document formatting[^2]. If you have worked with XML before, you'll know it can be a bit of a pain to transform into a tabular format typically used in data analysis. The good news is you're not alone! This article will help you to load XML files with R, extract what you need from them, and store the results in a analysis-friendly data frame.
 
-knit_print.data.frame = function(x, ...){
-  knitr::knit_print(
-    reactable(x,
-              compact = T, 
-              resizable = T,
-              ),
-    ...
-    )
-}
-```
+[^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
+
+[^2]: The *x* at the end of Microsoft file types (e.g. .docx, .xlsx, .pptx) stands for XML.
 
 ::: {.callout-tip appearance="simple"}
 ## What you'll learn:
@@ -51,18 +43,12 @@ knit_print.data.frame = function(x, ...){
 
 -   Explore the structure of XML documents
 
--   List, map, and flatten your data into a tabular format using `{purrr}` and using list columns with `{tidyr}`
+-   List, map, and flatten your data into a tabular format using `{purrr}`, and making use of `{tidyr}`'s list columns when necessary
 :::
-
-Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. This flexibility is useful for storing all kinds of information from financial transactions and recipes to webpage content and document formatting[^2]. Unfortunately, this can make data quite difficult to parse and analyze in tabular format. If you are trying to wrestle some data from XML into an analysis-friendly form, then this article is for you.
-
-[^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
-
-[^2]: The *x* at the end of Microsoft file types (e.g. .docx, .xlsx, .pptx) stands for XML.
 
 # What is XML?
 
-At its core, XML is "information wrapped in tags". The structure of XML can be thought of as branches of a tree, with each branch having one or more leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp). `<bookstore>` is the parent, or *root* element in the example above. The book store has two `<book>` child elements containing their own child elements which are individual data points about the book.
+At its core, XML is "information wrapped in tags". Think of XML's structure as branches of a tree, with each branch having their own leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp).
 
 ``` xml
 <bookstore>
