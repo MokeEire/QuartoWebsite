@@ -20,6 +20,15 @@ website:
       - icon: github
         aria-label: github
         href: https://github.com/MokeEire
+  page-footer: 
+    left: "Copyright 2022, Mark Barrett" 
+    right:
+      - icon: twitter
+        aria-label: twitter
+        href: https://twitter.com/Mmm_JuicyFruit
+      - icon: github
+        aria-label: github
+        href: https://github.com/MokeEire
 
 format:
   html:
