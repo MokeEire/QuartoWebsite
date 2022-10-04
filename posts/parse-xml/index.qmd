@@ -121,7 +121,7 @@ library(xml2)
 
 ```
 
-To illustrate potential complexities of XML structures I'll be using [congressional bill status data](https://www.govinfo.gov/bulkdata/BILLSTATUS) from the US GPO's [GovInfo service](https://www.govinfo.gov/). In particular, you can download the sample bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021") (chosen for its examples of challenges parsing XML).
+To illustrate complexities of XML structures I'll be using [congressional bill status data](https://www.govinfo.gov/bulkdata/BILLSTATUS) from the US GPO's [GovInfo service](https://www.govinfo.gov/). In particular, you can download the sample bill [here](https://www.govinfo.gov/bulkdata/BILLSTATUS/117/hr/BILLSTATUS-117hr391.xml "HR-391: Global Health Security Act of 2021") (chosen for its examples of challenges parsing XML).
 
 First we need to read in the XML file. You can pass the URL or file path of the XML file to `read_xml()` to create an `xml_document` object[^5]. To see the contents of the file you've just loaded you can use `xml_contents()` or enter the object's name (here `bill_xml`) in the console.
 
@@ -263,7 +263,7 @@ glimpse(example_bill_df[["house_votes"]], width = 90)
 ```{r}
 #| label: glimpse-actio
 #| echo: false
-glimpse(example_bill_df[["actions"]], width = 80)
+glimpse(example_bill_df[["actions"]], width = 40)
 ```
 
 ## Sponsors
@@ -320,6 +320,8 @@ In the example below, we need to use `getNodeSet(., [path =] "//bill")` to selec
 
 ```{r}
 #| label: xml-to-df
+#| code-summary: "Use {XML} functions to read XML data"
+#| attr-output: '.details summary="Output of xmlToDataFrame"'
 # First we need to use xmlParse function to create XMLDocument object
 bill_xml_parse = xmlParse(bill_xml)
 
@@ -383,6 +385,7 @@ In the code below the `[` expressions within the square brackets `]` are called 
 
 ```{r}
 #| label: singular-nodes-list
+#| code-summary: "Select non-empty child-less elements using XPath"
 #| code-fold: show
 singular_nodes = xml_find_all(bill_xml, 
                               # //bill/* selects the child nodes in a bill
@@ -397,6 +400,7 @@ Now that we have the data we want in a list, we can flatten each element in the 
 ```{r}
 #| label: singular-nodes-list-named
 #| code-fold: show
+#| code-summary: "Name the list elements"
 singular_list_named = setNames(singular_list, 
                                 xml_name(singular_nodes))
 
@@ -405,6 +409,8 @@ singular_list_named = setNames(singular_list,
 When flattened, a named list becomes a data frame with column names in tow.
 
 ```{r}
+#| label: flatten-singular-nodes
+#| code-summary: "Flatten singular nodes into data frame"
 (bill_df = flatten_dfc(singular_list_named)) %>% 
   glimpse()
 ```
@@ -413,7 +419,7 @@ With the singular nodes transformed, we have the base of our data frame. The nex
 
 ```{r}
 #| label: singular-nodes-rt
-#| column: page
+#| column: screen-inset
 #| echo: false
 #| eval: false
 reactable(bill_df,
@@ -532,19 +538,21 @@ microbenchmark::microbenchmark(
 )
 ```
 
-Using the `{purrr}` library's `map_dfr()`, we apply this function to each action and combine the results into **d**ata **f**rame **r**ows. Here's the output of this process:
+Using the `{purrr}` library's `map_dfr()`, we apply my `parse_action()` function to each element of our actions list and combine the results into **d**ata **f**rame **r**ows.
 
 ```{r}
-# Parse the first action
+#| label: parse-actions
+#| code-summary: "Parse actions and combine into data frame"
 (actions_df = map_dfr(actions_list, parse_action)) %>% 
   glimpse()
 ```
 
-When you plan to combine rows into a data frame or `unnest()` the data in the future, it is useful to be explicit about the expected data types of each column. This can be done using `type_convert()`. Because we are only adding a single row of data to `bill_df` we can encase the actions in a list and use dollar assignment. If you were adding multiple rows of data, you would need to make sure that you are adding a column of the same length as `bill_df`.
+When you plan to combine rows into a data frame or `unnest()` the data in the future, it is useful to be explicit about the expected data types of each column. This can be done using `type_convert()`.
 
 ```{r}
-#| label: actions-dfr
+#| label: actions-type-convert
 #| code-fold: show
+#| code-summary: "Specify column types"
 
 # Specify column data types
 actions_col_types = cols(
@@ -563,7 +571,14 @@ actions_col_types = cols(
 actions_df = type_convert(actions_df,
                           col_types = actions_col_types)
 
-# Assign actions as data frame within a list
+```
+
+Because we are only adding a single row of data to `bill_df` we can encase the actions in a list and use dollar assignment. If you were adding multiple rows of data, you would need to make sure that you are adding a column of the same length as `bill_df`.
+
+```{r}
+#| label: assign-actions-to-df
+#| code-fold: show
+#| code-summary: "Assign actions as list column in our data frame"
 bill_df$actions = list(actions_df)
 ```
 
@@ -592,12 +607,13 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
 
 ## When they put XML in your XML
 
-So we've dealt with cases with multiple child elements, but you can also have links to XML files within those child elements as you can see in the `<url>` element below.[^12]
+So we've dealt with cases with multiple child elements, but XML allows for all sorts of weird and wonderful storage options. The congressional data includes information about votes taken on a bill, the total vote count, and the votes of individual legislators. However, only the high level information is included in the `<recordedVotes>` element. the more detailed information on individual legislators' votes are contained in an XML file referenced by the `<url>` element as you can see below.[^12]
 
-[^12]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="267"}
+[^12]: ![They heard you like XML so they put XML in your XML](https://c.tenor.com/um2EhyMQyR8AAAAC/xzibit-meme.gif){width="133"}
 
 ```{r}
 #| label: vote-nodes-contents
+#| code-summary: "Assign actions as list column in our data frame"
 
 # Find recordedVote nodes inside recordedVote container
 bill_recorded_vote_nodes = xml_find_all(
@@ -609,10 +625,11 @@ bill_recorded_vote_nodes = xml_find_all(
 xml_contents(bill_recorded_vote_nodes)
 ```
 
-Before we dive one level deeper, to start building our vote-level data frame, we can convert the top-level nodes to a list and flatten it into columns.
+Before we dive one level deeper, we can convert the top-level nodes to a list and flatten it into columns to start building our vote-level data frame.
 
 ```{r}
 #| label: vote-nodes-df
+#| code-summary: "Convert `<recordedVotes>` to a list and flatten into data frame"
 # Coerce nodes to list
 recorded_votes_list = as_list(bill_recorded_vote_nodes)
 
