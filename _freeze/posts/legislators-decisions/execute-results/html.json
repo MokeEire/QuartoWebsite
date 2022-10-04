@@ -1,0 +1,16 @@
+{
+  "hash": "929874491010103984ba0a7710ac507f",
+  "result": {
+    "markdown": "---\ntitle: \"Why we need to think about our legislator's decisions\"\nsubtitle: \"\"\ndate: \"2022-07-14\"\ndraft: true\ncategories: \n  - policy\n  - governance\n  - decision-making\nformat: \n  html: \n    toc: true\n    code-link: true\n    code-fold: show\n    code-tools: true\n    comments:\n      hypothesis: true\n---\n\n::: {.cell}\n\n:::\n\n\n\n\nGovernance institutions around the world appear to be struggling to address modern challenges as they morph from *changes* to *crises*. In the US, legislators have squarely failed to address several ongoing crises from homelessness to global warming amidst a bleak backdrop of racial injustice and deepening political divides. The credibility of the governing institutions is deteriorating as the response to a global pandemic was slow and lackluster, the scientific community repeatedly warns of catastrophic environmental risks, and civil society struggles with economic inequality amidst growing corporate influence.\n\nCongress seems to be struggling to pass laws in the first place, regardless of the individual law's effectiveness. It is troubling when significant legislative efforts, like the Inflation Reduction Act, only has support from one side of the aisle. One would hope the legislative process improves the quality of legislation as a bill goes from idea to law, and that the institution itself would get better at not only drafting legislation, but debating and revising it too.\n\nQuestions I want to answer:\n\n-   What parts of the legislative process rely on human judgement? \\\n    Obviously a lot, but what are the discrete decisions made through the committees, on the floor, and in between.\n\n-   Are there elements of the decision-making context, for which there is evidence of bias, noise, or decision-hygiene interventions?\n\n-   What kind of options are there for studying decision-making in legislatures?\n",
+    "supporting": [
+      "legislators-decisions_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
