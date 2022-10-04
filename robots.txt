@@ -1,1 +1,1 @@
-Sitemap: https://mokeeire.github.io/QuartoWebsite/sitemap.xml
+Sitemap: https://MokeEire.github.io/QuartoWebsite/sitemap.xml
