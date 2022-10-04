@@ -796,7 +796,8 @@ Here are some of the helpful articles I came across in the course of writing thi
 -   [Converting nested XML to dataframe in R](https://urbandatapalette.com/post/2021-03-xml-dataframe-r/)
 -   [Parse and process XML (and HTML) with xml2](https://www.rstudio.com/blog/xml2/)
 
-# Session Info
+::: {.callout-note collapse="true"}
+## Session Info
 
 Version information about R, OS, and loaded packages.
 
@@ -805,3 +806,4 @@ Version information about R, OS, and loaded packages.
 #| echo: false
 sessioninfo::session_info("loaded")
 ```
+:::
