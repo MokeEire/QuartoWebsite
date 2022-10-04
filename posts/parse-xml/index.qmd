@@ -91,7 +91,7 @@ At its core, XML is "information wrapped in tags". Think of XML's structure as b
 
 `<bookstore>` is the parent, or *root* element in the example above. The two `<book>` elements are the bookstore's *children*, each of which has individual data points in *child* elements (e.g. `<title>`) and *attributes* e.g. `<book category="children">` stores the book's category as an attribute.
 
-::: {.callout-note appearance="minimal"}
+::: {.callout-note appearance="simple"}
 ## Note
 
 Attributes are a useful way to store data related to a specific element for HTML, but using child elements is typically preferred in XML[^3]. However, you'll still likely run into data stored in attributes so we'll touch on extracting data from both.
@@ -99,7 +99,7 @@ Attributes are a useful way to store data related to a specific element for HTML
 
 [^3]: To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
 
-# Navigating XML with R
+# Navigate XML with R {#sec-navigate-xml}
 
 If you've never used R before, this will be a bit of a rough point to start learning. Instead I would recommend checking [RStudio's beginners guide](https://education.rstudio.com/learn/beginner/), so for the remainder of the post I will assume some familiarity with R. Four packages I use throughout this post are listed below. If you don't understand how a function works or want to see the function reference, click on the function in the code and it *should* bring you to the function's help page.
 
@@ -147,14 +147,13 @@ We have two top-level nodes - `<bill>` and `<dublinCore>`[^6]. The latter is act
 ```{r}
 #| label: xml-bill-child
 #| code-fold: show
-#| column: page-right
 #| code-summary: "Select first matching child element"
 
 (bill_node = xml_child(bill_xml, "bill"))
 
 ```
 
-# Define the output
+# Define the output {#sec-define-output}
 
 Now we have the bill XML loaded and we've already stripped away some data we don't need but before diving deeper, it's helpful to think about the how you want to the processed XML data to be structured. For example, in the bill status data I might want to collect party-level votes. This could take the form of one row per party per bill with a column for yeas, nays, and abstentions[^7]. Perhaps I want to look at the policy areas of bills which became law. Instead of processing the entire file and then selecting the data I want, I can select only the nodes I need at the outset before transforming the data into a data frame. This will likely save you some time in cases where you have a lot of data.
 
@@ -433,7 +432,7 @@ reactable(bill_df,
             ))
 ```
 
-# Dealing with nested data
+# Dealing with nested data {#sec-nested-data}
 
 In congressional XML data, the actions and votes on a bill are stored in containers. To collect this information and keep our dataset at the bill-level, we can transform each container into data frames using the same steps as before and then assign them as a list columns in our `bill_df` data frame.
 
@@ -444,11 +443,12 @@ Actions are stored in a container node where each `<item>` represents a congress
 ```{r}
 #| label: actions-list
 #| code-fold: show
+#| code-summary: "Select all action elements and convert them to a list"
+#| attr-output: '.details summary="Structure of actions list"'
 
 actions_xml = xml_find_all(bill_node, "actions/item")
 
 actions_list = as_list(actions_xml)
-
 # Look at first action
 glimpse(actions_list[[1]], width = 50)
 ```
@@ -458,22 +458,35 @@ For an individual action, we have the date, a list of committees related to the 
 ```{r}
 #| label: actions-functions
 #| code-fold: true
-#| code-summary: "View Functions"
-# Helper function: flatten_dfc_rename
-# flatten a list to data frame and 
-# rename the columns with a given prefix
+#| code-summary: "View helper functions"
+#' Helper function: flatten_dfc_rename
+#' Flatten a list into a data frame and apply a prefix to the column names
+#'
+#' @param list_to_flatten A list to flatten
+#' @param name_prefix A string to apply as a prefix to columns
+#'
+#' @return A data frame of columns that begin with the prefix
 flatten_dfc_rename = function(list_to_flatten, 
-                          name_prefix = "prefix"){
+                              name_prefix = "prefix"){
   rename_with(
     .data = flatten_dfc(list_to_flatten), 
     .fn = ~str_c(name_prefix, "_", .),
     # Exclude columns which already start with the prefix
     .cols = -starts_with(name_prefix)
-    )
+  )
 }
 
-# Function: parse_action
-# Parse actions from list to data frame
+#' Function: parse_action
+#' Parse actions from list to data frame
+#' 
+#' Separately flatten and rename source system and committee elements,
+#' then flatten and rename remaining elements. 
+#' Committee elements are flattened into a nested data frame 
+#' because an action can relate to multiple committees.
+#'
+#' @param action An action element in list form
+#'
+#' @return A data frame with a single row containing action information
 parse_action = function(action){
   action %>% 
     # Flatten + rename sourceSystem elements

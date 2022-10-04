@@ -35,5 +35,8 @@ format:
     theme: flatly
     css: styles.css
 
+filters:
+  - fold_results.lua
+
 execute:
   freeze: auto
