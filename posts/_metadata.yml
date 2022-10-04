@@ -1,0 +1,9 @@
+freeze: true
+
+format: 
+  html: 
+    include-after-body: ../footer.html
+    comments:
+      hypothesis: true
+      utterances:
+        repo: MokeEire/QuartoWebsite
