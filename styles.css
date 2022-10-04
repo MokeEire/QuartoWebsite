@@ -13,3 +13,7 @@ div.cell-output-stdout > pre {
 .reactable {
   margin: 32px 8px;
 }
+
+pre code {
+  font-size: .75rem;
+}
