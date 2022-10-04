@@ -46,6 +46,28 @@ Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Ma
 -   List, map, and flatten your data into a tabular format using `{purrr}`, and making use of `{tidyr}`'s list columns when necessary
 :::
 
+::: {.callout-note collapse="true" appearance="simple"}
+## TL;DR
+
+Transforming XML into a tabular format can be tricky depending on the structure. Start by understanding how the data is organized, what you want it to look like, and what level of detail you are looking at. This post uses [GovInfo's congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS) to explore examples of XML structure.
+
+1.  [Navigate XML with R]
+
+> Look through any available documentation, always. When you read in the XML file, `xmlParse()`, `xml_structure()`, and `xml_contents()` are some of the functions that will help you navigate the structure you're dealing with.
+
+2.  [**Define the output**]
+
+> Consider what you want the output to look like and think about how the data needs to be transformed to match this. Once you understand the existing structure, the data you need, and your desired output structure, it is time to start parsing.
+
+3.  **Parse a single element** (write a function if it gets too complicated)
+
+> Get one element into the form you want first. Writing functions can help you think through the data transformations being applied and make your code easier to read. You can see an example of this functional approach in @sec-nested-data . Once you're reliably parsing multiple elements and producing a consistent output format, you can scale up.
+
+4.  **Apply to all elements**
+
+> Next, focus on processing a single file in full (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of all the files in your dataset.
+:::
+
 # What is XML?
 
 At its core, XML is "information wrapped in tags". Think of XML's structure as branches of a tree, with each branch having their own leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp).
@@ -591,139 +613,151 @@ recorded_votes_list = as_list(bill_recorded_vote_nodes)
 We use `flatten_dfc()` to flatten each vote element into a data frame as columns and then `map_dfr()` rolls them all up as rows into a single data frame.
 :::
 
-Now we want to get the vote roll XML file, so we'll need to use `read_xml()` . There are two main nodes - `<vote-metadata>` and `<vote-data>`. One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. Let's parse the legislator-level data first. Here is the XML for a single legislator's vote:
+Now to get the vote roll XML file we'll use `read_xml()` . There are two main nodes - `<vote-metadata>` and `<vote-data>`. One node contains the aggregated vote information, while `<vote-data>` contains the legislator-level vote data. We'll focus on `<vote-data>` here.
 
 ```{r}
 #| label: vote-roll-xml
+#| code-summary: "Read vote roll data and convert to list"
 vote_roll_xml = read_xml(recorded_votes_df$url)
 
+# Find all vote-data elements
 vote_data = xml_find_all(vote_roll_xml, "vote-data")
 
-vote_legislators = vote_data %>% 
-  xml_find_all("recorded-vote")
+# Find all recorded-vote elements
+vote_legislators = xml_find_all(vote_data, "recorded-vote")
 
+# Convert to list and show first element
 (legislators_list = as_list(vote_legislators))[1] %>% 
   glimpse()
 
 ```
 
-With a similar combination of `as_list()` , `flatten_dfr()`, and `unnest()` we can flatten the XML into one row per legislator but we lose all the attributes.
+If we use the same combination of `as_list()` , `map_dfr()`, and `flatten_dfc()` we can flatten the XML into one row per legislator but we lose all the attributes.
 
 ```{r}
 #| label: vote-roll-data-flat
-(vote_roll_flattened = vote_data %>% 
-  as_list() %>% 
-  flatten_dfr() %>% 
-    unnest(everything()))
+#| code-summary: "Convert list of votes to data frame and LOSE attributes"
+(vote_roll_flattened = as_list(vote_legislators) %>% 
+  map_dfr(flatten_dfc))
 ```
 
-Instead we'll need to extract the attributes before we flatten the data. We want to extract the attributes only for legislator using `map()` to apply `map_at()` on each legislator element and extract the attributes from each while retaining the value in `vote`. It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.
+To extract the attributes before we flatten the data, we can apply `map_at()` to each legislator element and extract the attributes from each while retaining the value in `vote`.[^13]
+
+[^13]: We do lose the top-level element in the legislator list. This does not matter in this case because the name is repeated in the attributes, but be aware of this in case you want to combine values in a list with its attributes.
+
+```{r}
+#| label: extract-attr
+#| code-summary: "Extract attributes to list elements"
+(legislator_attr = legislators_list %>% 
+    # Modify one level deeper using map_at to target legislator elements
+    map(map_at, "legislator", attributes))[[1]] %>% 
+  glimpse()
+```
 
 ```{r}
 #| label: vote-roll-leg-df
-(legislator_vote_df = legislators_list %>% 
-    # Modify one level deeper using map_at to target legislator elements
-    map(map_at, "legislator", attributes) %>% 
-    map_dfr(flatten_dfc))
+#| code-summary: "Convert list of votes to data frame and KEEP attributes"
+(legislator_vote_df = map_dfr(legislator_attr, flatten_dfc) %>% 
+    # Use {janitor} to clean up the column names
+    janitor::clean_names()) %>% 
+  glimpse()
 ```
 
-Now we have a table of legislator voting data! But what about the `<vote-metadata>`? Everything other than the `<vote-totals>` element is singular so we can get that out of the way the same way as before:
+It can often feel like you're getting lost in a list of lists, but with some experimentation you'll be able to find your way back to the surface.
+
+Now we have a table of legislator voting data, and the last thing to take care of is the `<vote-metadata>`. Everything other than the `<vote-totals>` element is singular so we can get that out of the way the same way as before:
 
 ```{r}
 #| label: vote-roll-metadata-xml
-vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")
+#| code-summary: "View `<vote-metadata>` element"
+(vote_metadata = xml_find_all(vote_roll_xml, "vote-metadata")) %>% 
+  xml_contents()
+```
 
+Because we have the individual votes, we don't need to keep the `<vote-totals>` element, but it is useful to note because it could serve as a check for data consistency in the future. Instead, we'll just keep the singular nodes in `<vote-metadata>`
+
+```{r}
+#| label: combine-votes-df
+#| code-summary: "Convert singular vote nodes to data frame"
 vote_singular_nodes = xml_singular_nodes(vote_metadata)
 
 (vote_df = as_list(vote_singular_nodes) %>% 
   # as_list() doesn't retain element names so we set names ourselves
   setNames(xml_name(vote_singular_nodes)) %>% 
-  flatten_dfc()) %>% 
+  flatten_dfc() %>% 
+    janitor::clean_names()) %>% 
   glimpse()
-```
-
-The `<vote-totals>` are a bit of a unique little element, with 3 different types of nodes. This is another opportunity for us to be choosy with our data. The first node is table headers, which we don't need because the elements are tagged anyway. From these, we really only need the `<totals-by-party>` nodes as long as the totals of which agree with `<totals-by-vote>` , which is worth checking.
-
-```{r}
-#| label: vote-roll-metadata-totals-contents
-#| message: false
-#| layout-nrow: 1
-(vote_totals = xml_find_all(vote_metadata, "vote-totals")) %>% 
-  xml_contents()
-
-vote_totals_by_party = xml_find_all(vote_totals, "totals-by-party")
-
-party_vote_totals_df = as_list(vote_totals_by_party) %>% 
-  map_dfr(flatten_dfc) %>% 
-    type_convert()
-
-(totals_by_vote = xml_find_all(vote_totals, "totals-by-vote")) %>% 
-  xml_contents()
 ```
 
 Once we have our nodeset (which at last are all singular), we use the same listing, mapping, and flattening...or *lappening* as absolutely no one calls it.
 
-```{r}
-#| eval: false
-#| include: false
-# Check if totals match
-as_list(totals_by_vote) %>% 
-  map_dfr(flatten_dfc)
-
-summarise(party_vote_totals, 
-          across(.cols = -party, sum, na.rm=T))
-# They do!
-```
-
-Now that we have all of our vote data wrangled from the thorny grasp of XML, we can put it all together and nest it until we've gotten back to the bill-level i.e. the vote roll data frame goes in the votes data frame, which goes in the bill data frame.
+Now we can put all the pieces together and nest each element in its parent element until we've gotten back to the bill-level i.e. the vote roll data frame goes in the votes data frame, which goes in the bill data frame.
 
 ```{r}
 #| label: vote-roll-build
+#| code-summary: "Nest each element in their parent data frame"
+
+# Nest legislator votes in the vote roll data frame
 vote_roll_df = vote_df %>% 
-  mutate(legislator_votes = list(legislator_vote_df),
-         party_votes = list(party_vote_totals_df)) %>% 
+  mutate(legislator_votes = list(legislator_vote_df)) %>% 
     janitor::clean_names()
 
+# Nest vote rolls in the votes data frame
 (recorded_votes_df = recorded_votes_df %>% 
-  mutate(vote_roll = list(vote_roll_df))) %>% 
+  mutate(vote = list(vote_roll_df))) %>% 
   glimpse()
 
+# Nest votes in the bill data frame
 bill_df$votes = list(recorded_votes_df)
 ```
 
-Now we have the bill-level characteristics with action and vote information nested in list columns. If we want to analyze the actions data, we simply have to `unnest()` it.
+Now we have the bill-level characteristics with action and vote information nested in list columns. We can keep the data at the bill level or `unnest()` the elements we want to use.
+
+::: panel-tabset
+## Bill
 
 ```{r}
-#| label: unnest-actions
-unnest(bill_df, actions) %>% 
+glimpse(bill_df)
+```
+
+## Actions
+
+```{r}
+select(bill_df, billType, billNumber, actions) %>% 
+  unnest(actions) %>% 
   glimpse()
 ```
 
-I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^13].
+## Votes (Vote-level)
 
-[^13]: Ctrl/Cmd+F: `extract_bill_status`
+```{r}
+# Select bill ID and votes
+select(bill_df, billType, billNumber, votes) %>% 
+  unnest(votes) %>% 
+  # Unnest further vote info and add prefix to cols
+  unnest(vote, names_sep = "_") %>% 
+  glimpse()
+```
 
-# TL;DR: Main Points
+## Votes (Legislator-level)
 
-Transforming XML into a tabular format can be tricky depending on the structure. Start by understanding how the data is organized, what you want it to look like, and what level of detail you are looking at.
+```{r}
+# Select bill ID and votes
+select(bill_df, billType, billNumber, votes) %>% 
+  unnest(votes) %>% 
+  # Select bill ID, roll number, and vote list col
+  select(billType:rollNumber, vote) %>% 
+  unnest(vote) %>% 
+  # Select bill ID, roll number, and legislators list col
+  select(billType:rollNumber, legislator_votes) %>% 
+  unnest(legislator_votes) %>% 
+  glimpse()
+```
+:::
 
-1.  **Explore the structure**
+I'll stop there for brevity's sake, but you can find the code for extracting the full XML file [here](https://github.com/MokeEire/my-reps/blob/master/R/parsing_functions.R)[^14]. Please reach out with any feedback, leave a comment below, or share this with someone who's struggling with XML. There may even be a reward for anyone who finds mistakes in my code 🤷.
 
-> Look through any available documentation, always. When you read in the XML file, functions like `xmlParse()`, `xml_structure()`, and `xml_contents()` will show you the structure you're dealing with.
-
-2.  **Define the output**
-
-> Consider what you want the output to look like and think about how the data needs to be transformed to match this.
-
-3.  **Process a single element** (write a function if it gets too complicated)
-
-> Get one element into the form you want. Writing functions can help you think through the data transformations being applied and make your code easier to read.
-
-4.  **Apply to all elements**
-
-> Focus on processing the entire file (or the subset of the file you're interested in). You might want an XML file to return a single row, a single column, or a data frame of size $n\times k$. Once you have a single file returned in the format you want, you can combine the outputs of all the files in your dataset.
-
-Please reach out with any questions or feedback! All is welcome, and there may even be a reward for anyone who finds a mistake in the code.
+[^14]: Ctrl/Cmd+F: `extract_bill_status`
 
 ```{r}
 #| eval: false
