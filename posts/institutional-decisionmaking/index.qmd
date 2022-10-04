@@ -47,7 +47,5 @@ Using research from behavioural science to inoculate and support decision-making
 ::: callout-warning
 ## Under Construction
 
-More to come soon.
-
-![](undraw_under_construction_46pa.png){fig-align="center" width="385"}
+![More to come soon.](undraw_under_construction_46pa.png){fig-align="center" width="385"}
 :::
