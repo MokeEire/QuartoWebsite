@@ -2,12 +2,14 @@
   {
     "listing": "/blog.html",
     "items": [
-      "/posts/parse-xml/parse-xml.html"
+      "/posts/parse-xml/parse-xml.html",
+      "/posts/institutional-decisionmaking/institutional-decisionmaking.html"
     ]
   },
   {
     "listing": "/index.html",
     "items": [
+      "/posts/institutional-decisionmaking/institutional-decisionmaking.html",
       "/posts/parse-xml/parse-xml.html"
     ]
   }
