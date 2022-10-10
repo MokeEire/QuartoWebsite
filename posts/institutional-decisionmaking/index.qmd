@@ -4,6 +4,7 @@ subtitle: "And how behavioural science can help."
 date: "2022-10-03"
 draft: false
 image: "undraw_connected_world_wuay.png"
+bibliography: references.bib
 categories: 
   - policy
   - governance
@@ -13,14 +14,11 @@ editor:
     wrap: sentence
 ---
 
-Improving powerful institutions' decision-making is one of the most important things we can do in the 21st century.
-Global challenges like climate change and AI safety require a huge degree of co-ordination from national and international institutions, and in particular they may need institutions to make decisions which are unpopular in the short term, but necessary in the long term.
-Governments need to reduce emissions and reduce their reliance on fossil fuels, but making such costly decisions in the face of global health and economic crises is not going to be palatable to politicians who wish to be re-elected in the near future.
-AI research labs must ensure that our understanding of AI ethics and safety are sufficient to prevent an AI from developing beyond our control, but this is both less exciting and less profitable.
+Improving the decision-making of powerful institutions may be one of the most consequential endeavors of the 21st century.
+Institutions are vital levers of change for our most pressing challenges from mitigating climate change to ensuring the safe and ethical development of artificial intelligence.
+It is important that these institutions' goals are aligned with better global outcomes and that their decision-making processes are effective in achieving their aims.
 
-Meanwhile, our information systems have become heavily dependent on social media platforms corporations which explicitly do not have responsibility for content posted on their platforms.
-That is not to say they should bear this responsibility, because that would likely lead to overly-conservative censorship of content to avoid litigation.
-But when misinformation is proliferating on platforms, the founder of Facebook is pleading for Congress to step in, and legislators are demonstrating a profound lack of expertise in the technologies at hand, we need to improve the decisions being made in one or both of these institutions.
+# What is institutional decision-making?
 
 Institutional decision-making is vague so it is important to clarify what is meant by *institutions* and *decision-making*.
 I borrow definitions from the [Effective Institutions Project](https://forum.effectivealtruism.org/posts/ttpSEgE3by7AAhQ7w/improving-institutional-decision-making-which-institutions-a#Background) because they do an excellent job balancing comprehensiveness with brevity.
@@ -31,6 +29,8 @@ I borrow definitions from the [Effective Institutions Project](https://forum.eff
 
 So put together, it means we want to understand the processes of a (usually) legal entity for achieving its aims.
 In the case of governments, these aims are usually to provide a safe, economically viable state for its citizens and residents, while corporations are usually required to deliver as much value to shareholders as possible.
+
+# What does it mean to improve institutional decision-making?
 
 Considering what an institution actually *intends* to do is related to the first of two pathways defined by the Effective Institutions Project for improving institutional decision-making.
 It is particularly important that powerful institutions, whose decisions can have broad second- and third-order consequences, are driven to improve global outcomes and factor in the scope of their impact beyond the likely more narrow set of interests that determine their actions.
@@ -43,6 +43,23 @@ For most institutions, the processes in place to achieve their intended outcomes
 
 In the face of challenges as complex and structurally interdependent as climate change and AI safety, we need institutions driven by holistic, altruistically-defined aims, and which are designed to effectively achieve those aims.
 Using research from behavioural science to inoculate and support decision-making from biases and judgement errors could enhance our problem-solving capacity for issues from pandemic response preparedness to political gridlock.
+
+# How will it help?
+
+## Climate Change
+
+Almost all options for mitigating climate change face institutional barriers and the feasibility of these solutions depends on institutions' ability to effectively enact policy.
+To reduce global emissions to a level that prevents 1.5C warming above pre-industrial levels, we need national and international institutions to co-ordinate and act effectively [@shukla2022summary].
+Importantly, national governments should be evaluating how their emissions have compared to the targets set at previous climate talks and identifying why (in the majority of cases) the country did not achieve their climate goals.
+If making such costly decisions in the face of global health and economic crises is not palatable to politicians focused on re-election, perhaps political institutions need to be examined.
+
+AI research labs must ensure that our understanding of AI ethics and safety are sufficient to prevent an AI from developing beyond our control, but this is both less exciting and less profitable.
+
+## Information Systems
+
+Meanwhile, social media platforms have become of our information systems on corporations which explicitly do not have responsibility for content posted on their platforms.
+That is not to say they should bear this responsibility, because that would likely lead to overly-conservative censorship of content to avoid litigation.
+But when misinformation is proliferating on platforms, the founder of Facebook is pleading for Congress to step in, and legislators are demonstrating a profound lack of expertise in the technologies at hand, we need to improve the decisions being made in one or both of these institutions.
 
 ::: callout-warning
 ## Under Construction
