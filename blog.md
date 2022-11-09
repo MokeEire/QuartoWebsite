@@ -3,6 +3,9 @@ title: "Blog"
 listing: 
   contents: posts
   type: grid
-  sort: "date"
-  fields: [image, date, title, author, reading-time]
+  categories: true
+  fields: [image, date, title, categories, author, reading-time]
+  sort: "date desc"
+  sort-ui: [date]
+  image-height: "160px"
 ---

@@ -3,10 +3,10 @@ title: "Hi, I'm Mark."
 subtitle: "Welcome to my personal website"
 listing: 
   contents: posts
-  sort: "date desc"
   type: default
   categories: unnumbered
-  fields: [date, title, image, reading-time]
+  fields: [date, title, categories, image, reading-time]
+  sort: "date desc"
   sort-ui: [date]
   image-height: "160px"
 page-layout: full
