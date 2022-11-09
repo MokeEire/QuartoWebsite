@@ -12,24 +12,35 @@ website:
         text: Home
       - href: about.qmd
         text: About
-      - href: blog.md
-        text: Blog
+      - blog.md
+      - data-visualization.md
     right:
-      - icon: twitter
-        aria-label: twitter
-        href: https://twitter.com/Mmm_JuicyFruit
       - icon: github
         aria-label: github
         href: https://github.com/MokeEire
+      - icon: linkedin
+        aria-label: linkedin
+        href: https://www.linkedin.com/in/markkbarrett/
+      - icon: twitter
+        aria-label: twitter
+        href: https://twitter.com/Mmm_JuicyFruit
+      - icon: bar-chart-steps
+        aria-label: data-viz
+        menu: 
+          - text: "Tableau Public"
+            href: https://public.tableau.com/app/profile/mokeeire
   page-footer: 
     left: "Copyright 2022, Mark Barrett" 
     right:
-      - icon: twitter
-        aria-label: twitter
-        href: https://twitter.com/Mmm_JuicyFruit
       - icon: github
         aria-label: github
         href: https://github.com/MokeEire
+      - icon: linkedin
+        aria-label: linkedin
+        href: https://www.linkedin.com/in/markkbarrett/
+      - icon: twitter
+        aria-label: twitter
+        href: https://twitter.com/Mmm_JuicyFruit
 
 format:
   html:
