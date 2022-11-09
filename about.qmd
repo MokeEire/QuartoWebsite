@@ -8,12 +8,12 @@ about:
     - icon: github
       text: Github
       href: https://github.com/MokeEire
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com/Mmm_JuicyFruit
     - icon: linkedin
       text: LinkedIn
       href: https://www.linkedin.com/in/markkbarrett/
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/Mmm_JuicyFruit
 ---
 
 I am a senior data analyst, with experience developing analytic tools and supporting policy research.
