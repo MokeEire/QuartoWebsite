@@ -11,13 +11,26 @@ about:
     - icon: twitter
       text: Twitter
       href: https://twitter.com/Mmm_JuicyFruit
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/markkbarrett/
 ---
 
-I am an analyst with a passion for behavioural science, public policy, and R. 
-The purpose of this website is to build a data analysis portfolio and write about policy issues that matter to me.
+I am a senior data analyst, with experience developing analytic tools and supporting policy research.
+I am hooked on the idea that thoughtful use of data analytics and behavioural science can improve the everyday decision-making of individuals and institutions.
+While at the RAND Corporation, I developed decision-making analytics tools, streamlined data collection methods, and analyzed survey data for research projects on Truth Decay, criminal justice, and education. 
+The feeling that my work was contributing to the world around me, even through the often diffuse mechanisms of research, was a potent driver and frequently a catalyst of flow.
 
-I am interested in **decision-making**, **governance institutions**, and **information systems**, and particularly where these topics overlap.
+After my time at RAND, I had planned to pursue a Masters in economics in Europe, but as the school year approached I began to feel this was not the right path for me.
+Living in the Los Angeles rental market, I needed to find a job fairly quickly to keep afloat.
+I knew I was good at data analysis and enjoyed programming so I decided to look for a role in data analytics.
+I wanted to combine my analytics skills with my background in behavioural science to make data accessible to decision-makers and improve organizations' decision-making processes.
+Over the past `r round(lubridate::time_length(lubridate::today() - lubridate::ymd("2020-01-31"), unit = "year"))` years I have led projects evaluating data quality, strengthened the decision-making capacity of senior leadership by building powerful interactive dashboards, and enhanced collaboration between analytics and other departments by coordinating analytics working groups.
 
+While I enjoy working on analytics problems, I have not found the same level of fulfilment I found working in policy research.
+I knew wanted to build a high-impact career that contributes to pressing problems in our world, in particular the structures and processes of institutions' decision-making.
+I struggled to put my ambitions into words until I stumbled across [80,000 Hours](https://80000hours.org/).
+Reading through their [key ideas](https://80000hours.org/key-ideas/) and listening to hours of the [80,000 Hours podcast](https://80000hours.org/podcast/) cemented my goal of using my career to make a difference.
 
 ## Education
 
@@ -26,14 +39,13 @@ B.S in Economics & Psychology | Aug. 2012 - May 2016
 
 ## Experience
 
-**RAND Corporation**  
-Research Assistant | Apr. 2016 - Feb. 2020
+**Karl Storz**  
+Sr. Business Analyst | June 2022 - present
 
 **CBRE**  
 Sr. Research Data Analyst | Mar. 2020 - May 2022
 
-**Karl Storz**  
-Sr. Business Analyst | June 2022 - present
-
+**RAND Corporation**  
+Research Assistant | Apr. 2016 - Feb. 2020
 
 
