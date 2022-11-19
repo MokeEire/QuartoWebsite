@@ -17,3 +17,22 @@ div.cell-output-stdout > pre {
 pre code {
   font-size: .75rem;
 }
+/*
+// Try aligning code summary text to the right and styling like a button
+summary {
+  background-color: #18bc9c;
+  color: #ffffff !important;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: block;
+}
+
+details {
+  text-align: -webkit-right;
+}
+
+div.sourceCode {
+  text-align: -webkit-auto;
+}
+*/
