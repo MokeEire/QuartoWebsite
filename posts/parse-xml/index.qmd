@@ -1,6 +1,6 @@
 ---
-title: "Parsing XML with R"
-subtitle: "Untangling data from complex XML structures using `{XML}` and `{xml2}`"
+title: "Untangling XML data with R"
+subtitle: "And parsing it into a tidy format"
 date: "2022-07-14"
 categories: 
   - data
