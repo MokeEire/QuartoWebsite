@@ -275,8 +275,6 @@ glimpse(example_bill_df[["sponsors"]], width = 70)
 ```
 :::
 
-# From XML to Data Frame
-
 How your XML is structured, and how you want to structure your tabular output will determine how you need to process the XML file. In general, this will involve the following steps:
 
 1.  Select the XML nodes you want to include in your dataset.
@@ -295,7 +293,7 @@ If you find yourself doing similar transformations in multiple cases or copy-pas
 A good resource to start learning about writing functions is [How to Write a Function in R](https://www.earthdatascience.org/courses/earth-analytics/automate-science-workflows/write-function-r-programming/).
 :::
 
-## Convert an XML nodeset to a data frame
+# The simple case
 
 When converting XML into a data frame, one of the simplest cases to deal with is a set of nodes which each have a single value. You can think of singular nodes as the contents of a single cell in a data frame. When your data are entirely made up of nodes like this, you can convert XML to a data frame using two functions from `{XML}`:
 
@@ -438,11 +436,11 @@ reactable(bill_df,
             ))
 ```
 
-# Dealing with nested data {#sec-nested-data}
+# The more complicated (and realistic) case {#sec-nested-data}
 
 In congressional XML data, the actions and votes on a bill are stored in containers. To collect this information and keep our dataset at the bill-level, we can transform each container into data frames using the same steps as before and then assign them as a list columns in our `bill_df` data frame.
 
-## Transforming nested data into list columns
+## Parse a single element
 
 Actions are stored in a container node where each `<item>` represents a congressional action taken for a bill, such as being introduced, sent to a committee, debated on the floor, etc. Just as before, we use `as_list()` to convert the `{xml_nodeset}` to a list.
 
@@ -538,6 +536,8 @@ microbenchmark::microbenchmark(
 )
 ```
 
+## Apply it to all elements
+
 Using the `{purrr}` library's `map_dfr()`, we apply my `parse_action()` function to each element of our actions list and combine the results into **d**ata **f**rame **r**ows.
 
 ```{r}
@@ -605,7 +605,7 @@ bill_df$action_counts = list(type_convert(bill_action_counts,
                                           col_types = cols(action = col_character(), count = col_integer())))
 ```
 
-## When they put XML in your XML
+# When they put XML in your XML
 
 So we've dealt with cases with multiple child elements, but XML allows for all sorts of weird and wonderful storage options. The congressional data includes information about votes taken on a bill, the total vote count, and the votes of individual legislators. However, only the high level information is included in the `<recordedVotes>` element. the more detailed information on individual legislators' votes are contained in an XML file referenced by the `<url>` element as you can see below.[^12]
 
