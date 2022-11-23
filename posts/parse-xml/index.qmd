@@ -30,7 +30,7 @@ bill_xml_file = read_xml(bill_xml_url)
 
 ```
 
-Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Markup Language (XML) is a storage format designed to contain any "arbitrary" structure[^1] of data. XML's flexibility is useful for storing information like financial transactions and recipes to webpage content and document formatting[^2]. If you have worked with XML before, you'll know it can be a bit of a pain to transform into a tabular format typically used in data analysis. The good news is you're not alone! This article will help you to load XML files with R, extract what you need from them, and store the results in a analysis-friendly data frame.
+XML, or (e)Xtensible Markup Language, can be a pain to get into a tabular format for analysis. It is designed to contain any "arbitrary" structure[^1] of data which makes it useful for storing things like financial transactions, webpage content and document formatting[^2]. Whenever I've worked with XML in the past, there seemed to be a dearth of resources describing how to actually transform the data into something usable. This post aims to remedy that by describing how to parse an XML file from [GovInfo's congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS).
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
@@ -39,11 +39,9 @@ Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Ma
 ::: {.callout-tip appearance="simple"}
 ## What you'll learn:
 
--   Load and parse XML files in R using the `{XML}` and `{xml2}` packages
-
--   Explore the structure of XML documents
-
--   List, map, and flatten your data into a tabular format using `{purrr}`, and making use of `{tidyr}`'s list columns when necessary
+1.  Load and parse XML files in R using the `{XML}` and `{xml2}` packages
+2.  Explore the structure of XML documents
+3.  Transform your data from XML into a tabular format using `{purrr}`, and make use of `{tidyr}`'s list columns
 :::
 
 ::: {.callout-note collapse="true" appearance="simple"}
@@ -51,7 +49,7 @@ Unlike Excel spreadsheets, CSV files, and other tabular formats, (e)Xtensible Ma
 
 Transforming XML into a tabular format can be tricky depending on the structure. Start by understanding how the data is organized, what you want it to look like, and what level of detail you are looking at. This post uses [GovInfo's congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS) to explore examples of XML structure.
 
-1.  [Navigate XML with R]
+1.  [Navigate XML](#sec-navigate-xml)
 
 > Look through any available documentation, always. When you read in the XML file, `xmlParse()`, `xml_structure()`, and `xml_contents()` are some of the functions that will help you navigate the structure you're dealing with.
 
@@ -59,9 +57,9 @@ Transforming XML into a tabular format can be tricky depending on the structure.
 
 > Consider what you want the output to look like and think about how the data needs to be transformed to match this. Once you understand the existing structure, the data you need, and your desired output structure, it is time to start parsing.
 
-3.  **Parse a single element** (write a function if it gets too complicated)
+3.  [**Parse a single element**] (write a function if it gets too complicated)
 
-> Get one element into the form you want first. Writing functions can help you think through the data transformations being applied and make your code easier to read. You can see an example of this functional approach in @sec-nested-data . Once you're reliably parsing multiple elements and producing a consistent output format, you can scale up.
+> Get one element into the form you want first. Writing functions can help you think through the data transformations being applied and make your code easier to read. You can see an example of this functional approach in [parsing legislative actions](#sec-nested-data). Once you're reliably parsing multiple elements and producing a consistent output format, you can scale up.
 
 4.  **Apply to all elements**
 
@@ -70,7 +68,7 @@ Transforming XML into a tabular format can be tricky depending on the structure.
 
 # What is XML?
 
-At its core, XML is "information wrapped in tags". Think of XML's structure as branches of a tree, with each branch having their own leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp).
+At its core, XML is "information wrapped in tags". You can think of the structure like branches of a tree, with each branch having their own leaves. Below is an example of a bookstore's data in XML format from [w3schools](https://www.w3schools.com/XML/xml_usedfor.asp).
 
 ``` xml
 <bookstore>
@@ -89,7 +87,7 @@ At its core, XML is "information wrapped in tags". Think of XML's structure as b
 </bookstore>
 ```
 
-`<bookstore>` is the parent, or *root* element in the example above. The two `<book>` elements are the bookstore's *children*, each of which has individual data points in *child* elements (e.g. `<title>`) and *attributes* e.g. `<book category="children">` stores the book's category as an attribute.
+`<bookstore>` is the parent, or *root* element here. The two `<book>` elements are the bookstore's *children*, each of which has individual data points in *child* elements (e.g. `<title>`) and *attributes* e.g. `<book category="children">` store books' category.
 
 ::: {.callout-note appearance="simple"}
 ## Note
@@ -99,9 +97,11 @@ Attributes are a useful way to store data related to a specific element for HTML
 
 [^3]: To learn more about what XML is and how to use it, I recommend going through [w3school's XML tutorial](https://www.w3schools.com/XML/default.asp).
 
-# Navigate XML with R {#sec-navigate-xml}
+# Navigate XML {#sec-navigate-xml}
 
-If you've never used R before, this will be a bit of a rough point to start learning. Instead I would recommend checking [RStudio's beginners guide](https://education.rstudio.com/learn/beginner/), so for the remainder of the post I will assume some familiarity with R. Four packages I use throughout this post are listed below. If you don't understand how a function works or want to see the function reference, click on the function in the code and it *should* bring you to the function's help page.
+If you've never used R before, this will be a bit of a rough point to start learning. Instead I would recommend checking [RStudio's beginners guide](https://education.rstudio.com/learn/beginner/), so for the remainder of the post I will assume some familiarity with R.
+
+Four packages I use throughout this post are listed below. If you don't understand how a function works or want to see the function reference, click on the function in the code and it *should* bring you to the function's help page.
 
 -   `{XML}` and `{xml2}` provide functions for reading in and parsing XML[^4]
 
@@ -140,7 +140,7 @@ xml_contents(bill_xml)
 
 ```
 
-We have two top-level nodes - `<bill>` and `<dublinCore>`[^6]. The latter is actually a metadata identifier and doesn't contain bill-related information. We can use `xml_child()` to select only elements inside the `<bill>` node, returning an XML nodeset that looks like this:
+We have two top-level nodes - `<bill>` and `<dublinCore>`[^6]. The latter is actually a metadata identifier and doesn't contain bill-related information. `xml_child()` selects the `<bill>` node which returns an XML nodeset that looks like this:
 
 [^6]: Which is a document metadata identifier, not an Irish metal music genre. While very useful in its own right, it isn't relevant for our task here.
 
@@ -330,7 +330,7 @@ xmlToDataFrame(getNodeSet(bill_xml_parse, "//bill")) %>%
 
 ```
 
-Because the congressional data has elements like `committees`, `actions`, and `sponsors` which contain multiple sub-elements, the contents are combined into single columns. When parsing nested XML like this, it might require multiple steps to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
+Because the congressional data has elements like `committees`, `actions`, and `sponsors` which contain multiple child elements of their own, the contents are combined into single columns. When parsing nested XML like this, it might require multiple steps to get the data into a [tidy data](https://vita.had.co.nz/papers/tidy-data.html) frame.
 
 In this case, the first step is to isolate singular elements like `billNumber` and `billType`, and deal with nested elements individually afterwards.
 
@@ -339,7 +339,7 @@ Singular elements are nodes which meet two criteria:
 1.  the node does not have any child nodes of its own, and
 2.  the node is not an empty string.
 
-We can use `xml_find_all()` to filter an XML document with [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language). The XPATH expression selects the nodes which match the given path or pattern[^10] in a similar way as regular expressions. As the function's help file says, "XPath is like regular expressions for trees".
+`xml_find_all()` finds nodes which match an [XPath](https://www.w3schools.com/xml/xml_parser.asp) (XML Path Language) expression[^10] in a similar way as regular expressions is used to match strings. As the function's help file says, "XPath is like regular expressions for trees".
 
 [^10]: [A very useful table of XPath syntax](https://www.w3schools.com/XML/xpath_syntax.asp){target="_blank"}
 
@@ -395,7 +395,7 @@ singular_nodes = xml_find_all(bill_xml,
   glimpse()
 ```
 
-Now that we have the data we want in a list, we can flatten each element in the list into a **d**ata **f**rame **c**olumn using purrr's `flatten_dfc()`. However, notice the elements in a `singular_list` are not named. If we flatten this list to a data frame, our columns also won't have any column names. We can use `xml_name()` to create a character vector of the nodes' names in combination with `setNames()` to create a named list. Just make sure `singular_list` and `singular_nodes` are the same length and in the same order.
+Now that we have the data we want in a list, we can flatten each element in the list into a **d**ata **f**rame **c**olumn using purrr's `flatten_dfc()`. However, notice the elements in a `singular_list` are not named. If we flatten this list to a data frame, our columns also won't have any column names. `xml_name()` creates a character vector of the nodes' names. When used in combination with `setNames()` we can create a named list. Just make sure `singular_list` and `singular_nodes` are the same length and in the same order.
 
 ```{r}
 #| label: singular-nodes-list-named
