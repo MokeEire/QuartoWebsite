@@ -1,4 +1,4 @@
 - source: project
   netlify:
-    - id: "015f6d14-c864-4d98-8030-f2d4f4026118"
-      url: "https://deft-florentine-57fcaf.netlify.app/"
+    - id: 015f6d14-c864-4d98-8030-f2d4f4026118
+      url: 'https://deft-florentine-57fcaf.netlify.app'

@@ -5,7 +5,6 @@ website:
   title: "Mark Barrett"
   site-url: https://deft-florentine-57fcaf.netlify.app/
   repo-url: https://github.com/MokeEire/QuartoWebsite
-  page-navigation: true
   navbar:
     left:
       - href: index.qmd
