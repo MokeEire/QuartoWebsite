@@ -14,6 +14,18 @@ editor:
     wrap: sentence
 ---
 
+How can we best spend our time and energy in ways that improve the world?
+I have been, and still am, grappling with this question for a while now and I have to say - it's a toughie.
+Working to mitigate (and now adapt to) climate change is a clear front runner to consider, but the levers of power for reducing emissions and switching to clean energy can't really be budged by individual action.
+Another issue that is front of mind is the myriad of increasing inequalities that are being cultivated by the economic and political systems at hand.
+Housing has become a fundamental tool for powerful corporations and home-owning individuals to accrue wealth.
+Tech companies like Airbnb have made this tool more powerful and further entrenched the idea that the purpose of housing was to provide wealth, not shelter.
+When we account for the costs of a system enabling the powerful to extract increasing amounts of money from less powerful individuals, the housing market seems quite inefficient.
+Problems like these are exacerbated by the fact that powerful economic actors (individuals and corporations with lots of money) can use this power to influence powerful political actors (the people who make our laws) to protect or entrench their economic power.
+Why does Intuit , a company that earns money automating tax collection, spend millions of dollars on lobbying?
+Why does the IRS require manual tax collection unlike most developed nations?
+🤷
+
 Improving the decision-making of powerful institutions may be one of the most consequential endeavors of the 21st century.
 Institutions are vital levers of change for our most pressing challenges from mitigating climate change to ensuring the safe and ethical development of artificial intelligence.
 It is important that these institutions' goals are aligned with better global outcomes and that their decision-making processes are effective in achieving their aims.
