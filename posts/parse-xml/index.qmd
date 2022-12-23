@@ -30,7 +30,7 @@ bill_xml_file = read_xml(bill_xml_url)
 
 ```
 
-XML, or (e)Xtensible Markup Language, can be a pain to get into a tabular format for analysis. It is designed to contain any "arbitrary" structure[^1] of data which makes it useful for storing things like financial transactions, webpage content and document formatting[^2]. Whenever I've worked with XML in the past, there seemed to be a dearth of resources describing how to actually transform the data into something usable. This post aims to remedy that by describing how to parse an XML file from [GovInfo's congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS).
+XML, or (e)Xtensible Markup Language, is a versatile data format designed to store any "arbitrary" data structure[^1] but it can be a pain to transform into a typical tabular format. It is used to store things like financial transactions, webpage content and document formatting[^2]. When I've worked with XML in the past, there never seems to be many resources describing how to actually *use* the data. This post aims to remedy that by describing how to parse XML using [GovInfo's congressional bill data](https://www.govinfo.gov/bulkdata/BILLSTATUS) as an example.
 
 [^1]: [Wikipedia](https://en.wikipedia.org/wiki/XML) for the curious. Don't miss the drama about Microsoft's "vociferous protests" as one of the co-editors started working with Netscape.
 
