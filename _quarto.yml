@@ -48,6 +48,7 @@ format:
 
 filters:
   - fold_results.lua
+  - lightbox
 
 execute:
   freeze: auto

@@ -1,0 +1,18 @@
+a.lightbox > img:hover {
+    box-shadow: 2px 3px 8px 1px #2f3e5038;
+    transition: 600ms ease all;
+    transform: translateX(4px) translateY(-4px);
+}
+
+a.lightbox > img.img-fluid {
+  margin-top: 8px;
+  transition: 400ms ease all;
+}
+
+
+div.gslide div.gslide-description,
+div.gslide-description .gslide-title,
+div.gslide-description .gslide-desc {
+    color: var(--quarto-body-color);
+    background-color: var(--quarto-body-bg);
+}
