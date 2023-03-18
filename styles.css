@@ -17,6 +17,11 @@ div.cell-output-stdout > pre {
 pre code {
   font-size: .75rem;
 }
+
+div.quarto-post .thumbnail img {
+    object-fit: none;
+    object-position: 50% 31%;
+}
 /*
 // Try aligning code summary text to the right and styling like a button
 summary {
