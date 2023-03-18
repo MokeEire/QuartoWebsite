@@ -1,6 +1,6 @@
 ---
 title: "Mark Barrett"
-image: me-circle.png
+image: me-canada.jpeg
 about:
   template: trestles
   image-width: 280px
