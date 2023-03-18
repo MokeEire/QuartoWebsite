@@ -2,14 +2,31 @@
 title: "Hi, I'm Mark."
 subtitle: "Welcome to my personal website"
 listing: 
-  contents: posts
-  type: default
-  categories: unnumbered
-  fields: [date, title, categories, image, reading-time]
-  sort: "date desc"
-  sort-ui: [date]
-  image-height: "160px"
+  - id: posts
+    contents: posts
+    type: default
+    categories: unnumbered
+    fields: [date, title, categories, image, reading-time]
+    sort: "date desc"
+    sort-ui: [date]
+    image-height: "160px"
+  - id: dataviz
+    contents: dataviz
+    type: default
+    categories: unnumbered
+    fields: [date, title, categories, image, reading-time]
+    sort: "date desc"
+    sort-ui: [date]
+    image-height: "160px"
 page-layout: full
 title-block-banner: true
 image: me-circle.png
 ---
+
+:::{#posts}
+:::
+
+## Data Visualization
+
+:::{#dataviz}
+:::
