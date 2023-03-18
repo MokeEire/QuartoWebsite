@@ -3,8 +3,9 @@ title: "Marketshare Analysis"
 date: "2022-03-09"
 image: https://public.tableau.com/static/images/Ma/MarketshareAnalysis_16468738927240/MarketsharebyMarketandProductType/4_3.png
 categories: 
-  - Tableau
   - dashboard
+  - Tableau
+  - analytics
 ---
 
 > How are we doing compared to our competitors?

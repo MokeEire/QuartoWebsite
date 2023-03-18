@@ -4,7 +4,8 @@ date: "2019-12-15"
 image: https://public.tableau.com/static/images/Cr/CriminalizingHomelessness/CriminalizingHomelessness/4_3.png
 categories: 
   - Tableau
-  - dashboard
+  - policy
+  - homelessness
 ---
 
 An exploration of LAPD's arrest data, honing in on arrests related to what is known as the "sit-lie-sleep" law, and related charges that implicitly criminalize homelessness.

@@ -2,8 +2,8 @@
 title: "TidyTuesday: Scooby Doo"
 date: "2022-07-21"
 categories: 
-  - Tableau
-  - dashboard
+  - R
+  - TidyTuesday
 lightbox: auto
 ---
 
