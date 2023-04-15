@@ -16,13 +16,15 @@ about:
       href: https://twitter.com/Mmm_JuicyFruit
 ---
 
-I am a senior data analyst with experience developing analytic tools and supporting policy research. I want to build a high-impact career that addresses the pressing problems in our world by improving the decision-making processes and structures of important institutions around the world. 
+I am a senior data analyst with experience developing analytic tools and supporting policy research. 
+I want to build a high-impact career that addresses pressing problems in the world by improving decision-making processes and structures of institutions using evidence-based insights. 
 
-While at the RAND Corporation, I developed decision-making analytics tools, streamlined data collection methods, and analyzed survey data for research projects on Truth Decay, criminal justice, and education.
+While at the RAND Corporation, I developed decision-making analytics tools, streamlined data collection methods, and analyzed survey data for research projects on Truth Decay, criminal justice, and education. I learned the rigour of program evaluations, analytical research, and developed proficiency in numerous data science tools including R, SQL, and Python. 
 
-After my time in policy research, I looked for a role in data analytics to use my experience in behavioural science and technical skills to improve organizations’ decision-making through by making data accessible and understandable. 
+Over the past 3 years I have lead projects mapping and analyzing organizational processes and delivered behaviourally-informed solutions to structural and operational "data problems" that arise throughout the analytics process. 
+I have been using Tableau, SQL, and R to provide effective visualizations, rigorous analysis, and automate tasks like data cleaning,
 
-Over the past 3 years I have led projects evaluating data quality, estimating marketshare, and enhancing collaboration between analytics and other departments. My work has strengthened the decision-making capacity of senior leadership by providing powerful interactive dashboards to inform key decisions across organizations.
+I am looking to bring my policy expertise and data skills to an organization that is aware of its social impact and actively seeks to improve it.
 
 ## Education
 
